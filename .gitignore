@@ -1,0 +1,35 @@
+# ═══════════════════════════════════════════════
+# CryoLab .gitignore — WHITELIST MODE
+# ═══════════════════════════════════════════════
+# PUBLIC REPO: bogie970/cryolab
+# ONLY push: reference papers (PDFs) + status/journal for inter-agent comms
+# EVERYTHING ELSE is prohibited from GitHub.
+#
+# LAW: Never commit secrets (tokens, webhooks, API keys, passwords).
+# If accidentally committed, rotate immediately — it is BURNED.
+
+# Block EVERYTHING by default
+*
+**/
+**/*
+
+# ── ALLOWED: This .gitignore ──
+!.gitignore
+
+# ── ALLOWED: Reference papers ──
+!references/
+!references/**
+!references/NV_Physics/
+!references/NV_Physics/**
+
+# ── ALLOWED: Status/journal for inter-agent comms ──
+!status/
+!status/**
+
+# ── Even within allowed dirs, block secrets ──
+**/*.json
+**/watchdog.json
+**/*secret*
+**/*credential*
+**/*token*
+**/.env

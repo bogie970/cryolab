@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NV Center Physics — Master Reference</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<style>
+  :root {
+    --bg: #1e1e2e; --surface: #181825; --overlay: #313244;
+    --text: #cdd6f4; --subtext: #a6adc8; --blue: #89b4fa;
+    --green: #a6e3a1; --red: #f38ba8; --yellow: #f9e2af;
+    --peach: #fab387; --mauve: #cba6f7; --teal: #94e2d5;
+    --pink: #f5c2e7; --lavender: #b4befe;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.7; max-width: 960px; margin: 0 auto;
+    padding: 2rem 2.5rem 4rem;
+  }
+  h1 { color: var(--blue); font-size: 2.2rem; margin: 0 0 0.3rem; border-bottom: 2px solid var(--overlay); padding-bottom: 0.5rem; }
+  h2 { color: var(--mauve); font-size: 1.5rem; margin: 2.5rem 0 1rem; border-bottom: 1px solid var(--overlay); padding-bottom: 0.3rem; }
+  h3 { color: var(--teal); font-size: 1.15rem; margin: 1.8rem 0 0.6rem; }
+  h4 { color: var(--peach); font-size: 1rem; margin: 1.2rem 0 0.4rem; }
+  p { margin: 0.6rem 0; }
+  .subtitle { color: var(--subtext); font-size: 0.9rem; margin-bottom: 0.2rem; }
+  .citation-note { background: var(--surface); border-left: 3px solid var(--blue); padding: 0.8rem 1.2rem; margin: 1rem 0; border-radius: 0 6px 6px 0; font-size: 0.9rem; color: var(--subtext); }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { background: var(--surface); color: var(--green); padding: 0.15rem 0.4rem; border-radius: 4px; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.9em; }
+  pre { background: var(--surface); border: 1px solid var(--overlay); border-radius: 8px; padding: 1rem 1.2rem; overflow-x: auto; margin: 0.8rem 0; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.85rem; line-height: 1.5; color: var(--text); }
+  .eq-box { background: var(--surface); border: 2px solid var(--mauve); border-radius: 8px; padding: 1rem 1.5rem; margin: 1rem 0; text-align: center; }
+  .eq-box.key { border-color: var(--yellow); background: #1e1e2ecc; }
+  .eq-label { font-size: 0.8rem; color: var(--subtext); text-align: right; margin-top: 0.3rem; }
+  table { border-collapse: collapse; width: 100%; margin: 0.8rem 0; font-size: 0.9rem; }
+  th { background: var(--surface); color: var(--blue); padding: 0.5rem 0.8rem; text-align: left; border-bottom: 2px solid var(--overlay); }
+  td { padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--overlay); }
+  tr:hover td { background: var(--surface); }
+  strong { color: var(--peach); }
+  em { color: var(--subtext); }
+  ul, ol { margin: 0.5rem 0 0.5rem 1.5rem; }
+  li { margin: 0.25rem 0; }
+  .toc { background: var(--surface); border-radius: 8px; padding: 1.2rem 1.5rem; margin: 1.5rem 0; }
+  .toc h3 { margin-top: 0; color: var(--lavender); }
+  .toc ol { margin-left: 1.2rem; }
+  .toc a { color: var(--lavender); }
+  .highlight { background: linear-gradient(135deg, rgba(203,166,247,0.1), rgba(137,180,250,0.1)); border: 1px solid var(--mauve); border-radius: 8px; padding: 1rem 1.2rem; margin: 1rem 0; }
+  .warning { background: rgba(243,139,168,0.1); border-left: 3px solid var(--red); padding: 0.6rem 1rem; margin: 0.8rem 0; border-radius: 0 6px 6px 0; }
+  .ref-entry { margin: 1rem 0; padding: 0.8rem; background: var(--surface); border-radius: 6px; }
+  .ref-entry .ref-title { color: var(--yellow); font-weight: 600; }
+  .ref-entry .ref-detail { color: var(--subtext); font-size: 0.85rem; margin-top: 0.2rem; }
+  hr { border: none; border-top: 1px solid var(--overlay); margin: 2rem 0; }
+  .ascii-art { font-family: 'Cascadia Code', 'Consolas', monospace; white-space: pre; line-height: 1.3; color: var(--green); }
+  @media print {
+    body { background: #fff; color: #222; max-width: 100%; }
+    h1 { color: #333; } h2 { color: #555; } h3 { color: #666; }
+    pre, code, .eq-box, .toc, .ref-entry { background: #f5f5f5; border-color: #ccc; }
+    strong { color: #c00; }
+  }
+</style>
+</head>
+<body>
+
+<h1>NV Center Physics &mdash; Master Reference</h1>
+<p class="subtitle"><strong>CryoLab Technical Document</strong> | Created 2026-03-02 | v1.0</p>
+<p class="subtitle"><strong>Scope:</strong> Ground-state spin physics, ODMR, magnetometry, fitting functions</p>
+<p class="subtitle"><strong>Audience:</strong> Jacob &mdash; for fitting, analysis, and paper writing</p>
+
+<div class="citation-note">
+<strong>Citation note:</strong> All equations and values in this document are sourced from the papers in the
+<code>NV_Physics_References/</code> folder. Inline citations use [Author Year] format; full references with PDF filenames are in &sect;10.
+</div>
+
+<div class="toc">
+<h3>Table of Contents</h3>
+<ol>
+  <li><a href="#s1">Crystal Structure and the NV Defect</a></li>
+  <li><a href="#s2">Electronic Structure</a></li>
+  <li><a href="#s3">Ground-State Spin Hamiltonian</a></li>
+  <li><a href="#s4">Zero-Field Splitting: D and E</a></li>
+  <li><a href="#s5">Zeeman Interaction and Transition Frequencies</a></li>
+  <li><a href="#s6">The Four NV Axes &mdash; Peak Pairing and Geometry</a></li>
+  <li><a href="#s7">ODMR Transition Frequencies &mdash; The Fitting Function</a></li>
+  <li><a href="#s8">Linewidth and FWHM</a></li>
+  <li><a href="#s9">CW-ODMR Sensitivity</a></li>
+  <li><a href="#s10">References</a></li>
+  <li><a href="#appA">Appendix A: Numerical Constants</a></li>
+  <li><a href="#appB">Appendix B: Our Measured Values</a></li>
+</ol>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="s1">1. Crystal Structure and the NV Defect</h2>
+
+<p>Diamond is face-centered cubic (FCC) with a two-atom basis. Each carbon is sp&sup3;-bonded to four nearest neighbors along the tetrahedral &langle;111&rangle; directions. The lattice constant is <em>a</em> = 3.567 &Aring; [Doherty 2013, &sect;2.1].</p>
+
+<p>The nitrogen-vacancy (NV) center is a <strong>point defect</strong>: one carbon atom replaced by nitrogen (N) adjacent to a vacant lattice site (V). The N-V axis lies along one of the four crystallographically equivalent &langle;111&rangle; directions. The defect has <strong>C<sub>3v</sub> symmetry</strong> &mdash; 3-fold rotational symmetry about the N-V axis, plus three mirror planes containing that axis [Maze 2011, &sect;II].</p>
+
+<p>The relevant charge state for magnetometry is <strong>NV<sup>&minus;</sup></strong> (negatively charged), which has 6 electrons: 2 from the vacancy dangling bonds, 2 from the nitrogen, and 1 captured from the lattice. This gives a spin-1 (S=1) ground state [Doherty 2013, &sect;3].</p>
+
+<h3>Why NV<sup>&minus;</sup> and not NV<sup>0</sup>?</h3>
+<p>NV<sup>0</sup> has spin-1/2 and no optically detected magnetic resonance (ODMR) contrast. NV<sup>&minus;</sup> has spin-1 with a spin-dependent fluorescence mechanism that enables ODMR. The charge state can switch under illumination; typical NV experiments ensure stable NV<sup>&minus;</sup> population via appropriate laser power and wavelength (532 nm) [Mittiga 2018].</p>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="s2">2. Electronic Structure</h2>
+
+<p>The NV<sup>&minus;</sup> ground state is a spin triplet: <strong><sup>3</sup>A<sub>2</sub></strong> (orbital singlet, spin S=1). The excited state is also a spin triplet: <strong><sup>3</sup>E</strong> (orbital doublet, spin S=1).</p>
+
+<p>Key energy levels [Doherty 2013, &sect;3; Maze 2011]:</p>
+
+<pre class="ascii-art">
+                     <sup>3</sup>E (excited state)
+                    /    \
+                 m<sub>s</sub>=0    m<sub>s</sub>=&plusmn;1
+                    |         |
+   532 nm excite    |    ISC to singlet
+                    |    (spin-selective)
+                    |         |
+   637-800 nm       |    <sup>1</sup>A<sub>1</sub> &rarr; <sup>1</sup>E
+   fluorescence     |    (non-radiative or 1042 nm IR)
+                    |         |
+                    \    /
+                     <sup>3</sup>A<sub>2</sub> (ground state)
+                    /    \
+                 m<sub>s</sub>=0    m<sub>s</sub>=&plusmn;1    &larr; separated by D &asymp; 2.87 GHz
+</pre>
+
+<h3>The ODMR Mechanism</h3>
+<ol>
+  <li>Green laser (532 nm) excites both m<sub>s</sub> = 0 and m<sub>s</sub> = &plusmn;1 to <sup>3</sup>E</li>
+  <li>m<sub>s</sub> = 0 decays radiatively back to m<sub>s</sub> = 0 ground state (<strong>bright</strong>)</li>
+  <li>m<sub>s</sub> = &plusmn;1 has a competing pathway through the singlet states (intersystem crossing, ISC) that is <strong>non-radiative</strong> (dark)</li>
+  <li>The singlet pathway preferentially decays to m<sub>s</sub> = 0 (spin polarization)</li>
+  <li>Net effect: m<sub>s</sub> = &plusmn;1 fluoresces ~30% less than m<sub>s</sub> = 0</li>
+</ol>
+
+<div class="highlight">
+<strong>Therefore:</strong> when microwaves drive the m<sub>s</sub> = 0 &rarr; m<sub>s</sub> = &plusmn;1 transition, fluorescence <strong>drops</strong>. This is the ODMR dip.
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="s3">3. Ground-State Spin Hamiltonian</h2>
+
+<p>The full ground-state Hamiltonian for NV<sup>&minus;</sup> in an external magnetic field is [Doherty 2013, Eq. 20; Maze 2011, Eq. 1; Rondin 2014, Eq. 1]:</p>
+
+$$\mathcal{H} = \mathcal{H}_\text{ZFS} + \mathcal{H}_\text{Zeeman} + \mathcal{H}_\text{hyperfine} + \mathcal{H}_\text{electric} + \mathcal{H}_\text{strain}$$
+
+<p>For ODMR magnetometry, the dominant terms are:</p>
+
+<div class="eq-box key">
+$$\mathcal{H} = D \, S_z^2 + E \left( S_x^2 - S_y^2 \right) + \gamma_e \, \mathbf{B} \cdot \mathbf{S}$$
+<div class="eq-label">The working Hamiltonian for ensemble CW-ODMR</div>
+</div>
+
+<p>where:</p>
+<ul>
+  <li>$\mathbf{S} = (S_x, S_y, S_z)$ are the spin-1 operators (3&times;3 matrices)</li>
+  <li><strong>z-axis</strong> is along the NV symmetry axis (the N&rarr;V direction)</li>
+  <li>$D$ is the axial zero-field splitting parameter</li>
+  <li>$E$ is the transverse zero-field splitting (strain/electric field)</li>
+  <li>$\gamma_e$ is the NV gyromagnetic ratio = $g_e \mu_B / h$</li>
+  <li>$\mathbf{B} = (B_x, B_y, B_z)$ is the external magnetic field in the NV frame</li>
+</ul>
+
+<h3>Spin-1 Matrices</h3>
+<p>In the $\{|{+1}\rangle, |{0}\rangle, |{-1}\rangle\}$ basis (eigenstates of $S_z$):</p>
+
+$$S_x = \frac{1}{\sqrt{2}} \begin{pmatrix} 0 & 1 & 0 \\ 1 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix} \qquad
+S_y = \frac{1}{\sqrt{2}} \begin{pmatrix} 0 & -i & 0 \\ i & 0 & -i \\ 0 & i & 0 \end{pmatrix} \qquad
+S_z = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & -1 \end{pmatrix}$$
+
+<h3>Full Hamiltonian Matrix (in NV frame)</h3>
+<p>Writing $B_\parallel = B_z$ (along NV axis) and $B_\perp = \sqrt{B_x^2 + B_y^2}$:</p>
+
+$$\mathcal{H} = \begin{pmatrix}
+D + \gamma B_\parallel & \frac{\gamma B_\perp}{\sqrt{2}} & E \\
+\frac{\gamma B_\perp}{\sqrt{2}} & 0 & \frac{\gamma B_\perp}{\sqrt{2}} \\
+E & \frac{\gamma B_\perp}{\sqrt{2}} & D - \gamma B_\parallel
+\end{pmatrix}$$
+
+<p>The off-diagonal $E$ terms couple $|{+1}\rangle$ and $|{-1}\rangle$. The $B_\perp$ terms couple $|{0}\rangle$ to $|{\pm 1}\rangle$. When $E = 0$ and $B_\perp = 0$, the eigenvalues are trivially $D + \gamma B_\parallel$, 0, and $D - \gamma B_\parallel$.</p>
+
+<h3>Full Hamiltonian Including Electric/Strain Fields</h3>
+<p>For completeness, the full ground-state Hamiltonian including Stark and strain interactions is [Doherty 2013, Eq. 20]:</p>
+
+$$\mathcal{H}_\text{GS} = D \left[ S_z^2 - \tfrac{2}{3} \right]
++ \gamma_e \, \mathbf{S} \cdot \mathbf{B}
++ d_\parallel (\mathcal{E}_z + \delta_z) \left[ S_z^2 - \tfrac{2}{3} \right]
++ d_\perp (\mathcal{E}_x + \delta_x)(S_y^2 - S_x^2)
++ d_\perp (\mathcal{E}_y + \delta_y)(S_x S_y + S_y S_x)$$
+
+<p>where $\mathcal{E}$ is the electric field and $\delta$ is the strain field, with coupling constants $d_\parallel = 0.35$ Hz&middot;cm/V and $d_\perp = 17$ Hz&middot;cm/V. In practice, we absorb the strain/electric field effects into effective D and E parameters:</p>
+<ul>
+  <li>$D_\text{eff} = D + d_\parallel (\mathcal{E}_z + \delta_z)$ &larr; axial shift (tiny, negligible)</li>
+  <li>$E_\text{eff} = d_\perp \sqrt{(\mathcal{E}_x + \delta_x)^2 + (\mathcal{E}_y + \delta_y)^2}$ &larr; transverse splitting</li>
+</ul>
+
+<h3>What We Neglect (and Why It's Okay)</h3>
+<table>
+  <tr><th>Term</th><th>Magnitude</th><th>Why negligible</th></tr>
+  <tr><td>Nuclear hyperfine (<sup>14</sup>N)</td><td>$A_\parallel = -2.14$ MHz, $A_\perp = -2.70$ MHz</td><td>Below our linewidth (~10 MHz FWHM). Each $m_s$ level splits into 3 ($I=1$), but unresolved in ensemble ODMR [Felton 2009]</td></tr>
+  <tr><td>Nuclear hyperfine (<sup>13</sup>C)</td><td>~13 MHz (nearest neighbor)</td><td>Natural abundance 1.1%. Contributes to inhomogeneous broadening, not peak positions</td></tr>
+  <tr><td>Electric field</td><td>$d_\parallel = 0.35$ Hz/(V/cm), $d_\perp = 17$ Hz/(V/cm)</td><td>Negligible at lab fields. Strain term is the relevant analog [Doherty 2013]</td></tr>
+  <tr><td>Quadrupole (<sup>14</sup>N)</td><td>$P = -5.01$ MHz</td><td>Only relevant for hyperfine-resolved experiments [Felton 2009]</td></tr>
+</table>
+
+<div class="highlight">
+<strong>For ensemble CW-ODMR magnetometry (our case), the 3-parameter Hamiltonian $\mathcal{H} = D S_z^2 + E(S_x^2 - S_y^2) + \gamma \mathbf{B} \cdot \mathbf{S}$ captures all resolvable physics.</strong>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="s4">4. Zero-Field Splitting: D and E</h2>
+
+<h3>D &mdash; Axial Zero-Field Splitting</h3>
+
+<p><strong>Physical origin:</strong> Spin-spin dipolar interaction between the two unpaired electrons in the <sup>3</sup>A<sub>2</sub> state. The NV axis provides an anisotropic environment: the two electrons' dipolar coupling is different along vs. perpendicular to the N-V axis [Doherty 2013, &sect;3.2].</p>
+
+$$D = \frac{3}{4} \cdot \frac{\mu_0}{4\pi} (g_e \mu_B)^2 \left\langle \frac{1 - 3\cos^2\theta}{r^3} \right\rangle$$
+
+<p>where the average is over the two-electron wavefunction.</p>
+
+<table>
+  <tr><th>Condition</th><th>Value (MHz)</th><th>Source</th></tr>
+  <tr><td>Room temperature</td><td>2870.2 &plusmn; 0.1</td><td>[Acosta 2010]</td></tr>
+  <tr><td>T = 0 K (extrapolated)</td><td>&asymp; 2877.7</td><td>[Cambria 2023]</td></tr>
+  <tr><td><strong>Our measurement at ~12K</strong></td><td><strong>&asymp; 2878</strong></td><td>Center of dips at 10G</td></tr>
+</table>
+
+<h3>Temperature Dependence of D</h3>
+
+<p>D(T) decreases with increasing temperature. Physical origin: ~85% electron-phonon interaction, ~15% thermal lattice expansion [Doherty 2014].</p>
+
+<p>Original measurement [Acosta 2010]:</p>
+<div class="eq-box">
+$$\frac{dD}{dT} = -74.2(7) \text{ kHz/K} \qquad \text{(near room temperature, 280-330K)}$$
+</div>
+
+<h4>Modern best-practice model: Cambria 2023 two-phonon Bose-Einstein</h4>
+
+<div class="eq-box key">
+$$D(T) = D_0 + c_1 \, n_1(T) + c_2 \, n_2(T)$$
+<p style="margin-top:0.5rem;">where $\displaystyle n_i(T) = \frac{1}{e^{\Delta_i / k_B T} - 1}$ is the Bose-Einstein phonon occupation number.</p>
+</div>
+
+<table>
+  <tr><th>Parameter</th><th>Value</th><th>Description</th></tr>
+  <tr><td>$D_0$</td><td>~2877.7 MHz</td><td>Zero-temperature ZFS</td></tr>
+  <tr><td>$c_1$</td><td>-54.91 MHz</td><td>Coupling to phonon mode 1</td></tr>
+  <tr><td>$c_2$</td><td>-249.6 MHz</td><td>Coupling to phonon mode 2</td></tr>
+  <tr><td>$\Delta_1$</td><td>58.73 meV (681 K)</td><td>Energy of phonon mode 1</td></tr>
+  <tr><td>$\Delta_2$</td><td>145.5 meV (1689 K)</td><td>Energy of phonon mode 2</td></tr>
+</table>
+
+<p>This model is valid from 15K to 500K without divergence (unlike polynomial fits). [Cambria 2023, Phys. Rev. B 108, L180102]</p>
+
+<h4>Effective thermal shift rates</h4>
+<table>
+  <tr><th>Temperature</th><th>dD/dT (kHz/K)</th><th>Phonon occupation</th></tr>
+  <tr><td>300 K</td><td>-74</td><td>Both modes active</td></tr>
+  <tr><td>200 K</td><td>-53</td><td>Mode 2 freezing out</td></tr>
+  <tr><td>100 K</td><td>-17</td><td>Only mode 1 contributes</td></tr>
+  <tr><td>50 K</td><td>~-2</td><td>Mode 1 nearly frozen</td></tr>
+  <tr><td style="color:var(--green);font-weight:bold;">12 K (us)</td><td style="color:var(--green);font-weight:bold;">~0 (&lt; 0.1)</td><td style="color:var(--green);">Both modes exponentially frozen</td></tr>
+</table>
+
+<div class="highlight">
+<strong>At 12K:</strong> $n_1(12\text{K}) = 1/[e^{681/12}-1] \sim e^{-57} \approx 0$. Both phonon modes are exponentially frozen out. D is a constant. A 0.1K fluctuation shifts D by &lt; 10 kHz &mdash; far below our 0.1 MHz bin size. <strong>This is why we work at cryo.</strong>
+</div>
+
+<h3>E &mdash; Transverse Zero-Field Splitting (Strain Parameter)</h3>
+
+<p><strong>Physical origin:</strong> Breaks the C<sub>3v</sub> symmetry. Any perturbation that distinguishes $x$ from $y$ in the plane perpendicular to the NV axis:</p>
+<ul>
+  <li>Crystal strain (most common in bulk diamond)</li>
+  <li>Local electric fields (from nearby charges)</li>
+  <li>Surface proximity (for shallow NVs)</li>
+</ul>
+
+<p>E lifts the degeneracy of $m_s = +1$ and $m_s = -1$ at zero field.</p>
+
+<table>
+  <tr><th>Diamond type</th><th>Typical E</th></tr>
+  <tr><td>High-quality CVD</td><td>&lt; 1 MHz</td></tr>
+  <tr><td>Natural diamond</td><td>~1-10 MHz</td></tr>
+  <tr><td>Nanodiamonds</td><td>~5-20 MHz</td></tr>
+</table>
+
+<p><strong>Effect on ODMR:</strong></p>
+<ul>
+  <li>At zero field: two dips at $D + E$ and $D - E$ (splitting = $2E$)</li>
+  <li>At finite field ($\gamma B_\parallel \gg E$): enters as $\sqrt{(\gamma B_\parallel)^2 + E^2}$ &mdash; small correction</li>
+</ul>
+
+<p><strong>How to measure E:</strong> Zero-field ODMR. Two dips separated by $2E$. Mean gives $D$. If $E$ &lt; linewidth, two dips merge.</p>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="s5">5. Zeeman Interaction and Transition Frequencies</h2>
+
+<h3>Decomposition of B in the NV frame</h3>
+<p>For a single NV orientation with axis $\hat{n}$:</p>
+
+$$B_\parallel = \mathbf{B} \cdot \hat{n} \qquad B_\perp = \sqrt{|\mathbf{B}|^2 - B_\parallel^2}$$
+
+<h3>Eigenvalues of the Ground-State Hamiltonian</h3>
+
+<p>The 3&times;3 Hamiltonian matrix has three eigenvalues. The two ODMR-active transitions are $m_s = 0 \to \pm 1$.</p>
+
+<p><strong>Exact transition frequencies</strong> (for $E = 0$) [Rondin 2014, Eq. 3]:</p>
+
+$$f_\pm = D + \frac{(\gamma B_\perp)^2}{2D} \pm \gamma B_\parallel \sqrt{1 + \frac{(\gamma B_\perp)^2}{D^2 - (\gamma B_\parallel)^2}}$$
+
+<p><strong>Exact inverse formulas</strong> [Rondin 2014] &mdash; Given measured $f_u$ and $f_l$:</p>
+
+$$|B| = \frac{1}{\sqrt{3} \, \gamma} \sqrt{f_u^2 + f_l^2 - f_u f_l - D^2}$$
+
+$$\cos^2\theta = \frac{-(f_u + f_l)^3 + 3f_u^3 + 3f_l^3}{27 D (\gamma B)^2} + \frac{2D^2}{27(\gamma B)^2} + \frac{1}{3}$$
+
+<h3>Perturbative Result ($\gamma |B| \ll D$)</h3>
+<p>Always true for us: $\gamma \cdot 30\text{G} = 84$ MHz $\ll 2878$ MHz.</p>
+
+<div class="eq-box key">
+$$\boxed{f_{\pm} = D + \frac{\gamma^2 B_\perp^2}{2D} \pm \sqrt{(\gamma B_\parallel)^2 + E^2}}$$
+<div class="eq-label">THE KEY FITTING EQUATION [Doherty 2013, Eq. 22; Rondin 2014, &sect;II.B]</div>
+</div>
+
+<table>
+  <tr><th>Term</th><th>Physical meaning</th></tr>
+  <tr><td>$D$</td><td>Zero-field splitting (axial). Shifts both transitions equally up.</td></tr>
+  <tr><td>$\gamma^2 B_\perp^2 / (2D)$</td><td>Second-order perpendicular Zeeman. Small upward shift of both transitions. Symmetric.</td></tr>
+  <tr><td>$\gamma B_\parallel$</td><td>First-order parallel Zeeman. Splits the two transitions linearly.</td></tr>
+  <tr><td>$E$</td><td>Strain. Adds in quadrature with the parallel Zeeman. Important only when $\gamma B_\parallel \sim E$.</td></tr>
+</table>
+
+<h4>Limiting cases</h4>
+<table>
+  <tr><th>Regime</th><th>Expression</th><th>Splitting</th></tr>
+  <tr><td>Low field ($\gamma B_\parallel \gg E$)</td><td>$f_\pm \approx D \pm \gamma B_\parallel$</td><td>$2\gamma B_\parallel$ (linear Zeeman)</td></tr>
+  <tr><td>Zero field ($B = 0$)</td><td>$f_\pm = D \pm E$</td><td>$2E$</td></tr>
+  <tr><td>General (per axis $i$)</td><td>$f_{\pm,i} = D + \frac{\gamma^2 B_{\perp,i}^2}{2D} \pm \sqrt{(\gamma B_{\parallel,i})^2 + E^2}$</td><td>$2\sqrt{(\gamma B_{\parallel,i})^2 + E^2}$</td></tr>
+</table>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="s6">6. The Four NV Axes &mdash; Peak Pairing and Geometry</h2>
+
+<h3>The Four Orientations</h3>
+<p>In the diamond lattice, there are exactly four distinct &langle;111&rangle; directions [Doherty 2013, &sect;2.1]:</p>
+
+$$\hat{n}_1 = \frac{1}{\sqrt{3}}(+1,+1,+1) \qquad \hat{n}_2 = \frac{1}{\sqrt{3}}(+1,-1,-1)$$
+$$\hat{n}_3 = \frac{1}{\sqrt{3}}(-1,+1,-1) \qquad \hat{n}_4 = \frac{1}{\sqrt{3}}(-1,-1,+1)$$
+
+<p>These are the four body diagonals of a cube. Each pair subtends the tetrahedral angle: $\arccos(-1/3) \approx 109.47°$.</p>
+
+<h3>Projections onto B-field</h3>
+<p>Given $\mathbf{B} = |B|(\sin\theta\cos\phi, \sin\theta\sin\phi, \cos\theta)$ in the crystal frame:</p>
+
+$$B_{\parallel,i} = |\mathbf{B} \cdot \hat{n}_i| \qquad B_{\perp,i} = \sqrt{|B|^2 - B_{\parallel,i}^2}$$
+
+<p><strong>Key property:</strong> The four projections are constrained &mdash; they are NOT independent. Given $|B|$, $\theta$, and $\phi$, all four projections are determined.</p>
+
+<h3>ODMR Spectrum: How Many Peaks?</h3>
+<p>Each NV axis $i$ gives two transitions: $f_{+,i}$ and $f_{-,i}$. Four axes &rarr; up to <strong>8 peaks</strong> total (4 pairs).</p>
+
+<table>
+  <tr><th>B direction</th><th>Distinct projections</th><th>Visible dips</th></tr>
+  <tr><td>$\mathbf{B} \parallel \langle100\rangle$</td><td>1 (all equal)</td><td>2 (all degenerate)</td></tr>
+  <tr><td>$\mathbf{B} \parallel \langle110\rangle$</td><td>2</td><td>4 (2 degenerate pairs)</td></tr>
+  <tr><td>$\mathbf{B} \parallel \langle111\rangle$</td><td>2 (1 aligned + 3 equivalent)</td><td>4</td></tr>
+  <tr><td>General direction</td><td>4 (all different)</td><td>8</td></tr>
+</table>
+
+<h3>Peak Pairing Rules</h3>
+<p>Peaks come in pairs $(f_{+,i}, f_{-,i})$ symmetric about:</p>
+
+$$\text{center}_i = D + \frac{\gamma^2 B_{\perp,i}^2}{2D} \approx D \qquad \text{splitting}_i = 2\sqrt{(\gamma B_{\parallel,i})^2 + E^2}$$
+
+<ol>
+  <li>Each pair is approximately symmetric about $D$</li>
+  <li>Pairs with larger splitting have their $f_-$ dip lower and $f_+$ dip higher</li>
+  <li>Pair centers shift slightly upward with increasing $B_\perp$ (second-order)</li>
+  <li>Sum rule: average of all 8 dip frequencies $\approx D$ (to first order)</li>
+</ol>
+
+<h3>When Do All 8 Peaks Resolve?</h3>
+<p>Condition: minimum inter-dip gap between adjacent peaks from different NV axes must exceed the FWHM.</p>
+
+<table>
+  <tr><th>Field</th><th>Visible peaks</th><th>Notes</th></tr>
+  <tr><td>10 G</td><td>~2</td><td>Only outermost pair (n<sub>4</sub>) partially resolved from cluster</td></tr>
+  <tr><td>20 G</td><td>~4-6</td><td>Partially overlapping features</td></tr>
+  <tr><td style="color:var(--green);font-weight:bold;">30 G</td><td style="color:var(--green);font-weight:bold;">8 (all resolved)</td><td style="color:var(--green);">Min gap &asymp; 10 MHz &asymp; FWHM</td></tr>
+  <tr><td>35+ G</td><td>8</td><td>Well-resolved with comfortable gaps</td></tr>
+</table>
+
+<div class="highlight">
+<strong>This is why we scan to high field:</strong> resolving all 8 peaks uniquely determines the B-field vector direction ($\theta$, $\phi$) in the crystal frame.
+</div>
+
+<h3>Vector Reconstruction from 4 Splittings</h3>
+<p>Given measured splittings $S_i = f_{+,i} - f_{-,i}$ for each NV axis:</p>
+
+$$B_{\parallel,i} = \frac{\sqrt{S_i^2/4 - E^2}}{\gamma}$$
+
+<p>Define signed projections $p_i = s_i \cdot B_{\parallel,i}$ where $s_i = \pm 1$:</p>
+
+<div class="eq-box">
+$$B_x = \frac{\sqrt{3}}{4}(p_1 + p_2 - p_3 - p_4) \qquad B_y = \frac{\sqrt{3}}{4}(p_1 - p_2 + p_3 - p_4) \qquad B_z = \frac{\sqrt{3}}{4}(p_1 - p_2 - p_3 + p_4)$$
+</div>
+
+<p>2-fold sign ambiguity ($\mathbf{B}$ and $-\mathbf{B}$) resolved by known magnet geometry.</p>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="s7">7. ODMR Transition Frequencies &mdash; The Fitting Function</h2>
+
+<h3>Complete Model for Ensemble ODMR</h3>
+<p>The observed spectrum is the sum of dips from all NV axes:</p>
+
+<div class="eq-box key">
+$$P(f) = P_0 \left[ 1 - \sum_{i=1}^{4} \sum_{s=\pm} C_{s,i} \cdot L(f,\; f_{s,i},\; w_i) \right]$$
+<div class="eq-label">where $f_{\pm,i} = D + \frac{\gamma^2 B_{\perp,i}^2}{2D} \pm \sqrt{(\gamma B_{\parallel,i})^2 + E^2}$</div>
+</div>
+
+<ul>
+  <li>$P_0$ = baseline (off-resonance) power</li>
+  <li>$C_{s,i}$ = contrast of transition $s$ on axis $i$ (typically 1-10%)</li>
+  <li>$L(f, f_0, w)$ = lineshape function (Lorentzian, Gaussian, or Voigt)</li>
+  <li>$B_{\parallel,i} = \mathbf{B} \cdot \hat{n}_i$, &ensp; $B_{\perp,i} = \sqrt{|B|^2 - B_{\parallel,i}^2}$</li>
+</ul>
+
+<h3>Global Fit Parameters</h3>
+
+<h4>Physical parameters (5):</h4>
+<table>
+  <tr><th>Parameter</th><th>Symbol</th><th>Expected range</th><th>Determined by</th></tr>
+  <tr><td>Axial ZFS</td><td>$D$</td><td>2877-2879 MHz</td><td>Zero-field ODMR</td></tr>
+  <tr><td>Transverse ZFS</td><td>$E$</td><td>0-10 MHz</td><td>Zero-field ODMR</td></tr>
+  <tr><td>Field magnitude</td><td>$|B|$</td><td>0-37 G</td><td>Splitting vs field</td></tr>
+  <tr><td>Polar angle</td><td>$\theta_B$</td><td>0-180&deg;</td><td>High-field 8-peak pattern</td></tr>
+  <tr><td>Azimuthal angle</td><td>$\phi_B$</td><td>0-360&deg;</td><td>High-field 8-peak pattern</td></tr>
+</table>
+
+<h4>Lineshape parameters (per axis, often assumed equal):</h4>
+<table>
+  <tr><th>Parameter</th><th>Symbol</th><th>Expected range</th></tr>
+  <tr><td>FWHM</td><td>$w_i$</td><td>5-15 MHz (ensemble)</td></tr>
+  <tr><td>Contrast</td><td>$C_i$</td><td>1-10%</td></tr>
+</table>
+
+<h3>Fitting Strategy (for this campaign)</h3>
+
+<p><strong>Step 1: Zero-field measurement</strong> (Saturday)</p>
+<ul>
+  <li>Observe 2 dips at $D \pm E$</li>
+  <li>$D = (f_+ + f_-)/2$, &ensp; $E = (f_+ - f_-)/2$</li>
+</ul>
+
+<p><strong>Step 2: High-field measurement</strong> (30G+ data)</p>
+<ul>
+  <li>All 8 dips resolved. D, E fixed from Step 1.</li>
+  <li>Fit $\theta_B$ and $\phi_B$ to match 4 splitting patterns (over-determined: 4 splittings, 2 unknowns)</li>
+</ul>
+
+<p><strong>Step 3: Intermediate fields</strong> (10-28G data)</p>
+<ul>
+  <li>D, E, $\theta_B$, $\phi_B$ all known &mdash; verify Zeeman linearity</li>
+  <li>Fit per-axis linewidths and contrasts</li>
+  <li>Deviations &rarr; higher-order effects or field inhomogeneity</li>
+</ul>
+
+<p><strong>Step 4: Sensitivity characterization</strong></p>
+<ul>
+  <li>$\delta B = \sigma_\text{noise} / (dP/df \cdot df/dB)$ at operating field</li>
+  <li>$df/dB = \gamma$ for the parallel projection of the most-aligned axis</li>
+</ul>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="s8">8. Linewidth and FWHM</h2>
+
+<p>The observed ODMR linewidth has multiple contributions [Barry 2020, &sect;III]:</p>
+
+<h3>Intrinsic Broadening Mechanisms</h3>
+
+<h4>1. Inhomogeneous broadening (dominant in ensemble)</h4>
+<p>Different NV centers see slightly different local environments (strain, <sup>13</sup>C, charge). Gaussian contribution. Typical: 1-10 MHz for natural <sup>13</sup>C abundance (1.1%). Reduced to ~0.1 MHz in isotopically enriched <sup>12</sup>C (single NV).</p>
+
+<h4>2. <sup>14</sup>N Hyperfine</h4>
+<p>Each NV has <sup>14</sup>N (I=1). Splits each $m_s$ transition into 3 lines separated by $A_\parallel \approx 2.14$ MHz. Unresolved in ensemble with FWHM &gt; 5 MHz. Contributes ~4.3 MHz apparent broadening.</p>
+
+<h4>3. <sup>13</sup>C Hyperfine</h4>
+<p>Natural abundance <sup>13</sup>C nuclei. Nearest neighbor: ~13 MHz splitting. Ensemble: statistical distribution &rarr; Gaussian broadening ~1-3 MHz.</p>
+
+<h4>4. Power broadening</h4>
+<p>$\text{FWHM}_\text{power} = \sqrt{\text{FWHM}_0^2 + \Omega^2}$ where $\Omega$ is Rabi frequency. At +5 dBm: may contribute a few MHz. Trade-off with contrast.</p>
+
+<h4>5. Homogeneous broadening (T<sub>2</sub>-related)</h4>
+<p>Intrinsic $T_2$ ~ 1 ms in bulk &rarr; $1/(\pi T_2) \approx 0.3$ kHz &mdash; negligible. $T_2^*$ (ensemble): ~1-10 &mu;s &rarr; ~30-300 kHz &mdash; still small vs. inhomogeneous.</p>
+
+<h3>Lineshape Model</h3>
+<ul>
+  <li><strong>Best model: Voigt profile</strong> (Lorentzian &otimes; Gaussian). Lorentzian: power broadening. Gaussian: strain, <sup>13</sup>C, <sup>14</sup>N.</li>
+  <li>Single Lorentzian: acceptable for most ensemble ODMR</li>
+  <li>Single Gaussian: sometimes better for strain-dominated broadening</li>
+  <li><strong>Our data:</strong> start Lorentzian, try Gaussian, Voigt if wings don't fit</li>
+</ul>
+
+<div class="highlight">
+<strong>Our observed FWHM &asymp; 10 MHz</strong> (from 10G filtered grand average). Consistent with ensemble NV in mm-scale diamond with natural <sup>13</sup>C and moderate strain. Should NOT change significantly with applied field.
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="s9">9. CW-ODMR Sensitivity</h2>
+
+<h3>Shot-Noise Limited Sensitivity [Barry 2020, Eq. 17]</h3>
+
+<div class="eq-box key">
+$$\eta_\text{CW} = \frac{\mathcal{P}}{\gamma_e} \cdot \frac{\Delta\nu}{C \sqrt{R}} \qquad [\text{T}/\sqrt{\text{Hz}}]$$
+<p style="margin-top:0.5rem;">where $\mathcal{P} = \dfrac{4}{3\sqrt{3}} \approx 0.770$ (Lorentzian lineshape prefactor)</p>
+</div>
+
+<table>
+  <tr><th>Symbol</th><th>Definition</th></tr>
+  <tr><td>$\Delta\nu$</td><td>FWHM of the ODMR dip</td></tr>
+  <tr><td>$C$</td><td>ODMR contrast (e.g. 0.05 for 5%)</td></tr>
+  <tr><td>$R$</td><td>Photon detection rate (photons/s)</td></tr>
+  <tr><td>$\gamma_e$</td><td>28.024 GHz/T</td></tr>
+</table>
+
+<p>Sensitivity improves with: narrower linewidth, higher contrast, more photons ($\propto 1/\sqrt{R}$).</p>
+
+<h3>Comparison of Magnetometry Protocols</h3>
+<table>
+  <tr><th>Protocol</th><th>Coherence limit</th><th>Bandwidth</th><th>Typical sensitivity</th></tr>
+  <tr><td>CW-ODMR</td><td>~1/linewidth</td><td>DC (broadband)</td><td>~nT/$\sqrt{\text{Hz}}$</td></tr>
+  <tr><td>Ramsey (DC)</td><td>$T_2^*$</td><td>DC (broadband)</td><td>~460 fT/$\sqrt{\text{Hz}}$</td></tr>
+  <tr><td>Hahn Echo (AC)</td><td>$T_2$</td><td>Narrowband</td><td>~210 fT/$\sqrt{\text{Hz}}$</td></tr>
+  <tr><td>CPMG/XY8 (AC)</td><td>$T_2$ (extended)</td><td>Tunable kHz-MHz</td><td>Best narrowband</td></tr>
+</table>
+
+<p><strong>Key distinction:</strong> DC sensitivity limited by $T_2^*$; AC by $T_2$. Since $T_2 \gg T_2^*$, pulsed AC protocols achieve much better sensitivity. CW-ODMR (our method) is simplest, broadband DC.</p>
+
+<h3>Slope-Based Sensitivity (our experimental observable)</h3>
+
+<div class="eq-box">
+$$\eta = \frac{\sigma_\text{noise}}{\max|dP/df|} \qquad [\text{T}/\sqrt{\text{Hz}}]$$
+<div class="eq-label">Directly measured from data without needing photon rates</div>
+</div>
+
+<p>From our analysis script:</p>
+<pre>
+delta_f = wing_noise / max_slope      (frequency noise floor, MHz)
+delta_B = delta_f / gamma_NV          (field noise floor, Gauss)
+</pre>
+
+<h3>Bin-Limited Regime</h3>
+<p>When noise floor drops below frequency resolution:</p>
+
+$$\text{bin\_effect} = \max\left|\frac{dP}{df}\right| \times \text{bin\_size}$$
+
+<div class="highlight">
+If $\sigma_\text{noise} &lt; \text{bin\_effect}$, we are <strong>bin-limited</strong>: precision is limited by 0.1 MHz frequency step, not noise. <strong>This is always our target.</strong>
+</div>
+
+<h3>Sensitivity Scaling</h3>
+$$\eta(N) = \frac{\eta(1)}{\sqrt{N}} \qquad \text{(white noise regime)}$$
+<p>Until drift onset (typically $N \approx 15$-30 pairs), after which $\eta$ plateaus.</p>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="s10">10. References</h2>
+<p>All PDFs are in <code>analysis/NV_Physics_References/</code>.</p>
+
+<div class="ref-entry">
+  <div class="ref-title">[Doherty 2013]</div>
+  M. W. Doherty <em>et al.</em>, &ldquo;The nitrogen-vacancy colour centre in diamond,&rdquo; <em>Physics Reports</em> <strong>528</strong>, 1-45 (2013). arXiv: 1302.3288<br>
+  <div class="ref-detail">PDF: <code>Doherty_2013_NV_Centre_Review_PhysRep.pdf</code> &bull; Used for &sect;1-5. Comprehensive review.</div>
+</div>
+
+<div class="ref-entry">
+  <div class="ref-title">[Maze 2011]</div>
+  J. R. Maze <em>et al.</em>, &ldquo;Properties of nitrogen-vacancy centers in diamond: the group theoretic approach,&rdquo; <em>New J. Phys.</em> <strong>13</strong>, 025025 (2011). arXiv: 1010.1338<br>
+  <div class="ref-detail">PDF: <code>Maze_2011_NV_Properties_Group_Theory.pdf</code> &bull; Used for &sect;3. Group-theoretic Hamiltonian derivation.</div>
+</div>
+
+<div class="ref-entry">
+  <div class="ref-title">[Barry 2020]</div>
+  J. F. Barry <em>et al.</em>, &ldquo;Sensitivity optimization for NV-diamond magnetometry,&rdquo; <em>Rev. Mod. Phys.</em> <strong>92</strong>, 015004 (2020). arXiv: 1903.08176<br>
+  <div class="ref-detail">PDF: <code>Barry_2020_NV_Magnetometry_Sensitivity_RevModPhys.pdf</code> &bull; Used for &sect;8-9. Definitive sensitivity treatment.</div>
+</div>
+
+<div class="ref-entry">
+  <div class="ref-title">[Rondin 2014]</div>
+  L. Rondin <em>et al.</em>, &ldquo;Magnetometry with nitrogen-vacancy defects in diamond,&rdquo; <em>Rep. Prog. Phys.</em> <strong>77</strong>, 056503 (2014). arXiv: 1311.5214<br>
+  <div class="ref-detail">PDF: <code>Rondin_2014_NV_Magnetometry_Review.pdf</code> &bull; Used for &sect;5-6. Zeeman splitting, angular dependence.</div>
+</div>
+
+<div class="ref-entry">
+  <div class="ref-title">[Doherty 2012]</div>
+  M. W. Doherty <em>et al.</em>, &ldquo;Theory of the ground-state spin of the NV<sup>&minus;</sup> center in diamond,&rdquo; <em>Phys. Rev. B</em> <strong>85</strong>, 205203 (2012). arXiv: 1108.5546<br>
+  <div class="ref-detail">PDF: <code>Doherty_2012_Ground_State_Spin_Theory.pdf</code> &bull; Used for &sect;3-4. Spin-spin interaction origin of D.</div>
+</div>
+
+<div class="ref-entry">
+  <div class="ref-title">[Acosta 2010]</div>
+  V. M. Acosta <em>et al.</em>, &ldquo;Temperature dependence of the nitrogen-vacancy magnetic resonance in diamond,&rdquo; <em>PRL</em> <strong>104</strong>, 070801 (2010). arXiv: 1007.0011<br>
+  <div class="ref-detail">PDF: <code>Acosta_2010_Temperature_Dependence_ZFS.pdf</code> &bull; Used for &sect;4. D(T) temperature dependence.</div>
+</div>
+
+<div class="ref-entry">
+  <div class="ref-title">[Felton 2009]</div>
+  S. Felton <em>et al.</em>, &ldquo;Hyperfine interaction in the ground state of the negatively charged nitrogen vacancy center in diamond,&rdquo; <em>Phys. Rev. B</em> <strong>79</strong>, 075203 (2009). arXiv: 0807.0768<br>
+  <div class="ref-detail">PDF: <code>Felton_2009_Hyperfine_Interaction_NV.pdf</code> &bull; Used for &sect;3, &sect;8. Hyperfine constants.</div>
+</div>
+
+<div class="ref-entry">
+  <div class="ref-title">[Mittiga 2018]</div>
+  T. Mittiga <em>et al.</em>, &ldquo;Imaging the local charge environment of nitrogen-vacancy centers in diamond,&rdquo; <em>PRL</em> <strong>121</strong>, 246402 (2018). arXiv: 1809.01548<br>
+  <div class="ref-detail">PDF: <code>Mittiga_2018_Local_Charge_Environment_NV.pdf</code> &bull; Used for &sect;1. Charge state stability.</div>
+</div>
+
+<div class="ref-entry">
+  <div class="ref-title">[Clevenson 2015]</div>
+  H. Clevenson <em>et al.</em>, &ldquo;Broadband magnetometry and temperature sensing with a light-trapping diamond waveguide,&rdquo; <em>Nature Physics</em> <strong>11</strong>, 393-397 (2015). arXiv: 1406.3248<br>
+  <div class="ref-detail">PDF: <code>Clevenson_2015_Broadband_Magnetometry_Diamond_Waveguide.pdf</code> &bull; Used for &sect;9. Ensemble magnetometry.</div>
+</div>
+
+<div class="ref-entry">
+  <div class="ref-title">[Gruber 1997]</div>
+  A. Gruber <em>et al.</em>, &ldquo;Scanning confocal optical microscopy and magnetic resonance on single defect centers,&rdquo; <em>Science</em> <strong>276</strong>, 2012-2014 (1997). DOI: 10.1126/science.276.5321.2012<br>
+  <div class="ref-detail">PDF: Not available (behind paywall). &bull; Historical &mdash; first single-NV ODMR.</div>
+</div>
+
+<div class="ref-entry">
+  <div class="ref-title">[Cambria 2023]</div>
+  M. C. Cambria <em>et al.</em>, &ldquo;Physically motivated analytical expression for the temperature dependence of the zero-field splitting of the NV center in diamond,&rdquo; <em>Phys. Rev. B</em> <strong>108</strong>, L180102 (2023). arXiv: 2306.05318<br>
+  <div class="ref-detail">PDF: Not downloaded &mdash; available on arXiv. &bull; Used for &sect;4. Two-phonon D(T) model.</div>
+</div>
+
+<div class="ref-entry">
+  <div class="ref-title">[Doherty 2014]</div>
+  M. W. Doherty <em>et al.</em>, &ldquo;Temperature shifts of the resonances of the NV<sup>&minus;</sup> center in diamond,&rdquo; <em>Phys. Rev. B</em> <strong>90</strong>, 041201(R) (2014). arXiv: 1310.7303<br>
+  <div class="ref-detail">PDF: Not downloaded &mdash; available on arXiv. &bull; Used for &sect;4. Thermal expansion vs electron-phonon.</div>
+</div>
+
+<div class="ref-entry">
+  <div class="ref-title">[Chen 2011]</div>
+  X.-D. Chen <em>et al.</em>, &ldquo;Temperature dependent energy level shifts of nitrogen-vacancy centers in diamond,&rdquo; <em>APL</em> <strong>99</strong>, 161903 (2011).<br>
+  <div class="ref-detail">PDF: Not downloaded. &bull; Used for &sect;4. D(T) polynomial fit 5.6-295K.</div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="appA">Appendix A: Numerical Constants</h2>
+
+<table>
+  <tr><th>Constant</th><th>Symbol</th><th>Value</th><th>Unit</th></tr>
+  <tr><td>Electron g-factor</td><td>$g_e$</td><td>2.0028</td><td>dimensionless</td></tr>
+  <tr><td>Bohr magneton</td><td>$\mu_B$</td><td>9.2741 &times; 10<sup>&minus;24</sup></td><td>J/T</td></tr>
+  <tr><td>NV gyromagnetic ratio</td><td>$\gamma_\text{NV}$</td><td>2.8024</td><td>MHz/G</td></tr>
+  <tr><td>(same in SI)</td><td>$\gamma_\text{NV}$</td><td>28.024</td><td>GHz/T</td></tr>
+  <tr><td>Zero-field splitting (RT)</td><td>$D_\text{RT}$</td><td>2870.2</td><td>MHz</td></tr>
+  <tr><td>Zero-field splitting (cryo)</td><td>$D_\text{cryo}$</td><td>~2878</td><td>MHz</td></tr>
+  <tr><td><sup>14</sup>N hyperfine $A_\parallel$</td><td>$A_\parallel$</td><td>&minus;2.14</td><td>MHz</td></tr>
+  <tr><td><sup>14</sup>N hyperfine $A_\perp$</td><td>$A_\perp$</td><td>&minus;2.70</td><td>MHz</td></tr>
+  <tr><td><sup>14</sup>N quadrupole</td><td>$P$</td><td>&minus;5.01</td><td>MHz</td></tr>
+  <tr><td>Planck constant</td><td>$h$</td><td>6.6261 &times; 10<sup>&minus;34</sup></td><td>J&middot;s</td></tr>
+  <tr><td>Diamond lattice constant</td><td>$a$</td><td>3.567</td><td>&Aring;</td></tr>
+  <tr><td>Tetrahedral angle</td><td>&mdash;</td><td>109.47</td><td>degrees</td></tr>
+  <tr><td>GSLAC field</td><td>$B_\text{GSLAC}$</td><td>~1024</td><td>Gauss</td></tr>
+</table>
+
+<h3>NV Axis Vectors (Crystal Frame)</h3>
+<table>
+  <tr><th>Axis</th><th>Direction</th><th>Decimal</th></tr>
+  <tr><td>$\hat{n}_1$</td><td>$[+1,+1,+1]/\sqrt{3}$</td><td>[0.5774, 0.5774, 0.5774]</td></tr>
+  <tr><td>$\hat{n}_2$</td><td>$[+1,-1,-1]/\sqrt{3}$</td><td>[0.5774, &minus;0.5774, &minus;0.5774]</td></tr>
+  <tr><td>$\hat{n}_3$</td><td>$[-1,+1,-1]/\sqrt{3}$</td><td>[&minus;0.5774, 0.5774, &minus;0.5774]</td></tr>
+  <tr><td>$\hat{n}_4$</td><td>$[-1,-1,+1]/\sqrt{3}$</td><td>[&minus;0.5774, &minus;0.5774, 0.5774]</td></tr>
+</table>
+
+<p>Dot products: $\hat{n}_i \cdot \hat{n}_j = -1/3$ for $i \neq j$. Angle: $\arccos(-1/3) = 109.47°$.</p>
+
+<hr>
+
+<!-- ============================================================ -->
+<h2 id="appB">Appendix B: Our Measured Values</h2>
+<p>From the Calibrated NV Cryo campaign series (2026-02-25 onwards):</p>
+
+<table>
+  <tr><th>Quantity</th><th>Value</th><th>Source</th></tr>
+  <tr><td>$D_\text{cryo}$</td><td>~2878 MHz</td><td>Center of dips at 10G</td></tr>
+  <tr><td>Splitting rate ($\hat{n}_4$)</td><td>4.26 MHz/G</td><td>Linear fit across 10.0-10.5G</td></tr>
+  <tr><td>Implied projection angle</td><td>~40.5&deg;</td><td>$\arccos(4.26 / 2 \times 2.8024)$</td></tr>
+  <tr><td>Ensemble FWHM</td><td>~10 MHz</td><td>Filtered grand average at 10G</td></tr>
+  <tr><td>Contrast (10G)</td><td>~6-7.5%</td><td>Per-pair, varies</td></tr>
+  <tr><td>Contrast trend</td><td>decreasing with field</td><td>7.55% (10.1G) &rarr; 6.88% (13.0G)</td></tr>
+  <tr><td>Baseline power</td><td>~0.8 &mu;W</td><td>532nm, PM101 at 632nm</td></tr>
+  <tr><td>Temperature</td><td>11-13 K</td><td>Lakeshore 335, sensor A</td></tr>
+  <tr><td>Operating dwell</td><td>20 ms</td><td>Optimized (FOM = 9.72&times;10<sup>&minus;6</sup>)</td></tr>
+  <tr><td>Sensitivity (10G)</td><td>~14 &mu;T/$\sqrt{\text{Hz}}$</td><td>Noise floor analysis</td></tr>
+  <tr><td>Drift onset</td><td>$N \approx 15$-30 pairs</td><td>~10-20 min wall clock</td></tr>
+  <tr><td>Bin-limited at</td><td>$N \approx 1$-5 (with norm.)</td><td>After baseline norm + Gaussian LP</td></tr>
+</table>
+
+<hr>
+
+<p style="color:var(--subtext); font-style:italic; text-align:center; margin-top:2rem;">
+This document will be expanded with Rabi oscillation physics, pulsed ODMR, T<sub>1</sub>/T<sub>2</sub> relaxometry, and dark matter sensitivity projections in future versions.
+</p>
+
+</body>
+</html>
