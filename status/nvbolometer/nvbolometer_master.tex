@@ -1,0 +1,73 @@
+% nvbolometer_master.tex
+% NV Bolometer: Master Document
+% NV Bolometer Project --- Cryogenic NV-Sensor + SiPM Readout System
+% Author: Jacob Bogenschuetz, UT Arlington Physics
+% Date: 2026-03-20
+%
+% COMPILATION:
+%   pdflatex nvbolometer_master.tex
+%   bibtex nvbolometer_master
+%   pdflatex nvbolometer_master.tex
+%   pdflatex nvbolometer_master.tex
+%
+% STRUCTURE:
+%   Sections are separate .tex files in sections/ loaded via \input{}.
+%   This is the Phase 1 skeleton — no content has been migrated yet.
+%   Content migration occurs in Phase 2.
+
+\documentclass[12pt,letterpaper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{graphicx}
+
+% \needref: marks a claim whose supporting PDF is not yet in references/
+% Use this wherever a spec or fact needs a citation that isn't in hand.
+\newcommand{\needref}[1]{\textcolor{red}{\textbf{[PENDING: #1]}}}
+
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
+
+\lstset{
+  language=Verilog,
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  numbers=left, numberstyle=\tiny\color{gray},
+  frame=single, breaklines=true, captionpos=b
+}
+
+\begin{document}
+
+\title{NV Bolometer: Cryogenic NV-Sensor + SiPM Readout System}
+\author{Jacob Bogenschuetz}
+\date{2026-03-20}
+\maketitle
+\tableofcontents
+\newpage
+
+\input{sections/01_overview}
+\input{sections/02_nv_sensing}
+\input{sections/03_sipm_readout}
+\input{sections/04_sipm_characterization}
+\input{sections/05_signal_chain}
+\input{sections/06_hardware_readiness}
+\input{sections/07_pixel_fabrication}
+\input{sections/08_oq1_meissner_zeeman}
+\input{sections/09_oq5_energy_resolution}
+\input{sections/10_oq4_epifluorescence}
+\input{sections/11_nbn_sourcing}
+
+\nocite{placeholder_skeleton}
+\bibliographystyle{unsrt}
+\bibliography{references/references}
+
+\end{document}

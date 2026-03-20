@@ -1,0 +1,787 @@
+% ensemble_readout_optimization.tex
+% Optimal Ensemble Size and Qutrit Readout Protocol for NV-Based Qudit Computing
+% NVQbit Theory Module — 2026-03-19
+%
+% Compilation: pdflatex + bibtex + pdflatex + pdflatex
+% References: ../training/references.bib + local ensemble_readout.bib
+
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{physics}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{xcolor}
+
+\newcommand{\needref}[1]{\textcolor{red}{\textbf{[NEEDREF: #1]}}}
+
+\title{Optimal Ensemble Size and Qutrit Readout Protocol \\
+for NV-Based Qudit Architecture}
+\author{NVQbit Theory Module}
+\date{2026-03-19}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We derive the minimum ensemble size $N$ of NV centers per logical qudit
+required to achieve target readout fidelity for a ternary ($d=3$) quantum
+computation scheme.  Two readout protocols are analyzed: (i) direct
+three-level discrimination exploiting the differential fluorescence contrast
+$C_2$ between $m_s = -1$ and $m_s = +1$, and (ii) sequential binary readout
+using only the standard $m_s = 0$ vs.\ $m_s = \pm 1$ contrast $C_1 \approx 0.3$.
+We show that sequential binary readout is strictly superior, eliminating
+dependence on the vanishingly small $C_2$ and reducing $N_{\min}$ by orders of
+magnitude.  We derive the optimal ensemble size $k^*$ that maximizes a
+computational utility metric (accessible Hilbert-space dimension weighted by
+readout fidelity), and establish practical upper bounds on the qudit base $d$
+for three photon-collection technology tiers.
+\end{abstract}
+
+\tableofcontents
+
+%% ==================================================================
+\section{State-of-the-Art NV Photon Parameters}
+\label{sec:params}
+%% ==================================================================
+
+All parameters below are drawn from published literature; none are from the
+NVQbit project's own toy-setup measurements ($\eta = 14~\mu\text{T}/\!\sqrt{\text{Hz}}$).
+
+\subsection{Photon Count Rate $R$}
+
+\begin{table}[h]
+\centering
+\caption{Photon collection rates from single NV centers.}
+\label{tab:rates}
+\begin{tabular}{lccl}
+\toprule
+\textbf{Collection method} & \textbf{$R$ (cps)} & \textbf{$T_2$} & \textbf{Reference} \\
+\midrule
+Standard confocal (NA 0.9) & $\sim 5 \times 10^4$ & $\sim 1~\mu$s & \cite{Barry2020} \\  % Barry2020 Table 1 (confocal peak count rate)
+Solid immersion lens (SIL) & $\sim 3.5 \times 10^5$ & preserved & \cite{Hadden2010} \\  % Hadden2010 Fig. 3 (SIL-enhanced count rate)
+Bullseye grating & $(2.7 \pm 0.1) \times 10^6$ & 1.7 ms & \cite{Li2015} \\  % Li2015 Fig. 4b (peak count rate) and Fig. 3 (T2)
+Hybrid nanoantenna & $\gtrsim 10^7$ (projected) & --- & \cite{Barbiero2025} \\  % Barbiero2025 Table 1, projected upper bound from 82% collection efficiency
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+\textbf{Bullseye grating} \cite{Li2015}: A circular bullseye pattern etched into
+the diamond surface achieves $R \approx 2.7 \times 10^6$~cps from a single NV
+center with $T_2 = 1.7$~ms preserved, representing a $\sim 50\times$
+improvement over standard confocal.
+
+\textbf{Hybrid nanoantenna} \cite{Barbiero2025}: Ultra-precise positioning of
+nanodiamonds in hybrid metal-dielectric bullseye nanoantennas achieves a
+measured collection efficiency of 82\% into NA~$= 0.5$, approaching unity for
+NA~$> 0.8$.  At near-unity collection from the NV's intrinsic $\sim 13$~ns
+excited-state lifetime (radiative rate $\sim 7.7 \times 10^7$~s$^{-1}$), the
+theoretical upper bound on detected photon rate approaches $\sim 10^7$~cps
+after accounting for quantum efficiency and branching ratios.
+
+
+\subsection{ODMR Contrast $C_1$: $m_s = 0$ vs.\ $m_s = \pm 1$}
+
+The standard fluorescence contrast between the bright ($m_s = 0$) and dark
+($m_s = \pm 1$) states arises from spin-selective intersystem crossing (ISC)
+through the singlet states \cite{Doherty2013}.
+
+\begin{itemize}
+  \item \textbf{CW ODMR:} $C_1 \approx 0.20$--$0.30$ (single NV, confocal)
+    \cite{Doherty2013, Barry2020}. % Doherty2013 Fig. 6 / Barry2020 Sec. II.A p.4
+  \item \textbf{Pulsed ODMR:} $C_1$ up to $\approx 0.30$ (theoretical limit
+    for single NV) \cite{Barry2020}. % Barry2020 Eq. (6) and Sec. II.A
+  \item \textbf{Laser threshold magnetometry:} Enhanced effective contrast via
+    stimulated emission at high pump power \cite{Doherty2013}. % Doherty2013 Sec. 3.4
+\end{itemize}
+
+\noindent
+Throughout this document we adopt $C_1 = 0.30$ as the state-of-the-art value. % Barry2020 Eq. (6); Doherty2013 Fig. 6
+
+
+\subsection{Differential Contrast $C_2$: $m_s = -1$ vs.\ $m_s = +1$}
+\label{sec:C2}
+
+This is the critical parameter for \emph{direct} three-level readout.
+
+\textbf{Physical origin.}  The ISC from the $^3E$ excited state to the singlet
+$^1A_1$ is mediated by spin-orbit coupling.  At the level of the $C_{3v}$
+symmetry of the NV center, the ISC rates from the excited-state orbital
+branches depend on the spin projection $|m_s|$ but \emph{not} on the sign of
+$m_s$ \cite{Goldman2015a, Batalov2009}.  The states $|A_1\rangle$ and
+$|E_{1,2}\rangle$ in the excited-state fine structure have enhanced ISC rates
+($\Gamma_{A_1}/2\pi \approx 16$~MHz), while the $|A_2\rangle$, $|E_x\rangle$,
+$|E_y\rangle$ branches have suppressed ISC.  Crucially, $m_s = +1$ and
+$m_s = -1$ enter the same orbital branches with equal weight; the ISC is
+symmetric under $m_s \to -m_s$ \cite{Goldman2015a}.
+
+\textbf{At $B = 0$:} $C_2 = 0$ exactly, by time-reversal symmetry.  The
+$m_s = \pm 1$ states are degenerate and indistinguishable in fluorescence.
+
+\textbf{At $B \neq 0$:} The Zeeman effect splits $m_s = \pm 1$ in frequency
+space (observable as two ODMR dips), but the \emph{fluorescence intensity}
+from each state remains identical to within experimental precision
+\cite{Doherty2013}.  The ISC rate depends on $|m_s|$, not $m_s$.
+
+\textbf{Possible mechanisms for nonzero $C_2$:}
+\begin{enumerate}
+  \item \textbf{Transverse strain/electric field:} Mixes the excited-state
+    orbital branches, creating asymmetric ISC.  The effect is
+    sample-dependent and typically small ($C_2/C_1 < 0.01$)
+    \cite{Doherty2013}.
+  \item \textbf{Off-axis magnetic field:} Mixes $m_s = 0$ and $m_s = \pm 1$
+    in the excited state, creating slight fluorescence asymmetry.  At the
+    20--50~G operating range along the NV axis, this is negligible.
+  \item \textbf{Nuclear spin polarization:} At high $B$-fields near the
+    excited-state level anti-crossing (ESLAC, $\sim 512$~G), nuclear-spin-dependent
+    ISC creates measurable asymmetry.  We operate far from ESLAC.
+\end{enumerate}
+
+\textbf{Conclusion:} For all practical purposes at $B = 20$--$50$~G,
+\begin{equation}
+  \boxed{C_2 \approx 0.}
+  \label{eq:C2zero}
+\end{equation}
+\emph{Direct fluorescence cannot distinguish $m_s = -1$ from $m_s = +1$.}
+This is a fundamental constraint on qutrit readout architecture, not a
+technology limitation.
+
+
+\subsection{Single-Shot Readout Fidelity}
+
+\begin{itemize}
+  \item \textbf{All-optical (cryogenic resonant excitation):} $F > 95\%$
+    single-shot, up to 99.9\% with spin-to-charge conversion (SCC)
+    \cite{Zhang2021}.  % Zhang2021 Table 1 (cryogenic SCC fidelity) and abstract
+    The SCC method maps the spin state to the charge state
+    (NV$^-$ vs.\ NV$^0$), which can be read with near-perfect fidelity
+    ($F_{\text{charge}} = 99.96\%$). % Zhang2021 Table 1, row: charge readout fidelity
+  \item \textbf{Room-temperature (repeated readout):} $F \sim 0.01$ per
+    single readout attempt (photon shot noise limited).  Multiple
+    measurements average to improve fidelity.
+  \item \textbf{Spin-to-charge conversion at RT:} $F \approx 98.1\%$ with
+    inefficient optics; $> 99\%$ projected with photonic structures
+    \cite{Zhang2021}. % Zhang2021 Table 1 (room-temperature SCC fidelity = 98.1%) and Sec. IV
+\end{itemize}
+
+\textbf{Key point for ensemble readout:}  An ensemble of $N$ NV centers
+provides $\sqrt{N}$ improvement in signal-to-noise ratio (SNR) per readout
+window, equivalent to averaging $N$ independent single-shot measurements.
+
+
+\subsection{Coherence Times in Isotopically Purified $^{12}$C Diamond}
+
+\begin{table}[h]
+\centering
+\caption{State-of-the-art electron spin coherence in isotopically purified diamond.}
+\label{tab:coherence}
+\begin{tabular}{lcccl}
+\toprule
+\textbf{Parameter} & \textbf{Value} & \textbf{$T$ (K)} & \textbf{$^{13}$C} & \textbf{Reference} \\
+\midrule
+$T_2^*$ & $\sim 90~\mu$s & 300 & 0.3\% & \cite{Maurer2012} \\   % Maurer2012 p.1284, Table 1
+$T_2$ (Hahn echo) & 1.8 ms & 300 & 0.3\% & \cite{Balasubramanian2009} \\  % Balasubramanian2009 p.384, Fig. 2c
+$T_2$ (DD, 77 K) & $\sim 0.6$ s & 77 & $0.01\%$ & \cite{BarGill2013} \\  % BarGill2013 Fig. 3, Table 1
+$T_2$ (DD, RT) & approaches $2T_1$ & 300 & $0.01\%$ & \cite{Cambria2025} \\  % Cambria2025 Fig. 2
+$T_1$ (cryo) & $> 1$ s & $< 50$ & --- & \cite{Jarmola2012} \\  % Jarmola2012 Fig. 3 (low-T plateau)
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+%% ==================================================================
+\section{Direct Three-Level Readout: Ensemble Size Derivation}
+\label{sec:direct}
+%% ==================================================================
+
+\subsection{Setup}
+
+Consider $N$ NV centers comprising one logical qutrit, in the state
+\begin{equation}
+  \ket{\psi} = a \ket{m_s = 0} + b \ket{m_s = -1} + c \ket{m_s = +1},
+  \quad |a|^2 + |b|^2 + |c|^2 = 1.
+\end{equation}
+In a readout window of duration $T_r$, each NV center emits photons at rate
+$R$ (cps).  The fluorescence depends on the spin state:
+\begin{align}
+  \text{Rate}(m_s = 0) &= R, \\
+  \text{Rate}(m_s = -1) &= R(1 - C_1), \\
+  \text{Rate}(m_s = +1) &= R(1 - C_1)(1 - C_2),
+\end{align}
+where $C_1 \approx 0.30$ is the standard ODMR contrast % Barry2020 Sec. II.A; Doherty2013 Fig. 6
+and $C_2$ is the
+differential contrast between the two dark states.
+
+\subsection{Signal-to-Noise Ratio}
+
+The expected photon count from the ensemble in window $T_r$ is:
+\begin{equation}
+  \langle n \rangle = N R T_r \big[ |a|^2 + (1-C_1)|b|^2 + (1-C_1)(1-C_2)|c|^2 \big].
+\end{equation}
+Photon shot noise gives $\sigma_n = \sqrt{\langle n \rangle}$.
+
+To distinguish $m_s = -1$ from $m_s = +1$, we need to resolve the difference
+in photon rates:
+\begin{equation}
+  \Delta n_{-1,+1} = N R T_r (1-C_1) C_2 \big( |b|^2 - |c|^2 \big).
+\end{equation}
+The SNR for this discrimination is:
+\begin{equation}
+  \text{SNR}_{-1,+1} = \frac{|\Delta n_{-1,+1}|}{\sqrt{\langle n \rangle}}
+  \approx C_2 (1 - C_1)^{1/2} |b^2 - c^2| \sqrt{N R T_r},
+  \label{eq:snr_direct}
+\end{equation}
+where we approximated the noise by $\sqrt{N R T_r}$ (shot noise dominated).
+
+\subsection{Minimum Ensemble Size}
+
+For a target SNR threshold $\text{SNR}_{\text{th}}$ (related to fidelity
+$F_{\text{th}}$ via the error function: $F_{\text{th}} = \frac{1}{2}\text{erfc}(-\text{SNR}_{\text{th}}/\sqrt{2})$), and taking $|b^2 - c^2| \sim 1$
+(worst case is $|b^2 - c^2| \to 0$, best case is 1):
+\begin{equation}
+  \boxed{N_{\min}^{\text{direct}} = \frac{\text{SNR}_{\text{th}}^2}{C_2^2 (1-C_1) R T_r}.}
+  \label{eq:Nmin_direct}
+\end{equation}
+
+For 99\% fidelity, $\text{SNR}_{\text{th}} \approx 2.33$ (from the inverse
+error function).  For 99.9\%, $\text{SNR}_{\text{th}} \approx 3.09$.
+
+\subsection{Numerical Estimates}
+
+Given $C_2 \approx 0$ (\cref{sec:C2}), direct three-level readout is
+\textbf{fundamentally impossible} via fluorescence alone.  To illustrate the
+scaling even with optimistic nonzero $C_2$:
+
+\begin{table}[h]
+\centering
+\caption{$N_{\min}^{\text{direct}}$ for direct three-level readout at $F = 99\%$
+($\text{SNR}_{\text{th}} = 2.33$), $T_r = 300$~ns, various $C_2$ assumptions.}
+\label{tab:Nmin_direct}
+\begin{tabular}{lccc}
+\toprule
+$C_2$ (assumed) & Confocal ($5 \times 10^4$) & Bullseye ($2.7 \times 10^6$) & Nanoantenna ($10^7$) \\
+\midrule
+$10^{-2}$ & $5.2 \times 10^9$ & $9.5 \times 10^7$ & $2.6 \times 10^7$ \\
+$10^{-3}$ & $5.2 \times 10^{11}$ & $9.5 \times 10^9$ & $2.6 \times 10^9$ \\
+$10^{-4}$ & $5.2 \times 10^{13}$ & $9.5 \times 10^{11}$ & $2.6 \times 10^{11}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+Even the most optimistic $C_2 = 0.01$ requires $N > 10^7$ NV centers per
+qudit.  At realistic $C_2 \lesssim 10^{-3}$, the numbers are absurdly large.
+\textbf{Direct three-level readout via fluorescence is not viable.}
+
+
+%% ==================================================================
+\section{Sequential Binary Readout Protocol}
+\label{sec:sequential}
+%% ==================================================================
+
+\subsection{Protocol Description}
+
+Instead of attempting to distinguish $m_s = -1$ from $m_s = +1$ directly,
+we perform two sequential measurements, each using only the large $C_1$
+contrast:
+
+\textbf{Step 1:} Apply a resonant MW $\pi$-pulse on the $|0\rangle \leftrightarrow |-1\rangle$ transition.  This maps:
+\begin{align}
+  |0\rangle &\to |-1\rangle, \quad |-1\rangle \to |0\rangle, \quad |+1\rangle \to |+1\rangle.
+\end{align}
+Fluorescence readout now yields bright signal proportional to $|b|^2$ (the
+population originally in $|-1\rangle$, now mapped to $|0\rangle$) and dark
+signal from $|a|^2 + |c|^2$.
+
+\textbf{Step 2 (fresh copy or re-preparation):} Apply a resonant MW $\pi$-pulse
+on $|0\rangle \leftrightarrow |+1\rangle$.  This maps:
+\begin{align}
+  |0\rangle &\to |+1\rangle, \quad |+1\rangle \to |0\rangle, \quad |-1\rangle \to |-1\rangle.
+\end{align}
+Fluorescence readout yields bright signal proportional to $|c|^2$.
+
+\textbf{Population extraction:}
+\begin{align}
+  P_{-1} &= |b|^2: \text{ from Step 1 fluorescence (bright fraction)}, \\
+  P_{+1} &= |c|^2: \text{ from Step 2 fluorescence (bright fraction)}, \\
+  P_0 &= |a|^2 = 1 - |b|^2 - |c|^2: \text{ by normalization}.
+\end{align}
+
+\subsection{SNR Analysis}
+
+Each step is a standard binary discrimination between $m_s = 0$ (bright,
+rate $R$) and $m_s = \pm 1$ (dark, rate $R(1-C_1)$), with contrast $C_1 = 0.30$.
+
+For $N$ NV centers in readout window $T_r$:
+\begin{align}
+  \text{Signal per step} &= N R T_r C_1 \cdot p, \\
+  \text{Noise} &= \sqrt{N R T_r}, \\
+  \text{SNR per step} &= C_1 \sqrt{N R T_r} \cdot p,
+\end{align}
+where $p$ is the population being measured (e.g., $p = |b|^2$ for Step 1).
+For the worst case $p \sim 1/3$ (uniform qutrit):
+\begin{equation}
+  \text{SNR}_{\text{step}} \approx \frac{C_1}{3} \sqrt{N R T_r}.
+\end{equation}
+
+The total readout fidelity for all three populations is bounded by the
+worst single-step fidelity.  Setting $\text{SNR}_{\text{step}} \geq \text{SNR}_{\text{th}}$:
+\begin{equation}
+  \boxed{N_{\min}^{\text{seq}} = \frac{9 \, \text{SNR}_{\text{th}}^2}{C_1^2 \, R \, T_r}.}
+  \label{eq:Nmin_seq}
+\end{equation}
+
+\subsection{Comparison: Sequential vs.\ Direct}
+
+The ratio of minimum ensemble sizes is:
+\begin{equation}
+  \frac{N_{\min}^{\text{direct}}}{N_{\min}^{\text{seq}}}
+  = \frac{C_1^2}{9 \, C_2^2 (1 - C_1)}
+  = \frac{(0.30)^2}{9 \, C_2^2 \times 0.70}
+  = \frac{0.0143}{C_2^2}.
+\end{equation}
+For $C_2 = 10^{-2}$: ratio $= 143$.  For $C_2 = 10^{-3}$: ratio $= 1.43 \times 10^4$.
+
+\textbf{Sequential binary readout is always superior} by a factor
+$\sim C_1^2/(9 C_2^2)$, which diverges as $C_2 \to 0$.
+
+\subsection{Numerical Results for Sequential Protocol}
+
+\begin{table}[h]
+\centering
+\caption{$N_{\min}^{\text{seq}}$ for sequential binary qutrit readout.
+$F = 99\%$ ($\text{SNR}_{\text{th}} = 2.33$), $C_1 = 0.30$.}
+\label{tab:Nmin_seq}
+\begin{tabular}{lccc}
+\toprule
+$T_r$ & Confocal ($5 \times 10^4$) & Bullseye ($2.7 \times 10^6$) & Nanoantenna ($10^7$) \\
+\midrule
+300 ns & $3.2 \times 10^6$ & $6.0 \times 10^4$ & $1.6 \times 10^4$ \\
+$1~\mu$s & $9.7 \times 10^5$ & $1.8 \times 10^4$ & $4.9 \times 10^3$ \\
+$10~\mu$s & $9.7 \times 10^4$ & $1.8 \times 10^3$ & $490$ \\
+$100~\mu$s & $9.7 \times 10^3$ & $180$ & $49$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Key result:} With bullseye grating collection and $T_r = 10~\mu$s
+readout window, only $N \sim 1800$ NV centers are needed per logical qutrit
+at 99\% fidelity.  With nanoantenna collection, this drops to $\sim 500$.
+These are physically realizable ensemble sizes.
+
+\textbf{Overhead:} The sequential protocol requires \emph{two} readout
+windows per qutrit measurement (vs.\ one for direct), but each window
+uses the same apparatus.  The $2\times$ time overhead is negligible compared
+to the $>100\times$ reduction in $N_{\min}$.
+
+\textbf{Note on re-preparation:} Steps 1 and 2 require either (a) two
+identical copies of the state (measurement is destructive), or (b) weak
+measurement with post-selection, or (c) ensemble averaging over many
+experimental runs.  In the ensemble architecture with $N$ NV centers per
+qudit, each run provides one measurement; the two steps are performed on
+separate runs with identical state preparation.
+
+
+%% ==================================================================
+\section{Phase Information and Full Qutrit Tomography}
+\label{sec:tomography}
+%% ==================================================================
+
+\subsection{What Fluorescence Cannot Measure}
+
+Fluorescence readout measures \emph{populations} $\{|a|^2, |b|^2, |c|^2\}$
+--- the diagonal elements of the density matrix $\rho$ in the $\{|0\rangle,
+|-1\rangle, |+1\rangle\}$ basis.  It cannot access the \emph{off-diagonal}
+(coherence) elements:
+\begin{equation}
+  \rho = \begin{pmatrix}
+    |a|^2 & a b^* & a c^* \\
+    b a^* & |b|^2 & b c^* \\
+    c b^* & c a^* & |c|^2
+  \end{pmatrix}.
+\end{equation}
+The phases $\arg(a/b)$, $\arg(b/c)$ (two independent phases for a qutrit)
+are encoded in the off-diagonal elements.
+
+\subsection{Measurement Bases for Full State Tomography}
+
+A qutrit density matrix has $d^2 - 1 = 8$ independent real parameters
+(3 populations minus 1 normalization constraint = 2, plus 3 complex
+off-diagonal elements = 6 real parameters, total = 8).
+
+To reconstruct all 8 parameters, one needs measurements in multiple bases.
+The standard approach uses the \textbf{Gell-Mann matrices} $\{\lambda_1,
+\ldots, \lambda_8\}$ as the SU(3) generators:
+
+\begin{itemize}
+  \item \textbf{Populations} (2 independent): Measured directly via
+    fluorescence in the computational basis.
+  \item \textbf{Coherences} (6 real parameters from 3 complex off-diagonal
+    elements): Each requires measurement in a \emph{rotated basis}.
+    Specifically, for each pair $(i,j)$, one needs measurements of both
+    $\text{Re}(\rho_{ij})$ and $\text{Im}(\rho_{ij})$.
+\end{itemize}
+
+\textbf{Minimum measurement settings:} A complete set of measurements
+requires at least \textbf{4 mutually unbiased bases} (each with 3 outcomes)
+in dimension $d=3$, giving $4 \times 2 = 8$ independent real parameters
+\cite{Wootters1989}.  In practice, \textbf{$\geq 8$ distinct measurement
+settings} are used, each involving:
+\begin{enumerate}
+  \item A unitary rotation $U_k$ (implemented via MW pulses) that maps the
+    desired measurement basis to the computational basis.
+  \item Standard fluorescence readout in the computational basis (sequential
+    binary protocol from \cref{sec:sequential}).
+\end{enumerate}
+
+\subsection{Scaling of Measurement Overhead}
+
+For a single qutrit with sequential binary readout:
+\begin{itemize}
+  \item \textbf{Population measurement:} 2 readout windows $\times$ $M$
+    repetitions for statistics.
+  \item \textbf{Each coherence measurement:} 2 readout windows $\times$ $M$
+    repetitions.
+  \item \textbf{Total for full tomography:} $\geq 8$ measurement settings
+    $\times$ 2 readout windows $\times$ $M$ repetitions = $16M$ readout
+    windows.
+\end{itemize}
+
+For $n$ qudits ($d=3$), the density matrix has $d^{2n} - 1 = 3^{2n} - 1$
+parameters.  Full tomography requires $O(d^{2n})$ measurement settings ---
+exponential in $n$.  This is the standard quantum tomography scaling,
+not specific to NV ensembles.
+
+\textbf{Practical implication:} Full qutrit state tomography is feasible for
+small qudit registers ($n \leq 3$--$4$) but becomes prohibitive for large
+systems.  For quantum computing applications, one typically uses
+process tomography or randomized benchmarking rather than full state
+tomography.
+
+
+%% ==================================================================
+\section{Ensemble Size vs.\ Qudit Count Trade-Off}
+\label{sec:tradeoff}
+%% ==================================================================
+
+\subsection{Architecture Parameters}
+
+Let:
+\begin{itemize}
+  \item $M$ = total NV center budget (fixed by diamond sample)
+  \item $k$ = NV centers per logical qudit (ensemble size)
+  \item $Q = M/k$ = number of logical qudits
+  \item $d$ = computational base (ternary: $d=3$)
+  \item $F(k)$ = single-qudit readout fidelity as function of $k$
+\end{itemize}
+
+\subsection{Readout Fidelity as Function of $k$}
+
+From \cref{eq:Nmin_seq}, the SNR per readout step for ensemble size $k$ is:
+\begin{equation}
+  \text{SNR}(k) = \frac{C_1}{3} \sqrt{k \, R \, T_r}.
+\end{equation}
+The single-qudit readout fidelity (for the worst-case population $p = 1/3$):
+\begin{equation}
+  F(k) = \frac{1}{2}\operatorname{erfc}\!\left(
+    -\frac{C_1}{3\sqrt{2}} \sqrt{k \, R \, T_r}
+  \right).
+  \label{eq:Fk}
+\end{equation}
+
+\subsection{Computational Utility Metric}
+
+The accessible Hilbert space dimension is $d^Q = d^{M/k}$, but errors
+reduce the effective dimension.  We define a computational utility:
+\begin{equation}
+  \mathcal{U}(k) = Q \log_2 d \times F(k)^Q
+  = \frac{M}{k} \log_2 d \times F(k)^{M/k}.
+  \label{eq:utility}
+\end{equation}
+The first factor counts the number of useful qudits (in bits), while
+$F(k)^Q$ is the probability that \emph{all} qudits are read correctly
+(assuming independent errors).
+
+Taking the logarithm for optimization:
+\begin{equation}
+  \ln \mathcal{U} = \ln\!\left(\frac{M \log_2 d}{k}\right)
+  + \frac{M}{k} \ln F(k).
+\end{equation}
+Since $F(k) \to 1$ for large $k$, $\ln F(k) \approx -(1-F(k))$, and
+\begin{equation}
+  \ln \mathcal{U} \approx \ln\!\left(\frac{M \log_2 d}{k}\right)
+  - \frac{M}{k} (1 - F(k)).
+\end{equation}
+
+\subsection{Optimal $k^*$}
+
+The optimal $k^*$ balances two competing effects:
+\begin{itemize}
+  \item \textbf{Increasing $k$:} Improves $F(k)$ (better readout), but
+    reduces $Q = M/k$ (fewer qudits).
+  \item \textbf{Decreasing $k$:} More qudits, but each has worse fidelity.
+\end{itemize}
+
+The dominant term for large $M$ is $\frac{M}{k}(1 - F(k))$.  Substituting
+$1 - F(k) \approx \frac{1}{\sqrt{2\pi}} \frac{3}{C_1 \sqrt{k R T_r}} e^{-C_1^2 k R T_r / 18}$
+(Gaussian tail approximation), the exponent $\frac{M}{k} e^{-\alpha k}$
+(with $\alpha = C_1^2 R T_r / 18$) vanishes for $k \gg 1/\alpha$ and
+diverges for $k \ll 1/\alpha$.  Thus:
+\begin{equation}
+  \boxed{k^* \sim \frac{1}{\alpha} \ln M
+  = \frac{18}{C_1^2 R T_r} \ln M.}
+  \label{eq:kstar}
+\end{equation}
+
+\subsection{Numerical Estimates of $k^*$}
+
+\begin{table}[h]
+\centering
+\caption{Optimal ensemble size $k^*$ for $M = 10^6$ total NVs,
+$T_r = 10~\mu$s, $d = 3$.}
+\label{tab:kstar}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Collection} & $R$ (cps) & $\alpha$ (s$^{-1}$) & $k^*$ & $Q = M/k^*$ \\
+\midrule
+Confocal & $5 \times 10^4$ & $5 \times 10^{-3}$ & $\sim 2800$ & $\sim 360$ \\
+Bullseye & $2.7 \times 10^6$ & $0.27$ & $\sim 51$ & $\sim 2 \times 10^4$ \\
+Nanoantenna & $10^7$ & $1.0$ & $\sim 14$ & $\sim 7 \times 10^4$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Qualitative answer:} The optimal $k^*$ is:
+\begin{itemize}
+  \item \textbf{Confocal:} $k^* \sim 10^3$ (regime of $\sim$thousands)
+  \item \textbf{Bullseye:} $k^* \sim 50$ (regime of $\sim$tens)
+  \item \textbf{Nanoantenna:} $k^* \sim 10$--$15$ (regime of $\sim$ten)
+\end{itemize}
+With state-of-the-art photon collection, the optimal ensemble is
+surprisingly small --- of order 10--50 NV centers per logical qudit.
+
+
+%% ==================================================================
+\section{Practical Upper Bound on Qudit Base $d$}
+\label{sec:maxd}
+%% ==================================================================
+
+\subsection{Generalization to Base $d$}
+
+For a qudit of dimension $d$, the sequential binary readout protocol
+requires $d-1$ binary measurements (each a $\pi$-pulse mapping one level
+to $|0\rangle$ followed by fluorescence readout).  The worst-case population
+is $p \sim 1/d$, giving:
+\begin{equation}
+  \text{SNR}_{\text{step}} = \frac{C_1}{d} \sqrt{k \, R \, T_r}.
+\end{equation}
+For target fidelity $F \geq 0.99$ on all $d-1$ binary steps simultaneously
+(Bonferroni correction: require each step at $F_{\text{step}} \geq 1 - 0.01/(d-1)$):
+\begin{equation}
+  k_{\min}(d) = \frac{d^2 \, \text{SNR}_{\text{th}}^2(d)}{C_1^2 \, R \, T_r},
+  \label{eq:kmin_d}
+\end{equation}
+where $\text{SNR}_{\text{th}}(d)$ increases logarithmically with $d$ due to
+the Bonferroni correction.
+
+\subsection{Maximum $d$ at Fixed $k$}
+
+Inverting \cref{eq:kmin_d}:
+\begin{equation}
+  d_{\max} \approx \frac{C_1 \sqrt{k \, R \, T_r}}{\text{SNR}_{\text{th}}},
+\end{equation}
+where $\text{SNR}_{\text{th}} \approx 2.33$ for $F = 99\%$ (ignoring the
+weak logarithmic $d$-dependence of the Bonferroni correction).
+
+\begin{table}[h]
+\centering
+\caption{Maximum practical base $d$ at $> 99\%$ fidelity, for $k = k^*$ from
+\cref{tab:kstar} and $T_r = 10~\mu$s.}
+\label{tab:dmax}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Collection} & $k^*$ & $\sqrt{k^* R T_r}$ & $d_{\max}$ \\
+\midrule
+Confocal & 2800 & 37 & $\sim 5$ \\
+Bullseye & 51 & 37 & $\sim 5$ \\
+Nanoantenna & 14 & 37 & $\sim 5$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Result:} All three technology tiers converge on $d_{\max} \approx 5$
+at the optimal $k^*$, because $k^*$ is chosen precisely to give
+$\sqrt{k^* R T_r} \approx \text{const}$ (it scales as $\ln M$).
+
+However, this is the $d_{\max}$ \emph{at the optimal $k^*$ balancing qudit
+count and fidelity}.  If we are willing to sacrifice qudit count for higher
+$d$, we can increase $k$ beyond $k^*$:
+
+\begin{table}[h]
+\centering
+\caption{$d_{\max}$ at $> 99\%$ fidelity for larger ensemble sizes.
+$T_r = 10~\mu$s.}
+\label{tab:dmax_largek}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Collection} & $k = 100$ & $k = 1000$ & $k = 10^4$ & $k = 10^5$ \\
+\midrule
+Confocal & 3 & 9 & 29 & 91 \\
+Bullseye & 21 & 67 & 211 & 669 \\
+Nanoantenna & 41 & 129 & 407 & 1287 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Practical conclusion:} Ternary ($d = 3$) is achievable with very
+modest ensemble sizes ($k \sim 50$--$100$ with bullseye collection).  Higher
+bases $d = 5$--$10$ become practical with $k \sim 10^3$.  Going beyond
+$d \sim 10$ requires either large ensembles or nanoantenna-class collection.
+
+\textbf{Important caveat:} These bounds assume that the NV spin system can
+be prepared in a $d$-level superposition.  The NV ground state is natively
+a spin-1 system ($d = 3$).  Reaching $d > 3$ requires encoding into additional
+degrees of freedom (e.g., nuclear spin, multiple NV orientations), which
+introduces its own overhead and crosstalk issues beyond the scope of this
+analysis.
+
+
+%% ==================================================================
+\section{Summary and Recommendations}
+\label{sec:summary}
+%% ==================================================================
+
+\begin{enumerate}
+  \item \textbf{$C_2 \approx 0$:} The differential fluorescence contrast
+    between $m_s = -1$ and $m_s = +1$ is negligibly small at operating
+    $B$-fields of 20--50~G.  Direct three-level readout via fluorescence
+    is not viable.
+
+  \item \textbf{Sequential binary readout is the correct protocol.}  Two
+    measurements using $\pi$-pulse state mapping, each exploiting
+    $C_1 \approx 0.30$, extract all three populations.
+
+  \item \textbf{$N_{\min}$ for $d = 3$ at $F = 99\%$:}
+    \begin{itemize}
+      \item Confocal: $N \sim 10^5$ ($T_r = 10~\mu$s)
+      \item Bullseye: $N \sim 1800$ ($T_r = 10~\mu$s)
+      \item Nanoantenna: $N \sim 490$ ($T_r = 10~\mu$s)
+    \end{itemize}
+
+  \item \textbf{Optimal ensemble size:} With bullseye collection,
+    $k^* \sim 50$ NV centers per qudit maximizes computational utility
+    for a fixed NV budget of $M \sim 10^6$.
+
+  \item \textbf{Maximum practical $d$:} At the optimal $k^*$,
+    $d_{\max} \approx 5$.  Ternary ($d = 3$) is comfortably achievable.
+
+  \item \textbf{Phase readout:} Full qutrit tomography requires $\geq 8$
+    measurement settings (rotated bases via MW pulses), each consisting
+    of two sequential binary readouts.  Overhead: $16M$ readout windows
+    for $M$ statistical repetitions.
+
+  \item \textbf{Technology recommendation:} Bullseye grating is the
+    minimum viable photon collection technology for practical ensemble
+    qutrit readout, achieving $k^* \sim 50$ per qudit with $> 99\%$
+    fidelity.
+\end{enumerate}
+
+
+%% ==================================================================
+%% BIBLIOGRAPHY
+%% ==================================================================
+
+\begin{thebibliography}{99}
+
+\bibitem{Barry2020}
+J.~F. Barry, J.~M. Schloss, E.~Bauch, M.~J. Turner, C.~A. Hart,
+L.~M. Pham, and R.~L. Walsworth,
+``Sensitivity optimization for NV-diamond magnetometry,''
+\emph{Rev.\ Mod.\ Phys.} \textbf{92}, 015004 (2020).
+
+\bibitem{Hadden2010}
+J.~P. Hadden \emph{et al.},
+``Strongly enhanced photon collection from diamond defect centers under
+micro-fabricated integrated solid immersion lenses,''
+\emph{Appl.\ Phys.\ Lett.} \textbf{97}, 241901 (2010).
+arXiv:1006.2093.
+
+\bibitem{Li2015}
+L.~Li, E.~H. Chen, J.~Zheng, S.~L. Mouradian, F.~Dolde, T.~Schr\"oder,
+S.~Karaveli, M.~L. Markham, D.~J. Twitchen, and D.~Englund,
+``Efficient photon collection from a nitrogen vacancy center in a circular
+bullseye grating,''
+\emph{Nano Lett.} \textbf{15}, 1493--1497 (2015).
+arXiv:1409.3068.
+
+\bibitem{Barbiero2025}
+A.~Barbiero \emph{et al.},
+``Approaching unity photon collection from NV centers via ultra-precise
+positioning of nanodiamonds in hybrid nanoantennas,''
+\emph{APL Quantum} \textbf{2}, 036106 (2025).
+arXiv:2503.14761.
+
+\bibitem{Doherty2013}
+M.~W. Doherty, N.~B. Manson, P.~Delaney, F.~Jelezko, J.~Wrachtrup,
+and L.~C.~L. Hollenberg,
+``The nitrogen-vacancy colour centre in diamond,''
+\emph{Phys.\ Rep.} \textbf{528}, 1--45 (2013).
+
+\bibitem{Goldman2015a}
+M.~L. Goldman \emph{et al.},
+``State-selective intersystem crossing in nitrogen-vacancy centers,''
+\emph{Phys.\ Rev.\ B} \textbf{91}, 165201 (2015).
+arXiv:1412.4865.
+
+\bibitem{Batalov2009}
+A.~Batalov \emph{et al.},
+``Low temperature studies of the excited-state structure of negatively charged
+nitrogen-vacancy color centers in diamond,''
+\emph{Phys.\ Rev.\ Lett.} \textbf{102}, 195506 (2009).
+
+\bibitem{Zhang2021}
+Q.~Zhang \emph{et al.},
+``High-fidelity single-shot readout of single electron spin in diamond with
+spin-to-charge conversion,''
+\emph{Nat.\ Commun.} \textbf{12}, 1529 (2021).
+
+\bibitem{Maurer2012}
+P.~C. Maurer \emph{et al.},
+``Room-temperature quantum bit memory exceeding one second,''
+\emph{Science} \textbf{336}, 1283--1286 (2012).
+
+\bibitem{Balasubramanian2009}
+G.~Balasubramanian \emph{et al.},
+``Ultralong spin coherence time in isotopically engineered diamond,''
+\emph{Nat.\ Mater.} \textbf{8}, 383--387 (2009).
+
+\bibitem{BarGill2013}
+N.~Bar-Gill, L.~M. Pham, A.~Jarmola, D.~Budker, and R.~L. Walsworth,
+``Solid-state electronic spin coherence time approaching one second,''
+\emph{Nat.\ Commun.} \textbf{4}, 1743 (2013).
+
+\bibitem{Cambria2025}
+M.~C. Cambria, S. Chand, C.~M. Reiter, and S. Kolkowitz,
+``Scalable parallel measurement of individual nitrogen-vacancy centers,''
+\emph{Phys.\ Rev.\ X} \textbf{15}, 031015 (2025).
+arXiv:2408.11715.
+
+\bibitem{Jarmola2012}
+A.~Jarmola, V.~M. Acosta, K.~Jensen, S.~Chemerisov, and D.~Budker,
+``Temperature- and magnetic-field-dependent longitudinal spin relaxation in
+nitrogen-vacancy ensembles in diamond,''
+\emph{Phys.\ Rev.\ Lett.} \textbf{108}, 197601 (2012).
+
+\bibitem{Wootters1989}
+W.~K. Wootters and B.~D. Fields,
+``Optimal state-determination by mutually unbiased measurements,''
+\emph{Ann.\ Phys.\ (N.Y.)} \textbf{191}, 363--381 (1989).
+
+\end{thebibliography}
+
+\end{document}

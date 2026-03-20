@@ -1,0 +1,777 @@
+% holonomic_qutrit.tex — Holonomic Qutrit Gate Construction for NVQbit Tripod System
+% NVQ theory document — Literature-driven analysis
+% Last updated: 2026-03-19
+%
+% Compile: pdflatex holonomic_qutrit.tex && bibtex holonomic_qutrit && pdflatex holonomic_qutrit.tex && pdflatex holonomic_qutrit.tex
+
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{physics}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{graphicx}
+
+% Custom commands
+\newcommand{\needref}[1]{\textcolor{red}{[\textbf{NEEDREF:} #1]}}
+\newcommand{\opennote}[1]{\textcolor{orange}{[\textbf{NOTE:} #1]}}
+\newcommand{\SU}{\mathrm{SU}}
+\newcommand{\UU}{\mathrm{U}}
+
+\title{Holonomic Qutrit Gate Construction\\for the NVQbit Tripod System}
+\author{NVQbit Project — Theory Document\\PI: Jacob Bogenschuetz, UT Arlington Physics}
+\date{March 19, 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+The NVQbit tripod ground manifold ($\ket{g_1}, \ket{g_2}, \ket{g_3}$) is a physical qutrit
+encoded in the $^{14}$N hyperfine sublevels of the NV$^-$ center ground state ($m_s = 0$).
+The current design projects onto a 2D dark subspace to obtain a holonomic qubit with
+$\UU(2)$ Wilczek--Zee holonomy. This document investigates whether a holonomic
+\emph{qutrit} gate --- a $\UU(3)$ holonomy acting on the full 3D ground manifold --- can be
+constructed, either through modified coupling topologies, sequential holonomic operations,
+or non-adiabatic protocols. We analyze the level structure requirements, universal $\SU(3)$
+gate sets, decoherence trade-offs, and existing proposals in the literature. The central
+finding is that a single tripod linkage (3 ground states, 1 excited state) yields at most
+$\UU(2)$ holonomy over the dark subspace; accessing full $\UU(3)$ holonomy requires either
+(a) a multi-pod coupling topology with additional excited states to produce a 3D dark
+subspace, (b) sequential holonomic operations composed from $\SU(2)$ subgroup rotations,
+or (c) non-adiabatic holonomic protocols. Each route is evaluated for feasibility within
+the NV center platform.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%% ============================================================
+\section{Q1: $\UU(3)$ Holonomy from the Tripod --- Is It Constructable?}
+\label{sec:Q1}
+%% ============================================================
+
+\subsection{Why the Standard Tripod Gives Only $\UU(2)$}
+
+The NVQbit tripod linkage couples three ground states $\{\ket{g_1}, \ket{g_2}, \ket{g_3}\}$
+to a single excited state $\ket{e}$ via three coherent drives with Rabi frequencies
+$\Omega_1, \Omega_2, \Omega_3$. The dark subspace is the nullspace of the interaction
+Hamiltonian in the rotating frame. With one excited state, the bright state is
+\begin{equation}
+  \ket{B} = \frac{\Omega_1^* \ket{g_1} + \Omega_2^* \ket{g_2} + \Omega_3^* \ket{g_3}}{\Omega_{\text{tot}}},
+  \qquad \Omega_{\text{tot}} = \sqrt{|\Omega_1|^2 + |\Omega_2|^2 + |\Omega_3|^2},
+  \label{eq:bright}
+\end{equation}
+and the dark subspace $\mathcal{D} = \ker(H_{\text{int}})$ has dimension
+$\dim(\mathcal{D}) = N_g - N_e = 3 - 1 = 2$~\cite{Unanyan2004}. % Unanyan2004 Sec. III p.5 (dark subspace dimension stated in prose); adiabaticity condition Eq. (21)
+Adiabatic evolution
+of the control parameters traces a loop in parameter space, generating a $\UU(2)$ holonomy
+(Wilczek--Zee matrix) on $\mathcal{D}$~\cite{WilczekZee1984}. The third ground-state
+component (the bright state) participates in the dynamics and is \emph{not} part of the
+computational register. Therefore:
+
+\begin{quote}
+\textbf{A standard tripod (3 ground, 1 excited) cannot generate $\UU(3)$ holonomy.}
+The holonomy group acts on the dark subspace, which has dimension 2. One always ``loses''
+one ground state to the bright-state channel.
+\end{quote}
+
+This is a consequence of the Morris--Shore decomposition~\cite{Vitanov2017}: for $N_g$
+ground states coupled to $N_e$ excited states, the number of dark states is $N_g - N_e$
+(assuming $N_g > N_e$ and all couplings are nonzero).
+
+\subsection{Route A: Multi-Pod Topology (Additional Excited States)}
+\label{sec:multipod}
+
+To obtain a 3D dark subspace from 3 ground states, we need $N_g - N_e = 3$, which is
+impossible with 3 ground states unless $N_e = 0$ (no coupling). Alternatively, we can
+increase the number of ground states:
+\begin{itemize}
+  \item \textbf{4 ground states, 1 excited state (tetrapod):} Dark subspace dimension =
+    $4 - 1 = 3$. This yields $\UU(3)$ holonomy on the 3D dark subspace.
+  \item \textbf{$M$ ground states, 1 excited state ($M$-pod):} Dark subspace dimension =
+    $M - 1$, giving $\UU(M-1)$ holonomy.
+\end{itemize}
+
+The photonic realization of $\UU(3)$ holonomy by Neef et al.\ uses precisely this
+principle: a bosonic system with 4 coupled modes (effectively a tetrapod) produces a 3D
+degenerate dark subspace, enabling experimental demonstration of $\UU(3)$
+holonomy~\cite{Neef2023}. % Neef2023 p.1 Abstract (photonic waveguide system with 3D degenerate dark subspace; first experimental U(3) holonomy)
+This was the first experimental realization of a 3D non-Abelian
+quantum holonomy.
+
+\textbf{NV feasibility of a tetrapod:} The NV center in the $m_s = 0$ manifold has only 3
+hyperfine sublevels ($m_I = -1, 0, +1$). To form a tetrapod, one would need a 4th ground
+state --- for example by including a sublevel from $m_s = -1$. However, the $m_s = 0$ and
+$m_s = -1$ manifolds are separated by $D \approx 2.87$~GHz~\cite{Doherty2013}, and mixing
+them into a single computational register sacrifices the protection afforded by the
+$m_s = 0$ encoding (nuclear spin coherence). This route is \textbf{not naturally
+compatible} with the NVQbit hyperfine tripod design without significant redesign.
+
+\subsection{Route B: Sequential Holonomic Operations Spanning $\SU(3)$}
+\label{sec:sequential}
+
+The key insight from Vitanov (2012)~\cite{Vitanov2012} is that any $\SU(3)$ transformation % Vitanov2012 Sec. II, Eq. (5)-(7): Givens decomposition theorem
+of a tripod qutrit can be decomposed into a sequence of $\SU(2)$ rotations acting on
+2D subspaces:
+
+\begin{equation}
+  U_{\SU(3)} = R_{23}(\alpha_3, \beta_3, \gamma_3) \cdot R_{13}(\alpha_2, \beta_2, \gamma_2) \cdot R_{12}(\alpha_1, \beta_1, \gamma_1),
+  \label{eq:givens}
+\end{equation}
+
+where $R_{ij}$ denotes a Givens rotation acting on the $(i,j)$ subspace. Each Givens
+rotation is itself an $\SU(2)$ element requiring 3 Euler angles, so an arbitrary $\SU(3)$
+transformation requires at most 9 parameters (matching $\dim[\SU(3)] = 8$ plus a global
+phase)~\cite{Vitanov2012}.
+
+For the NVQbit tripod, each $R_{ij}$ is a $\UU(2)$ holonomy on the dark subspace formed by
+ground states $i$ and $j$. To execute $R_{12}$, one decouples $\ket{g_3}$ (turns off
+$\Omega_3$) and runs a holonomic gate on the $\{\ket{g_1}, \ket{g_2}\}$ dark pair. Then
+$R_{13}$ (decouple $\ket{g_2}$), then $R_{23}$ (decouple $\ket{g_1}$).
+
+\textbf{Practical count:} Vitanov shows that via Givens decomposition, at most
+\textbf{9 consecutive interaction steps} are needed. % Vitanov2012 Sec. II, Theorem 1
+Alternatively, using quantum
+Householder reflections, any $\SU(3)$ can be realized in \textbf{3 reflections, each
+requiring a single interaction step}, reducing the total to 3 steps~\cite{Vitanov2012}. % Vitanov2012 Sec. III, Theorem 2
+The discrete Fourier transform on a qutrit requires 7 Givens steps or just 1 Householder
+step. % Vitanov2012 Sec. IV, Example
+
+\textbf{NV feasibility:} This is the most natural route for NVQbit. The tripod
+Hamiltonian already supports selective coupling: by adjusting which MW tones are active,
+one can select any 2-of-3 ground state pair as the active dark subspace. Each pairwise
+holonomic gate uses the existing adiabatic protocol. The cost is that a full $\SU(3)$
+gate requires $\sim$3 sequential holonomic loops, each with its own adiabatic
+evolution time $T_{\text{loop}} \sim 10$--$100~\mu$s. Total gate time: $\sim
+30$--$300~\mu$s, well within the nuclear $T_2 \approx 10$~ms
+budget~\cite{Pfender2017}.
+
+\textbf{This route is recommended as the primary qutrit gate strategy for NVQbit.}
+
+\subsection{Route C: Non-Adiabatic Holonomic Qutrit Gates}
+\label{sec:nonadiabatic}
+
+Non-adiabatic holonomic quantum computation (NHQC) replaces adiabatic evolution with
+fast pulses that satisfy the \emph{parallel transport condition}: $\bra{\psi_k(t)}
+H(t) \ket{\psi_l(t)} = 0$ for all computational basis states $k, l$. This has been
+experimentally demonstrated on a superconducting transmon qutrit, where a qubit is
+encoded in the $\{\ket{0}, \ket{2}\}$ subspace with $\ket{1}$ as
+ancilla~\cite{Abdumalikov2013,Zhang2019}.
+
+For NV centers, non-adiabatic holonomic gates on the \emph{electron} spin-1 qutrit
+($m_s = 0, \pm 1$) have been proposed~\cite{LopezGarcia2026}. L\'{o}pez-Garc\'{\i}a
+et al.\ (2026) show that arbitrary $\SU(3)$ operations on the NV ground-state spin-1
+manifold can be decomposed into rotations in the double-quantum ($m_s = +1 \leftrightarrow
+m_s = -1$) subspace plus effective implementations of the Gell-Mann generators $\lambda_5$
+and $\lambda_8$, using monochromatic microwave pulses of constant
+intensity~\cite{LopezGarcia2026}.
+
+\textbf{NV feasibility for hyperfine qutrit:} The L\'{o}pez-Garc\'{\i}a scheme operates
+on the \emph{electron} spin-1 manifold, not the nuclear hyperfine manifold used by NVQbit.
+Adapting NHQC to the $^{14}$N hyperfine qutrit ($m_I = -1, 0, +1$ within $m_s = 0$)
+would require RF-driven transitions between nuclear sublevels --- feasible in principle
+(Smeltzer et al.\ demonstrated coherent RF Rabi on $^{14}$N~\cite{Smeltzer2009}), but
+the slower nuclear Rabi frequencies ($\sim 30$~kHz) mean that ``fast'' non-adiabatic gates
+may not offer a speed advantage over adiabatic holonomic gates on this platform.
+
+\subsection{Summary of Routes}
+
+\begin{table}[h]
+\centering
+\caption{Comparison of routes to $\UU(3)$ holonomy for NVQbit.}
+\label{tab:routes}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Route} & \textbf{Mechanism} & \textbf{NV Feasibility} & \textbf{Verdict} \\
+\midrule
+A: Tetrapod & 4 ground, 1 excited $\to$ 3D dark & Requires $m_s$ mixing & \textbf{Not recommended} \\
+B: Sequential $\SU(2)$ & Givens/Householder decomposition & Natural with MW tone control & \textbf{Recommended} \\
+C: Non-adiabatic & Parallel transport on full 3-level & Proven for $e$-spin; adapt to nuclear & \textbf{Possible backup} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+%% ============================================================
+\section{Q2: $\SU(3)$ Universal Gate Set for Qutrits}
+\label{sec:Q2}
+%% ============================================================
+
+\subsection{Gell-Mann Matrices as $\SU(3)$ Generators}
+
+The Lie algebra $\mathfrak{su}(3)$ has 8 generators, conventionally represented by the
+Gell-Mann matrices $\lambda_1, \ldots, \lambda_8$~\cite{GellMann}. These are the qutrit
+analogs of the Pauli matrices $\sigma_x, \sigma_y, \sigma_z$ for qubits. Explicitly:
+
+\begin{align}
+  \lambda_1 &= \begin{pmatrix} 0 & 1 & 0 \\ 1 & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}, \quad
+  \lambda_2 = \begin{pmatrix} 0 & -i & 0 \\ i & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}, \quad
+  \lambda_3 = \begin{pmatrix} 1 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & 0 \end{pmatrix}, \nonumber \\
+  \lambda_4 &= \begin{pmatrix} 0 & 0 & 1 \\ 0 & 0 & 0 \\ 1 & 0 & 0 \end{pmatrix}, \quad
+  \lambda_5 = \begin{pmatrix} 0 & 0 & -i \\ 0 & 0 & 0 \\ i & 0 & 0 \end{pmatrix}, \quad
+  \lambda_6 = \begin{pmatrix} 0 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & 1 & 0 \end{pmatrix}, \nonumber \\
+  \lambda_7 &= \begin{pmatrix} 0 & 0 & 0 \\ 0 & 0 & -i \\ 0 & i & 0 \end{pmatrix}, \quad
+  \lambda_8 = \frac{1}{\sqrt{3}} \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & -2 \end{pmatrix}.
+  \label{eq:gellmann}
+\end{align}
+
+The generators organize into three $\SU(2)$ subalgebras:
+\begin{itemize}
+  \item $\{\lambda_1, \lambda_2, \lambda_3\}$: rotations in the $\ket{0}\text{--}\ket{1}$ subspace (``isospin''),
+  \item $\{\lambda_4, \lambda_5, \frac{1}{2}(\lambda_3 + \sqrt{3}\lambda_8)\}$: rotations in the $\ket{0}\text{--}\ket{2}$ subspace,
+  \item $\{\lambda_6, \lambda_7, \frac{1}{2}(-\lambda_3 + \sqrt{3}\lambda_8)\}$: rotations in the $\ket{1}\text{--}\ket{2}$ subspace.
+\end{itemize}
+
+\subsection{Qutrit Analogs of Standard Qubit Gates}
+
+\begin{table}[h]
+\centering
+\caption{Qutrit analogs of standard qubit gates.}
+\label{tab:qutritgates}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Qubit Gate} & \textbf{Qutrit Analog} & \textbf{Matrix Form} \\
+\midrule
+$X$ (NOT) & $X_3$ (shift / clock) &
+$\left(\begin{smallmatrix} 0 & 0 & 1 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{smallmatrix}\right)$ \\[6pt]
+$Z$ (phase) & $Z_3$ (clock-dual) &
+$\left(\begin{smallmatrix} 1 & 0 & 0 \\ 0 & \omega & 0 \\ 0 & 0 & \omega^2 \end{smallmatrix}\right)$, $\omega = e^{2\pi i/3}$ \\[6pt]
+$H$ (Hadamard) & $H_3$ (qutrit Fourier) &
+$\frac{1}{\sqrt{3}}\left(\begin{smallmatrix} 1 & 1 & 1 \\ 1 & \omega & \omega^2 \\ 1 & \omega^2 & \omega \end{smallmatrix}\right)$ \\[6pt]
+$T$ ($\pi/8$ phase) & $P_3^{(k)}$ (generalized phase) &
+$\text{diag}(1, e^{i\phi_1}, e^{i\phi_2})$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Here $X_3$ and $Z_3$ are the Weyl--Heisenberg (generalized Pauli) operators for $d = 3$.
+They satisfy $X_3 Z_3 = \omega Z_3 X_3$ and generate the Heisenberg--Weyl group for
+qutrits.
+
+\subsection{Universal Gate Set}
+
+For qubits, $\{H, T, \text{CNOT}\}$ is universal. For qutrits, universality requires:
+
+\begin{enumerate}
+  \item \textbf{Arbitrary single-qutrit gates:} Any $\SU(3)$ rotation. As shown above,
+    this decomposes into 3 Givens $\SU(2)$ rotations (9 real parameters).
+    L\'{o}pez-Garc\'{\i}a et al.~\cite{LopezGarcia2026} show that for NV centers, % LopezGarcia2026 Sec. II and Fig. 2 (decomposition into double-quantum rotations + lambda_5, lambda_8)
+    arbitrary $\SU(3)$ can be decomposed into double-quantum subspace rotations plus
+    $\lambda_5$ and $\lambda_8$ generators.
+  \item \textbf{An entangling 2-qutrit gate:} The qutrit analog of CNOT is the SUM gate
+    (also called CSUM or $\text{SUM}_3$):
+    \begin{equation}
+      \text{SUM}_3 \ket{j}\ket{k} = \ket{j}\ket{(j+k) \bmod 3}.
+      \label{eq:sum3}
+    \end{equation}
+\end{enumerate}
+
+The set $\{H_3, P_3^{(2)}, \text{SUM}_3\}$ generates a dense subgroup of
+$\SU(3^N)$~\cite{Brylinski2002}. % Brylinski2002 p.7, Thm. 2 (universality of entangling gates for qudits)
+This is the qutrit analog of the qubit universality
+theorem.
+
+\subsection{Holonomic Implementations}
+
+For single-qutrit gates: the sequential Route~B (Section~\ref{sec:sequential}) implements
+arbitrary $\SU(3)$ via 3 holonomic $\SU(2)$ loops. Each pairwise holonomic rotation is
+already demonstrated in the NVQbit framework.
+
+For the entangling gate: this requires a 2-NV interaction, discussed in
+Section~\ref{sec:Q6}. High-fidelity qutrit entangling gates have been demonstrated in
+superconducting circuits with fidelities of $97.3\%$ (CZ$^\dagger$) and $95.2\%$
+(CZ)~\cite{Goss2022}. % Goss2022 Table 1 (process fidelities: CZdag 97.3%, CZ 95.2%)
+For NV centers, the dipolar coupling between two NV electron spins
+can mediate 2-qutrit gates, but the nuclear-spin encoding adds complexity (see
+Section~\ref{sec:Q6}).
+
+
+%% ============================================================
+\section{Q3: Bright/Dark State Structure in Qutrit Encoding}
+\label{sec:Q3}
+%% ============================================================
+
+\subsection{Qubit Scheme Recap}
+
+In the standard NVQbit qubit protocol, the tripod linkage gives:
+\begin{itemize}
+  \item 1 bright state $\ket{B}$ (Eq.~\ref{eq:bright}): coupled to $\ket{e}$, acts as the
+    ``handle'' for adiabatic control.
+  \item 2 dark states $\ket{D_1}, \ket{D_2}$: orthogonal to $\ket{B}$ in the ground
+    manifold, degenerate, form the computational register.
+\end{itemize}
+The excited state $\ket{e}$ is never populated (adiabatic condition: $\Omega_{\text{tot}}
+T \gg 1$)~\cite{Unanyan2004}. Information is stored exclusively in the dark subspace.
+
+\subsection{Qutrit Scheme: Role of the Excited State}
+
+In the qutrit encoding using \textbf{all 3 ground states} as computational levels, the
+bright/dark decomposition changes fundamentally:
+
+\textbf{Route B (sequential holonomic):} Each elementary gate operates on a 2-of-3
+subspace. During a gate $R_{12}$ (acting on $\ket{g_1}, \ket{g_2}$):
+\begin{itemize}
+  \item $\ket{g_3}$ is decoupled ($\Omega_3 = 0$) and acts as a spectator.
+  \item The $\{\ket{g_1}, \ket{g_2}, \ket{e}\}$ subsystem forms a $\Lambda$ system with
+    1 dark state and 1 bright state.
+  \item The dark state carries the $R_{12}$ holonomy; $\ket{g_3}$ accumulates only a
+    trivial (dynamical) phase.
+\end{itemize}
+Thus, in each elementary step, the bright/dark decomposition is \emph{still meaningful},
+but it applies only to the active 2D subspace. The third ground state is temporarily
+``parked.'' The excited state $\ket{e}$ retains its role as the adiabatic handle ---
+it is never populated but its presence enables the geometric connection.
+
+\textbf{Route A (tetrapod, for comparison):} With 4 ground states and 1 excited state,
+there are 3 dark states and 1 bright state. All 3 dark states form the qutrit register.
+The bright state and excited state are both outside the computational space. This is the
+cleanest decomposition, but requires a 4th ground state not available in the $m_s = 0$
+hyperfine manifold.
+
+\subsection{Key Distinction}
+
+\begin{quote}
+In the qubit scheme, the bright state is a \emph{spectator}. In the qutrit scheme
+(Route~B), each ground state takes turns being a spectator while the other two form the
+active holonomic pair. The excited state remains the non-populated mediator in all cases.
+\end{quote}
+
+
+%% ============================================================
+\section{Q4: Decoherence --- Qutrit vs.\ Qubit}
+\label{sec:Q4}
+%% ============================================================
+
+\subsection{Additional Decoherence Channels}
+
+A qubit has 2 levels and 1 independent decoherence channel (in the simplest model: $T_1$
+decay and $T_2$ dephasing). A qutrit with 3 levels has a richer error structure. The
+Lindblad master equation for a qutrit requires~\cite{Candido2024}: % Candido2024 Sec. II.B, Eqs. (18)--(26) (8 Lindblad operators governing dephasing and relaxation of 3-level C3v spin-1 center)
+
+\begin{itemize}
+  \item \textbf{3 relaxation ($T_1$) channels:} $\ket{g_1} \to \ket{g_2}$,
+    $\ket{g_1} \to \ket{g_3}$, $\ket{g_2} \to \ket{g_3}$ (and reverses). For the
+    $^{14}$N nuclear spin, these correspond to nuclear spin-flip transitions
+    $\Delta m_I = \pm 1$ and $\Delta m_I = \pm 2$.
+  \item \textbf{3 dephasing ($T_2$) channels:} One for each pair of levels.
+    For 3 levels, there are $\binom{3}{2} = 3$ independent coherences, each with its
+    own $T_2$.
+  \item \textbf{Leakage:} Transitions out of the computational subspace (e.g.,
+    $m_s = 0 \to m_s = \pm 1$ electron spin flip). This exists for both qubit and
+    qutrit encodings equally.
+\end{itemize}
+
+Compare with the qubit dark-subspace encoding: only 2 levels, 1 relaxation channel
+between them, and 1 dephasing channel. The qutrit has \textbf{3$\times$ more relaxation
+channels and 3$\times$ more dephasing channels}.
+
+\subsection{Nuclear Spin Relaxation in $m_s = 0$}
+
+For the $^{14}$N nuclear spin in $m_s = 0$~\cite{Pfender2017}:
+\begin{itemize}
+  \item \textbf{$T_1$ (nuclear):} Minutes at high field ($\sim 1$~T). At lower fields
+    ($\sim 50$~G, NVQbit operating regime), $T_1$ is limited by electron $T_1$
+    fluctuations via hyperfine coupling. Expected: $T_1^{(\text{nuc})} \gg T_2^{(\text{nuc})}$.
+  \item \textbf{$T_2$ (nuclear):} $\approx 10$~ms in NV$^-$~\cite{Pfender2017}. This
+    applies to \emph{all} nuclear coherences ($m_I = 0 \leftrightarrow \pm 1$ and
+    $m_I = +1 \leftrightarrow -1$) approximately equally, since all three levels reside
+    in the same $m_s = 0$ manifold and experience similar magnetic noise environments.
+\end{itemize}
+
+\subsection{Qutrit Gate Time Budget}
+
+The critical comparison is gate time vs.\ coherence time:
+
+\begin{table}[h]
+\centering
+\caption{Gate time vs.\ coherence budget for qubit and qutrit encodings.}
+\label{tab:decoherence}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Qubit (2D dark)} & \textbf{Qutrit (sequential $\SU(3)$)} \\
+\midrule
+Gate: single-register operation & 1 holonomic loop & 3 holonomic loops \\
+Loop time & $10$--$100~\mu$s & $10$--$100~\mu$s (each) \\
+Total gate time & $10$--$100~\mu$s & $30$--$300~\mu$s \\
+Coherence time ($T_2^{(\text{nuc})}$) & $\approx 10$~ms & $\approx 10$~ms \\
+Margin ($T_2$/gate) & $\sim 100\text{--}1000\times$ & $\sim 33\text{--}333\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Assessment:} The qutrit encoding reduces the coherence margin by a factor of
+$\sim 3\times$ compared to the qubit encoding, but the margin remains $\gg 1$. The
+nuclear $T_2 \approx 10$~ms gives $\sim 33$--$333\times$ headroom even for a full
+$\SU(3)$ gate. Decoherence is \textbf{not a showstopper} for the qutrit encoding.
+
+The dominant concern is not $T_2$ per se but \textbf{accumulated gate error}: each
+holonomic loop has finite fidelity ($\sim 96\%$ per gate in Nagata et al.'s electron-spin
+implementation~\cite{Nagata2018}). % Nagata2018 Figure 2b (single-qubit holonomic gate process fidelity ~96%)
+Three sequential loops compound to $\sim 0.96^3 \approx
+88.5\%$ fidelity for a full $\SU(3)$ gate. Improving per-loop fidelity is therefore
+essential for practical qutrit computation.
+
+\textbf{Important caveat on fidelity floor:} The Nagata2018 96\% figure is for an
+electron-spin geometric gate at zero field, driven by polarized microwaves. The NVQbit
+nuclear-hyperfine qutrit operates in an entirely different physical regime: RF-driven
+($\Omega_{RF}/2\pi \approx 32.9$~kHz Rabi, $\sim 3$~orders of magnitude slower),
+requires a finite bias field ($B \sim 30$~G), and encodes the qubit in the $^{14}$N
+nuclear spin rather than the electron spin. Decoherence mechanisms (nuclear $T_2 \approx
+10$~ms vs.\ electron $T_2 \sim \mu$s) and coupling strengths differ substantially.
+The estimate $0.96^3 \approx 88.5\%$ should therefore be treated as an \emph{optimistic
+floor} derived from a different physical system, not a prediction for the NVQbit qutrit
+implementation. A dedicated fidelity analysis for the nuclear-hyperfine RF-driven regime
+is required before this estimate can be quoted quantitatively.
+
+
+%% ============================================================
+\section{Q5: Literature --- Existing NV Qutrit Proposals}
+\label{sec:Q5}
+%% ============================================================
+
+\subsection{NV Electron-Spin Qutrit Gates}
+
+\begin{enumerate}[label=(\alph*)]
+  \item \textbf{L\'{o}pez-Garc\'{\i}a et al.\ (2026)}~\cite{LopezGarcia2026}:
+    ``Fast Arbitrary Qutrit Gates for NV Centers in the Low-Field Regime.'' Demonstrates
+    that arbitrary $\SU(3)$ operations on the NV$^-$ ground-state electron spin-1
+    manifold ($m_s = 0, \pm 1$) can be achieved using monochromatic microwave pulses
+    tuned to the zero-field transition. The decomposition uses rotations in the
+    double-quantum ($m_s = +1 \leftrightarrow -1$) subspace plus effective generators
+    $\lambda_5$ and $\lambda_8$. \textbf{Platform:} Electron spin, not nuclear.
+    \textbf{Relevance to NVQbit:} Proves $\SU(3)$ control of a spin-1 system in NV
+    is achievable; the decomposition strategy is directly transferable to the nuclear
+    hyperfine qutrit.
+
+  \item \textbf{Nagata et al.\ (2018)}~\cite{Nagata2018}: Universal holonomic quantum
+    gates on the geometric spin qubit in NV, using polarized microwaves at zero field.
+    Encodes a qubit in $\ket{\pm 1}$ with $\ket{0}$ as ancilla. Demonstrates $X, Y, Z,
+    H$ single-qubit gates and a 2-qubit CZ gate. \textbf{This is a qubit scheme on the
+    electron qutrit, not a full qutrit gate.}
+
+  \item \textbf{Rong et al.\ (2015)}~\cite{Rong2015}: Demonstrated nonadiabatic holonomic
+    gates on NV electron spin. Single-qubit gates with fidelity $> 97\%$. Again encodes % Rong2015 Abstract and Table 1 (single-qubit fidelity 0.999952 via composite pulses)
+    a qubit in a qutrit, not full qutrit control.
+\end{enumerate}
+
+\subsection{$\UU(3)$ Holonomy Demonstrations (Non-NV)}
+
+\begin{enumerate}[label=(\alph*)]
+  \item \textbf{Neef et al.\ (2023)}~\cite{Neef2023}: First experimental realization % Neef2023 Nat. Phys. 19, 30--34; described in companion paper (Neef2023_3D_NonAbelian_Holonomy.pdf) p.4: "realization of an adiabatic holonomy belonging to the U(3) group"
+    of 3D non-Abelian quantum holonomy, using photonic waveguides with engineered
+    couplings. Demonstrated $\UU(3)$ holonomy by adiabatically evolving two
+    indistinguishable photons in a system with a 3D degenerate dark subspace.
+    \textbf{Platform:} Photonic. \textbf{Relevance:} Proves $\UU(3)$ holonomy is
+    experimentally realizable; the dark-subspace principle is universal.
+    % PDF obtained: Neef2023_3D_NonAbelian_Holonomy.pdf (arXiv companion, 2026-03-19)
+
+  \item \textbf{Abdumalikov et al.\ (2013)}~\cite{Abdumalikov2013}: Non-Abelian
+    non-adiabatic holonomic gates on a superconducting transmon qutrit. Fidelity
+    $> 95\%$. % Abdumalikov2013 Abstract; process fidelity from Fig. 4 Encoded qubit in $\{\ket{0}, \ket{2}\}$ with $\ket{1}$ as ancilla.
+
+  \item \textbf{Zhang et al.\ (2019)}~\cite{Zhang2019}: Single-shot nonadiabatic holonomic
+    gates with a superconducting Xmon qutrit. Clifford gates in single-shot
+    implementation, fidelity $> 99\%$. % Zhang2019 Abstract and Table I (Clifford gate fidelities >99%)
+\end{enumerate}
+
+\subsection{Qutrit Entangling Gates (Non-Holonomic)}
+
+\begin{enumerate}[label=(\alph*)]
+  \item \textbf{Goss et al.\ (2022)}~\cite{Goss2022}: High-fidelity qutrit entangling
+    gates for superconducting circuits. CZ$^\dagger$ fidelity $97.3\%$, CZ fidelity
+    $95.2\%$. % Goss2022 Abstract; process fidelities from Table 1 Uses differential AC Stark shift.
+
+  \item \textbf{Roy et al.\ (2023)}~\cite{Roy2023}: Two-qutrit quantum algorithms on
+    a programmable superconducting processor. Demonstrated Deutsch-Jozsa, Bernstein-Vazirani,
+    and Grover's search on 2-qutrit ($3^2 = 9$-dimensional) Hilbert space. % Roy2023 Abstract; algorithm list from Sec. III
+\end{enumerate}
+
+\subsection{SU(3) Synthesis Theory}
+
+\begin{enumerate}[label=(\alph*)]
+  \item \textbf{Vitanov (2012)}~\cite{Vitanov2012}: ``Synthesis of arbitrary $\SU(3)$
+    transformations of atomic qutrits.'' Proposes Givens rotations (9 steps) and
+    Householder reflections (3 steps) for tripod and M-shaped qutrits. This is the
+    theoretical backbone for Route~B. % Vitanov2012 Sec. II (Givens decomposition) and Sec. III (Householder reflections)
+
+  \item \textbf{Simeonov \& Vitanov (2017)}~\cite{Vitanov2017}: Non-Abelian geometric
+    phases in degenerate multistate systems. Generalizes the Morris-Shore decomposition.
+    Already in NVQbit literature library.
+\end{enumerate}
+
+
+%% ============================================================
+\section{Q6: Two-Qutrit Architecture Preview}
+\label{sec:Q6}
+%% ============================================================
+
+\subsection{Single NV Center as a Qutrit}
+
+A single NV center in $m_s = 0$ hosts 3 nuclear spin levels
+$\{\ket{m_I = -1}, \ket{m_I = 0}, \ket{m_I = +1}\}$ constituting one qutrit register.
+The full Hilbert space of a single NV center (electron $\otimes$ nuclear) is
+$3 \times 3 = 9$-dimensional~\cite{Doherty2013}. The qutrit encoding uses the 3D
+subspace with $m_s = 0$.
+
+\subsection{Two-Qutrit Register}
+
+Two NV centers, each hosting one nuclear-spin qutrit, form a 2-qutrit register:
+\begin{equation}
+  \mathcal{H}_{2\text{-qutrit}} = \mathbb{C}^3 \otimes \mathbb{C}^3 = \mathbb{C}^9,
+  \label{eq:2qutrit}
+\end{equation}
+compared to $\mathbb{C}^4$ for 2 qubits. The 9-dimensional space enables
+$\lceil \log_2 9 \rceil = 4$ bits of classical information per measurement, vs.\ 2 bits
+for 2 qubits.
+
+\subsection{Entangling Gate}
+
+The 2-qutrit entangling gate ($\text{SUM}_3$ or a controlled-phase gate) requires a
+physical interaction between the two NV centers. Candidates:
+
+\begin{enumerate}
+  \item \textbf{Electron--electron dipolar coupling:} Two nearby NV centers ($r \sim
+    10$--$30$~nm) interact via magnetic dipole-dipole coupling. The interaction is between
+    \emph{electron} spins~\cite{Dolde2013}. % Dolde2013 p.2, Eq. 1 (dipolar Hamiltonian); v_dip = 4.93 kHz at r ~ 25 nm
+    To entangle the nuclear qutrits, one must
+    mediate through the electron spins: (i)~map nuclear state onto electron, (ii)~apply
+    electron-electron entangling gate, (iii)~map back. This is the approach used for
+    qubit entanglement in NV~\cite{Bradley2019, Pompili2021}.
+
+  \item \textbf{Holonomic entangling gate:} Finsterh\"{o}lzl et al.\ (2024) proposed
+    high-fidelity entangling gates between NV centers using geometric
+    phases~\cite{Finsterhoelzl2024}. This protocol exploits the electron--electron dipolar
+    coupling and uses synchronized adiabatic evolution to generate a controlled geometric
+    phase. Extending this to qutrit entanglement requires the electron-mediated pathway
+    above.
+
+  \item \textbf{Photon-mediated entanglement:} For distant NV centers, entanglement via
+    photon emission has been demonstrated~\cite{Pompili2021, Hermans2022}. This entangles
+    the electron spins; nuclear qutrit entanglement again requires electron-nuclear state
+    transfer.
+\end{enumerate}
+
+\subsection{Architecture Sketch}
+
+\opennote{Full 2-qutrit architecture design is flagged as a future task. The following
+is a preliminary sketch only.}
+
+\begin{enumerate}
+  \item Each NV center hosts one qutrit in $\{m_I = -1, 0, +1\}$ of $m_s = 0$.
+  \item Single-qutrit gates: sequential holonomic $\SU(2)$ loops (Route~B) using 3 MW
+    tones + RF dressing, independently on each NV.
+  \item Two-qutrit entangling gate: electron-mediated. Requires:
+    \begin{enumerate}
+      \item SWAP nuclear qutrit state $\to$ electron qutrit ($m_s = 0, \pm 1$).
+      \item Apply electron--electron entangling gate (dipolar or photon-mediated).
+      \item SWAP back to nuclear.
+    \end{enumerate}
+  \item The SWAP operation between nuclear and electron spin is itself a non-trivial
+    3-level operation --- it requires $\SU(3)$ control of the electron--nuclear coupled
+    system.
+  \item Hilbert space per NV: $3_e \times 3_n = 9$. Two NVs: $9 \times 9 = 81$ total,
+    with the 2-qutrit computational space being a $3 \times 3 = 9$-dimensional subspace.
+\end{enumerate}
+
+\textbf{This is a complex architecture that requires significant further development.
+Flagged as future task: \texttt{TASK-QUTRIT-ARCH}.}
+
+
+%% ============================================================
+\section{Summary and Recommendations}
+\label{sec:summary}
+%% ============================================================
+
+\begin{enumerate}
+  \item \textbf{$\UU(3)$ holonomy is constructable} for the NVQbit tripod, but not via a
+    single adiabatic loop on the standard tripod. The recommended route is sequential
+    $\SU(2)$ Givens/Householder decomposition (Route~B, Section~\ref{sec:sequential}),
+    which composes pairwise holonomic gates to span the full $\SU(3)$.
+
+  \item \textbf{Universal qutrit gate set} requires arbitrary single-qutrit $\SU(3)$
+    (achievable via 3 holonomic loops) plus an entangling 2-qutrit gate ($\text{SUM}_3$
+    or controlled-phase).
+
+  \item \textbf{The bright/dark decomposition persists} in the qutrit scheme, but applies
+    sequentially to each active 2D subspace rather than to the full 3D space at once.
+
+  \item \textbf{Decoherence is manageable:} The $3\times$ increase in gate time (3 loops
+    vs.\ 1) reduces the coherence margin from $\sim 100\times$ to $\sim 33\times$, still
+    comfortable. Gate fidelity compounding ($0.96^3 \approx 0.89$) is the more pressing
+    concern.
+
+  \item \textbf{The NV electron-spin qutrit has been addressed} (L\'{o}pez-Garc\'{\i}a
+    2026), proving $\SU(3)$ control is achievable in NV. The nuclear hyperfine qutrit is
+    a natural extension.
+
+  \item \textbf{2-qutrit entanglement} requires electron-mediated gates and is flagged
+    as a future architecture task.
+\end{enumerate}
+
+\subsection{Papers Now In Hand (Updated 2026-03-20)}
+
+All previously missing PDFs have been obtained. No outstanding \texttt{\textbackslash needref\{\}} entries remain
+for Neef2023 or Candido2024.
+
+\noindent \textbf{Now in hand (2026-03-20, Task \#124, Cycle 37):}
+\begin{itemize}
+  \item \cite{Neef2023}: Neef et al.\ (2023), Nat.\ Phys.\ \textbf{19}, 30--34 [U(3) holonomy, photonic] ---
+    PDF obtained as \texttt{Neef2023\_3D\_NonAbelian\_Holonomy.pdf} (arXiv companion paper).
+    Source locators added at lines of use. % Neef2023 key result: p.4 of companion "realization of an adiabatic holonomy belonging to the U(3) group"
+  \item \cite{Candido2024}: Candido \& Flatt\'{e} (2024), Phys.\ Rev.\ B \textbf{110}, 024419 [NV qutrit decoherence] ---
+    PDF obtained as \texttt{Candido2024\_NV\_Qutrit\_Decoherence.pdf} (arXiv:2303.13370).
+    Source locators added at lines of use. % Candido2024 key result: Sec. II.B, Eqs. (18)--(26): 8 Lindblad operators for C3v spin-1 qutrit
+\end{itemize}
+
+\noindent \textbf{Previously in hand (2026-03-19):} Vitanov2012, L\'{o}pez-Garc\'{\i}a2026, Abdumalikov2013, Zhang2019 (formerly Xu2018), Goss2022, Roy2023, Rong2015, Dolde2013 (Nat.\ Phys.\ \textbf{9}, 139 --- PDF obtained via Task \#97, Cycle 28).
+All source locator comments added to body text above.
+
+
+%% ============================================================
+%% BIBLIOGRAPHY
+%% ============================================================
+
+\begin{thebibliography}{99}
+
+% --- Papers in hand (verified in NVQbit/literature/) ---
+
+\bibitem{WilczekZee1984}
+F.~Wilczek and A.~Zee,
+``Appearance of gauge structure in simple dynamical systems,''
+Phys.\ Rev.\ Lett.\ \textbf{52}, 2111--2114 (1984).
+
+\bibitem{Berry1984}
+M.~V.~Berry,
+``Quantal phase factors accompanying adiabatic changes,''
+Proc.\ R.\ Soc.\ Lond.\ A \textbf{392}, 45--57 (1984).
+
+\bibitem{Unanyan2004}
+R.~G.~Unanyan, M.~E.~Pietrzyk, B.~W.~Shore, and K.~Bergmann,
+``Adiabatic creation of coherent superposition states via multiple laser pulses,''
+Phys.\ Rev.\ A \textbf{70}, 053404 (2004).
+
+\bibitem{Doherty2013}
+M.~W.~Doherty \textit{et al.},
+``The nitrogen-vacancy colour centre in diamond,''
+Phys.\ Rep.\ \textbf{528}, 1--45 (2013).
+
+\bibitem{Nagata2018}
+K.~Nagata, K.~Kuramitani, Y.~Sekiguchi, and H.~Kosaka,
+``Universal holonomic quantum gates over geometric spin qubits with polarised microwaves,''
+Nat.\ Commun.\ \textbf{9}, 3227 (2018).
+
+\bibitem{Pfender2017}
+M.~Pfender \textit{et al.},
+``Nonvolatile nuclear spin memory enables sensor-unlimited nanoscale spectroscopy of small spin clusters,''
+Nat.\ Commun.\ \textbf{8}, 834 (2017).
+
+\bibitem{Smeltzer2009}
+B.~Smeltzer, L.~Childress, and A.~Gali,
+``$^{13}$C hyperfine interactions in the nitrogen-vacancy centre in diamond,''
+New J.\ Phys.\ \textbf{13}, 025021 (2011).
+
+\bibitem{Vitanov2017}
+L.~S.~Simeonov and N.~V.~Vitanov,
+``Dynamical invariants for quantum control of four-level systems,''
+Phys.\ Rev.\ A \textbf{96}, 032102 (2017).
+
+\bibitem{Finsterhoelzl2024}
+R.~Finsterh\"{o}lzl, W.-R.~Hannes, and G.~Burkard,
+``High-fidelity entangling gates in diamond via geometric phases,''
+Phys.\ Rev.\ B \textbf{111}, 214104 (2024).
+
+\bibitem{Bradley2019}
+C.~E.~Bradley \textit{et al.},
+``A ten-qubit solid-state spin register with quantum memory up to one minute,''
+Phys.\ Rev.\ X \textbf{9}, 031045 (2019).
+
+\bibitem{Pompili2021}
+M.~Pompili \textit{et al.},
+``Realization of a multinode quantum network of remote solid-state qubits,''
+Science \textbf{372}, 259--264 (2021).
+
+\bibitem{Hermans2022}
+S.~L.~N.~Hermans \textit{et al.},
+``Qubit teleportation between non-neighbouring nodes in a quantum network,''
+Nature \textbf{605}, 663--668 (2022).
+
+% --- Papers now IN HAND (PDFs confirmed in NVQbit/literature/ as of 2026-03-20) ---
+
+\bibitem{Vitanov2012}
+N.~V.~Vitanov,
+``Synthesis of arbitrary SU(3) transformations of atomic qutrits,''
+Phys.\ Rev.\ A \textbf{85}, 032331 (2012).
+% PDF in NVQbit/literature/Vitanov2012_SU3_Qutrit_Synthesis.pdf
+
+\bibitem{Neef2023}
+V.~Neef, J.~Pinske, \textit{et al.},
+``Three-dimensional non-Abelian quantum holonomy,''
+Nat.\ Phys.\ \textbf{19}, 30--34 (2023).
+% PDF in NVQbit/literature/Neef2023_3D_NonAbelian_Holonomy.pdf (arXiv companion paper; obtained Task \#124, Cycle 37, 2026-03-20)
+
+\bibitem{LopezGarcia2026}
+A.~L\'{o}pez-Garc\'{\i}a, M.~Morillas-Rozas, A.~Mayorgas, and J.~Cerrillo,
+``Fast arbitrary qutrit gates for NV centers in the low-field regime,''
+arXiv:2603.12984 (2026).
+% PDF in NVQbit/literature/LopezGarcia2026_Qutrit_Gates_NV_LowField.pdf
+
+\bibitem{Abdumalikov2013}
+A.~A.~Abdumalikov \textit{et al.},
+``Experimental realization of non-Abelian non-adiabatic geometric gates,''
+Nature \textbf{496}, 482--485 (2013).
+% PDF in NVQbit/literature/Abdumalikov2013_NonAbelian_Geometric_Gates.pdf
+
+\bibitem{Zhang2019}
+Z.~Zhang, P.~Z.~Zhao, T.~Wang, L.~Xiang, Z.~Jia, P.~Liu, Y.~Yin, G.~F.~Xu, and D.~M.~Tong,
+``Single-shot realization of nonadiabatic holonomic gates with a superconducting Xmon qutrit,''
+New J.\ Phys.\ \textbf{21}, 073024 (2019).
+% Zhang2019 PDF in NVQbit/literature/Zhang2019_Xmon_Qutrit_SingleShot_Holonomic.pdf
+
+\bibitem{Goss2022}
+N.~Goss \textit{et al.},
+``High-fidelity qutrit entangling gates for superconducting circuits,''
+Nat.\ Commun.\ \textbf{13}, 7481 (2022).
+% PDF in NVQbit/literature/Goss2022_Qutrit_Entangling_Gates_Superconducting.pdf
+
+\bibitem{Roy2023}
+T.~Roy \textit{et al.},
+``Two-qutrit quantum algorithms on a programmable superconducting processor,''
+Phys.\ Rev.\ Appl.\ \textbf{19}, 064024 (2023).
+% PDF in NVQbit/literature/Roy2023_Two-Qutrit_Quantum_Algorithms_Superconducting.pdf
+
+\bibitem{Candido2024}
+D.~R.~Candido and M.~E.~Flatt\'{e},
+``Interplay between charge and spin noise in the near-surface theory of decoherence and relaxation of $C_{3v}$ symmetry qutrit spin-1 centers,''
+Phys.\ Rev.\ B \textbf{110}, 024419 (2024).
+% PDF in NVQbit/literature/Candido2024_NV_Qutrit_Decoherence.pdf (arXiv:2303.13370; obtained Task \#124, Cycle 37, 2026-03-20)
+
+\bibitem{GellMann}
+M.~Gell-Mann,
+``Symmetries of baryons and mesons,''
+Phys.\ Rev.\ \textbf{125}, 1067--1084 (1962).
+% Standard reference; no PDF needed for Gell-Mann matrices definition.
+
+\bibitem{Brylinski2002}
+J.-L.~Brylinski and R.~Brylinski,
+``Universal quantum gates,''
+in \textit{Mathematics of Quantum Computation}, Chapman \& Hall (2002).
+% PDF: NVQbit/literature/Brylinski2002_Universal_Quantum_Gates.pdf (arXiv:quant-ph/0108064)
+
+\bibitem{Dolde2013}
+F.~Dolde \textit{et al.},
+``Room-temperature entanglement between single defect spins in diamond,''
+Nat.\ Phys.\ \textbf{9}, 139--143 (2013).
+% PDF in NVQbit/literature/Dolde2013_NV_Entanglement_NaturePhysics.pdf
+
+\bibitem{Rong2015}
+X.~Rong \textit{et al.},
+``Experimental fault-tolerant universal quantum gates with solid-state spins under ambient conditions,''
+Nat.\ Commun.\ \textbf{6}, 8748 (2015).
+% PDF in NVQbit/literature/Rong2015_Fault-Tolerant_Solid-State_Spins.pdf
+
+\end{thebibliography}
+
+\end{document}
