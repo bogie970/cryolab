@@ -1,8 +1,103 @@
+% 05_signal_chain.tex — Section 5: Signal Chain & FPGA/AWG
+% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
+% Sources: hardware/rfsoc_vs_artix7_comparison.tex,
+%          hardware/fpga_dds_awg_analysis.tex,
+%          hardware/sipm_fpga/sipm_fpga_design.tex
+% Law 16: quantitative claims carry source locator comments.
+% Status: POPULATED (Phase 2)
+
 \section{Signal Chain \& FPGA/AWG}
 \label{sec:signal-chain}
 
-% Placeholder — content to be migrated in Phase 2.
-% Source: rfsoc_vs_artix7_comparison.tex, fpga_dds_awg_analysis.tex
-% Status: SKELETON
+This section covers the complete MW generation and detection signal chain for D0/D1
+ODMR operation, the FPGA Direct Digital Synthesis (DDS) design, and the hardware
+decision between the Artix-7 stack and the AMD RFSoC 4x2 platform.
 
-This section will cover the full signal chain from microwave generation through FPGA-based DDS/AWG control, including the RFSoC vs.\ Artix-7 platform comparison and timing architecture.
+\subsection{D0 Signal Chain (CW-ODMR)}
+
+For D0 (continuous-wave ODMR), the signal chain is:
+\begin{enumerate}
+  \item \textbf{ADF4351 MW synthesizer}: stepped from 2800--2950\,MHz at 0.1\,MHz increments;
+    output $+5$\,dBm~\cite{ADF4351datasheet}. % ADF4351datasheet p.4 Table 1
+  \item \textbf{ADL5321 RF driver amplifier}: gain 11.7\,dB at 2877\,MHz;
+    $P_{1\text{dB}} = 25.7$\,dBm~\cite{ADL5321datasheet}.
+    % ADL5321datasheet Table 2 (S21 interpolated: 11.71 dB at 2850 MHz); Table 1 (P1dB at 3.5 GHz)
+  \item \textbf{MW delivery to diamond}: via loop antenna or PCB stripline near NV ensemble.
+  \item \textbf{NV fluorescence detection}: confocal objective $\to$ dichroic $\to$ photodetector
+    (APD or SiPM, depending on milestone).
+  \item \textbf{Lock-in / software averaging}: ODMR contrast read vs.\ frequency step.
+\end{enumerate}
+
+\subsection{D1 Signal Chain (Pulsed ODMR)}
+
+For D1 (pulsed ODMR / Ramsey magnetometry), the MW chain adds the ADL5375 IQ modulator
+for phase control and pulsed-envelope shaping~\cite{ADL5375datasheet}:
+% ADL5375datasheet (IQ modulator, D1 upgrade path, not needed for D0; PDF in hand)
+\begin{equation*}
+  \text{ADF4351 LO}
+  \;\to\;
+  \text{ADL5375 IQ mod.}
+  \;\leftarrow\;
+  \text{FPGA DDS baseband}
+  \;\to\;
+  \text{ADL5321 PA}
+  \;\to\;
+  \text{NV diamond}.
+\end{equation*}
+The FPGA generates the baseband I/Q signals (0, $\pm 2.162$\,MHz for the NVQbit tripod
+protocol, or simple pulsed envelope for Ramsey) via on-chip DDS.
+
+\subsection{FPGA DDS Architecture}
+
+The Artix-7 XC7A100T contains 240 DSP48E1 blocks, each a 25$\times$18-bit
+multiplier-accumulator capable of running at up to 464\,MHz~\cite{XilinxUG479}.
+% XilinxUG479 p.47 (max clock from DS181 Artix-7 data sheet referenced therein)
+A complete DDS core for one tone requires $\sim$1--2 DSP48E1 blocks (32-bit accumulator +
+LUT); three tones require $\sim$6 DSP48E1 blocks.
+
+\begin{table}[ht]
+\centering
+\caption{DDS parameters at $f_\mathrm{clk} = 125$\,MHz, 32-bit accumulator.
+  \% internal: hardware/fpga\_dds\_awg\_analysis.tex Table~1 (DDS parameters).}
+\label{tab:dds_params}
+\small
+\begin{tabular}{@{}p{5cm}p{3cm}p{4cm}@{}}
+\toprule
+Parameter & Value & Note \\
+\midrule
+Frequency resolution & $f_\mathrm{clk}/2^{32} \approx 0.029$\,Hz & Far below 0.1\,MHz step size \\
+Steps per tone period (2.162\,MHz) & 58 cycles & Adequate for smooth envelope \\
+DAC output & 14-bit, 210\,MSPS & AD9744 ($\sim$\$20)~\needref{AD9744datasheet} \\
+Image rejection & $> 50$\,dB with digital filter & \needref{FPGA filter design verification} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{RFSoC vs.\ Artix-7: Decision Summary}
+
+A formal decision document compares the AMD RFSoC 4x2 kit against the Artix-7 custom stack
+for D1 pulsed MW generation.
+% internal: hardware/rfsoc_vs_artix7_comparison.tex (decision document for Dr. Varghese)
+
+\begin{table}[ht]
+\centering
+\caption{RFSoC 4x2 vs.\ Artix-7 stack: key comparison.
+  \% internal: hardware/rfsoc\_vs\_artix7\_comparison.tex Table 1.}
+\label{tab:rfsoc_vs_artix7}
+\small
+\begin{tabular}{@{}p{3.5cm}p{3.5cm}p{3.5cm}p{2cm}@{}}
+\toprule
+Criterion & RFSoC 4x2 & Artix-7 Stack & Winner \\
+\midrule
+Cost & $\sim$\$2,000 & $\sim$\$500 & Artix-7 \\
+LO phase noise & $-$130\,dBc/Hz @ 100\,kHz & $-$115\,dBc/Hz (ADF4351) & RFSoC \\
+% internal: rfsoc_vs_artix7_comparison.tex (phase noise comparison; ADF4351 phase noise from ADF4351datasheet)
+Timing resolution & $<$1\,ns (RF-DAC) & 17.5\,ps (TDC)~\cite{Lim2025} & Artix-7 (photon) \\
+D0/D1 suitability & Overkill for CW-ODMR & Adequate for CW+pulsed & Artix-7 \\
+D2/D3 suitability & Better (multi-tone) & 3-tone max & RFSoC \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Decision:} Artix-7 custom stack (Option A) for D0/D1. RFSoC deferred to D2/D3
+when multi-channel ($>$8 tones) and sub-MHz phase noise are required.

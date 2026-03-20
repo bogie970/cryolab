@@ -1,8 +1,131 @@
+% 03_sipm_readout.tex — Section 3: SiPM Readout Design
+% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
+% Sources: hardware/sipm_fpga/sipm_fpga_design.tex,
+%          hardware/sipm_fpga/ARCHITECTURE_SUMMARY.tex
+% Law 16: quantitative claims carry source locator comments.
+% Status: POPULATED (Phase 2)
+
 \section{SiPM Readout Design}
 \label{sec:sipm-readout}
 
-% Placeholder — content to be migrated in Phase 2.
-% Source: sipm_fpga_design.tex
-% Status: SKELETON
+The D1 photon-counting readout chain detects NV fluorescence using a silicon photomultiplier
+(SiPM) coupled to an FPGA-based timing and control system. The selected architecture
+(Option~A) replaces multiple standalone instruments with a single-board FPGA solution.
+% internal: hardware/sipm_fpga/ARCHITECTURE_SUMMARY.tex (architecture decision 2026-03-18)
 
-This section will cover the SiPM photon-counting readout architecture, FPGA control logic, and integration with the NV fluorescence detection chain.
+\subsection{Selected Architecture: Option A (SiPM + Fast Comparator + FPGA)}
+
+The readout chain is:
+\begin{equation*}
+  \underbrace{\text{S14420 SiPM}}_{\substack{\text{Hamamatsu}\\\text{Vis/NIR MPPC}}}
+  \;\to\;
+  \underbrace{\text{MAX40658 TIA}}_{\substack{18.3\,\mathrm{k}\Omega\\\text{transimpedance}}}
+  \;\to\;
+  \underbrace{\text{ADCMP601 comp.}}_{\substack{3.5\,\mathrm{ns}\\\text{prop. delay}}}
+  \;\to\;
+  \underbrace{\text{Nexys A7 FPGA}}_{\substack{\text{XC7A100T}\\\text{TDC + control}}}
+  \;\to\; \text{PC}.
+\end{equation*}
+
+\subsubsection{Component Specifications}
+
+\begin{table}[ht]
+\centering
+\caption{D1 readout chain component specifications. All PDFs in hand.}
+\label{tab:readout_components}
+\small
+\begin{tabular}{@{}p{2.8cm}p{3.2cm}p{6cm}@{}}
+\toprule
+Role & Part & Key Specs \\
+\midrule
+SiPM & Hamamatsu S14420-3050MG & PDE = 40\% at 600\,nm; $\sim$25\% at 700\,nm;
+  $V_\mathrm{BR} = 42 \pm 5$\,V at 25$^\circ$C;
+  DCR = 1600\,kcps typ.~\cite{S14420datasheet}
+  % S14420datasheet p.2-3 (electrical and optical characteristics)
+  \\
+TIA & MAX40658AUT+ & Transimpedance 18.3\,k$\Omega$; BW 360--520\,MHz;
+  input clamp 100\,mA; 3.3\,V supply~\cite{MAX40658datasheet}
+  % MAX40658datasheet p.3 Table (Z21 typ, BW min-max)
+  \\
+Comparator & ADCMP601BKSZ-R2 & Propagation delay 3.5\,ns; offset $\pm$2\,mV;
+  TTL/CMOS-compatible~\cite{ADCMP601datasheet}
+  % ADCMP601datasheet p.4 Table 1 (tPD typ)
+  \\
+FPGA & Nexys A7-100T (XC7A100T) & 101,440 logic cells; 4,860\,Kb BRAM;
+  USB-UART interface; active board replacing discontinued Arty A7-100T~\cite{NexysA7refmanual}
+  % NexysA7refmanual p.1 Table (FPGA overview)
+  \\
+MW synth. & ADF4351 module & 35\,MHz--4.4\,GHz, SPI, $+5$\,dBm~\cite{ADF4351datasheet}
+  % ADF4351datasheet p.4 Table 1 (frequency range, output power)
+  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Why Option A}
+
+\begin{enumerate}
+  \item \textbf{Minimal analog complexity:} 2 ICs (TIA + comparator) on a hand-solderable
+    2-layer PCB.
+  \item \textbf{SiPM wavelength match:} The S14420 is engineered for visible/NIR detection
+    (637--800\,nm NV emission band~\cite{Doherty2013}), % Doherty2013 Fig.~1(b) p.5 (ZPL at 637 nm, phonon sideband)
+    with enhanced red sensitivity vs.\ standard NUV-optimized SiPMs~\cite{S14420datasheet}.
+    % S14420datasheet p.3 Fig. (PDE vs. wavelength, 50 um cell curve shows peak at 550-600 nm)
+  \item \textbf{FPGA TDC resolution:} Artix-7 CARRY4 carry-chain TDC achieves
+    17.5\,ps resolution~\cite{Lim2025}, % Lim2025 Table 4 p.13 (4-tap SCSC LSB = 17.530 ps)
+    far exceeding the $\mu$s-scale ODMR dwell time (20\,ms per step, $+5$\,dBm,
+    0.1\,MHz steps; This work) and enabling future $T_1$ lifetime measurements.
+  \item \textbf{Cost:} Preliminary all-in estimate $\approx\!\$500$--600 for the full
+    readout chain (SiPM + TIA PCB + comparator + FPGA board + cables).
+    \needref{Formal vendor quote for complete BOM.}
+\end{enumerate}
+
+\subsection{Rejected Options}
+
+\begin{table}[ht]
+\centering
+\caption{Readout architecture options considered and their disposition.}
+\label{tab:rejected_options}
+\small
+\begin{tabular}{@{}p{3cm}p{2cm}p{8cm}@{}}
+\toprule
+Option & Decision & Reason \\
+\midrule
+B: CITIROC 1A ASIC & Rejected & Deprecated by Weeroc \needref{Weeroc deprecation notice};
+  designed for scintillator charge integration, not NV fluorescence photon-counting
+  (architectural mismatch); 32-channel overkill for single-pixel D0/D1. \\
+C: Preamp-only / FPGA I/O & Deferred & Worse threshold precision; better suited
+  to D2/D3 scale ($>$8 channels)~\cite{Kim2024SeHI}.
+  % Kim2024SeHI (SeHI method: FPGA I/O as comparator, 146 ps timing)
+  \\
+D: AMD RFSoC 4x2 & Deferred & 10$\times$ cost; 10$\times$ LO phase noise headroom;
+  adequate for D2/D3 pulsed MW; overkill for D0/D1 CW-ODMR.
+  % internal: hardware/rfsoc_vs_artix7_comparison.tex (decision document)
+  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{FPGA Functions}
+
+The Nexys A7-100T FPGA (XC7A100T) implements the following subsystems in HDL:
+\begin{enumerate}
+  \item \textbf{ADF4351 SPI controller:} 32-bit serial word to program MW frequency;
+    step size 0.1\,MHz; sweep rate set by PC.
+  \item \textbf{AOM gate:} Nanosecond-precision 532\,nm laser gating for pulsed ODMR
+    (D1 forward; not needed for D0 CW-ODMR).
+  \item \textbf{Carry-chain TDC:} 17.5\,ps-resolution photon timestamping using CARRY4
+    chains~\cite{Lim2025,Wu2010WaveUnion}. % Lim2025 Table 4 (17.530 ps resolution); Wu2010WaveUnion (Wave Union method)
+  \item \textbf{Histogram accumulator:} Photon arrival-time histogram binned per ODMR
+    frequency step; accumulated over the dwell time (20\,ms per step, This work).
+  \item \textbf{UART interface:} Histogram data transmitted to PC at end of sweep.
+\end{enumerate}
+
+\subsection{D0 vs.\ D1 Readout Requirements}
+
+For \textbf{D0} (Meissner--Zeeman POC): no photon-counting electronics are required.
+CW-ODMR using the existing ADF4351 synthesizer and a lock-in or software sweep is sufficient.
+The SiPM readout chain is designed for D1 (energy-resolving bolometry).
+
+For \textbf{D1}: the full chain (Table~\ref{tab:readout_components}) must be assembled
+and characterized at cryogenic temperature before use.

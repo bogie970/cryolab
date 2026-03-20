@@ -1,8 +1,116 @@
+% 10_oq4_epifluorescence.tex — Section 10: OQ-4 Epifluorescence Beamline
+% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
+% Source: open_questions/oq4_epifluorescence_beamline.tex (authoritative)
+% Law 16: quantitative claims carry source locator comments.
+% Status: POPULATED (Phase 2) — design requirements summary.
+%
+% NOTE: Authoritative source is oq4_epifluorescence_beamline.tex.
+%       This section presents design requirements and key options.
+
 \section{OQ-4: Epifluorescence Beamline}
 \label{sec:oq4}
 
-% Placeholder — content to be migrated in Phase 2.
-% Source: oq4_epifluorescence_beamline.tex
-% Status: SKELETON
+This section covers the D1 epifluorescence optical beamline design for cryogenic NV
+ensemble readout. Full analysis is in \texttt{oq4\_epifluorescence\_beamline.tex}.
 
-This section will cover the epifluorescence optical beamline design, including excitation/collection geometry, dichroic filtering, objective selection, and optical throughput budget for cryogenic NV readout.
+\subsection{Design Requirements}
+
+\begin{table}[ht]
+\centering
+\caption{D1 epifluorescence beamline requirements summary.
+  % internal: oq4\_epifluorescence\_beamline.tex Sec.~2 (requirements table)
+  Items marked [PI DECISION REQUIRED] need a PI decision before hardware can be ordered.}
+\label{tab:oq4_requirements}
+\small
+\begin{tabular}{@{}p{3.5cm}p{3cm}p{6cm}@{}}
+\toprule
+Parameter & Required value & Notes \\
+\midrule
+Excitation $\lambda$ & 532\,nm & Nd:YAG doubled, NV off-resonant excitation~\cite{Rondin2014}
+  % Rondin2014 p.4 Fig.1 (NV excitation via 532 nm phonon sideband)
+  \\
+Collection band & 637--800\,nm & NV$^-$ ZPL at 637\,nm + phonon sideband~\cite{Doherty2013}
+  % Doherty2013 Fig.~1(b) p.5 (ZPL at 637 nm, phonon sideband to ~800 nm)
+  \\
+Excitation rejection & OD $>$ 5 at 532\,nm & Dichroic + notch filter combination \\
+Operating temperature & 4--12\,K & Jacob's Montana cryostat \\
+NV target & Ensemble (not single-NV) & Relaxes NA requirement; longer WD acceptable \\
+Architecture choice & \needref{PI decision required} & In-cryostat vs.\ external objective (see below) \\
+Detector & SiPM or sCMOS & \needref{Jacob decides}; different coupling requirements \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Objective Architecture Decision}
+
+\textbf{The critical choice is whether the objective sits inside or outside the cryostat.}
+This is the single most consequential architectural decision.
+
+\subsubsection{Architecture A: Objective Inside Cryostat}
+
+\textbf{Advantages:} No window limits NA or working distance; achieves NA 0.65--0.82
+at sample; no aberration from a cryostat window.
+
+\textbf{Disadvantages:} Objective must survive 4\,K thermal cycling (standard microscope
+objectives contain lubricants that fail at 4\,K); thermal drift during temperature ramp;
+focus adjustment requires piezo scanner inside cryostat.
+
+\textbf{Recommended objective (in-cryostat):} Attocube LT-APO/LWD/VIS/0.64 ---
+NA 0.65; 5.0\,mm working distance; cryo-rated.
+\needref{AttocubeLTAPOLWD\_spec --- datasheet not yet downloaded.}
+
+\subsubsection{Architecture B: Objective External to Cryostat}
+
+\textbf{Advantages:} No cryogenic shock to objective; standard room-temperature optics
+can be used; easier focus adjustment.
+
+\textbf{Disadvantages:} NA limited by cryostat window aperture and distance;
+aberration from window (vacuum viewport or cold window).
+\needref{Cryostat window aperture and sample-to-window distance from Montana Instruments spec.}
+
+\subsection{Filter Chain}
+
+The dichroic and emission filter must:
+\begin{itemize}
+  \item Pass: 637--800\,nm (NV$^-$ emission band~\cite{Doherty2013})
+    % Doherty2013 Fig.~1(b) p.5 (ZPL at 637 nm, sideband to ~800 nm)
+  \item Reject: 532\,nm at OD $>$ 5 (dichroic + notch)
+  \item Typical choice: Thorlabs DMLP650 longpass dichroic + Semrock LP03-532RE edge filter
+    \needref{ThorlabsDMLP650\_spec; SemrockLP03-532RE\_spec (datasheets not yet downloaded).}
+\end{itemize}
+
+\subsection{Collection Efficiency Model}
+
+Collection efficiency for an NV ensemble as a function of objective NA~\cite{Rondin2014}:
+% Rondin2014 Sec.~IV (collection efficiency and far-field emission pattern)
+\begin{equation}
+  \eta_\mathrm{coll} \approx \frac{1}{2}\left(1 - \cos\theta_\mathrm{max}\right),
+  \quad \theta_\mathrm{max} = \arcsin(\mathrm{NA}/n_\mathrm{diamond}),
+  \label{eq:collection_efficiency}
+\end{equation}
+where $n_\mathrm{diamond} = 2.4$ is the diamond refractive index.
+
+\begin{table}[ht]
+\centering
+\caption{Collection efficiency vs.\ objective NA for NV emission in diamond ($n = 2.4$).
+  % internal: oq4\_epifluorescence\_beamline.tex Table (collection efficiency table)
+  Values from Eq.~(\ref{eq:collection_efficiency}).}
+\label{tab:collection_efficiency}
+\small
+\begin{tabular}{@{}p{4.5cm}p{2.5cm}p{2.5cm}p{3cm}@{}}
+\toprule
+Objective & NA & $\eta_\mathrm{coll}$ & Note \\
+\midrule
+Attocube LT-APO/LWD & 0.65 & 11.1\% & In-cryostat; 5\,mm WD \\
+Attocube LT-APO & 0.82 & 21.4\% & In-cryostat; 0.55\,mm WD \\
+Nikon Plan Apo 40$\times$ & 0.95 & 34.1\% & External; standard air objective \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{OQ-4 Status}
+
+\textbf{Status: OPEN.} The in-cryostat vs.\ external objective decision requires
+a PI decision (\needref{Jacob's decision: objective architecture}).
+The filter chain specifications are established; datasheets must be obtained
+before hardware procurement (\needref{Thorlabs DMLP650 and Semrock LP03-532RE datasheets}).

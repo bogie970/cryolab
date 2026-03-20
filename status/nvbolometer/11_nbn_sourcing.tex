@@ -1,8 +1,151 @@
+% 11_nbn_sourcing.tex — Section 11: NbN Film Sourcing & D0 Path
+% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
+% Source: hardware/nbn_film_sourcing.md (converted from markdown to LaTeX — Law 9 substitution-class task)
+% Law 16: quantitative claims carry source locator comments (URL inline per nbn_film_sourcing.md).
+% Status: POPULATED (Phase 2) — LaTeX conversion of .md sourcing report.
+%
+% NOTE: Authoritative source is hardware/nbn_film_sourcing.md (NVB Task #107, 2026-03-19).
+%       Source document retains all claim-level URL citations; this LaTeX version
+%       reproduces them as inline \url{} commands per Law 16.
+%       Prices gathered 2026-03-19 --- verify before purchasing.
+
 \section{NbN Film Sourcing \& D0 Path}
 \label{sec:nbn-sourcing}
 
-% Placeholder — content to be migrated in Phase 2.
-% Source: nbn_film_sourcing (to be converted from .md to .tex)
-% Status: SKELETON
+The D0 milestone requires an NbN superconducting thin-film on sapphire substrate with
+$T_c \geq 15.7$\,K. This section documents the sourcing analysis and recommended
+procurement path.
+% internal: hardware/nbn_film_sourcing.md (Task #107, NVB, 2026-03-19)
 
-This section will cover NbN thin-film sourcing options, vendor comparison, critical temperature specifications, and the procurement pathway for the D0 Meissner-Zeeman demonstration milestone.
+\subsection{Vendor Options}
+
+\begin{table}[ht]
+\centering
+\caption{NbN thin-film sourcing options evaluated 2026-03-19. Prices are preliminary;
+  verify before purchasing. Source: \texttt{nbn\_film\_sourcing.md} (in hand).
+  % internal: hardware/nbn\_film\_sourcing.md Sec.~1 (vendor table)
+  All URLs accessed 2026-03-19; market prices change.}
+\label{tab:nbn_vendors}
+\small
+\begin{tabular}{@{}p{3cm}p{3cm}p{2cm}p{5cm}@{}}
+\toprule
+Vendor & Product & $T_c$ spec & Note \\
+\midrule
+2D Semiconductors & NbN thin film (PLD) on SiO$_2$/Si & $\sim$12\,K &
+  \textbf{Below 15\,K target.} Custom sapphire substrate on request.
+  \url{https://2dsemiconductors.com/NbN-thin-film/}. \$590/sample (2026-03-19). \\
+AJA International & Contract reactive sputtering on customer substrate & Not listed &
+  Same AJA ORION class as UT NRC. Contact: \texttt{topgun@ajaint.com}.
+  \url{https://www.ajaint.com/deposition-services}. \\
+UT Arlington Shimadzu NRC & In-house reactive DC sputtering (AJA ORION UHV) &
+  $\geq 15.7$\,K achievable &
+  \textbf{Primary recommendation.} AJA ORION on-site; reactive N$_2$/Ar at 150$^\circ$C
+  achieves $T_c = 16.58$\,K at 200\,nm
+  (\url{https://ieeexplore.ieee.org/document/10697750/}).
+  Contact: \texttt{nanofab@uta.edu}. \\
+Cornell CNF & Contract user program; NbN for SNSPD published & Varies &
+  Reserve for if UT NRC fails.
+  \url{https://www.cnf.cornell.edu/}. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{UT Arlington Shimadzu NRC: Feasibility Assessment}
+
+The Shimadzu Institute NRC (Arlington, TX; \url{https://shimadzuinstitute.org/centers/nanotechnology-research-center/})
+has confirmed on-site:
+\begin{itemize}
+  \item AJA ATC ORION Series UHV sputtering system
+  \item Kurt J.\ Lesker Lab~18 sputtering system
+  \item Home-built sputter system
+\end{itemize}
+Reactive DC magnetron sputtering of Nb in N$_2$/Ar ambient on sapphire achieves
+$T_c = 16.58$\,K at 200\,nm film thickness and $\sim$150$^\circ$C substrate temperature
+(source: \url{https://ieeexplore.ieee.org/document/10697750/}).
+
+\textbf{What is NOT yet confirmed:}
+\begin{enumerate}
+  \item Whether an Nb sputtering target is installed or available.
+  \item Whether N$_2$ reactive gas is plumbed into any system.
+  \item User fee rate (per-hour or per-run for sputtering).
+\end{enumerate}
+
+\textbf{Recommended action:} Email \texttt{nanofab@uta.edu} with the following queries:
+(1)~Is an Nb target (or NbN target) available? (2)~Is N$_2$ reactive gas plumbed into the
+AJA ORION or KJL system? (3)~Per-hour fee for sputtering? (4)~Prior NbN experience on-site?
+
+Nb sputtering targets are commercially available ($\sim$\$200--500 from Heeger Materials:
+\url{https://heegermaterials.com/sputtering-targets/463-niobium-nitride-sputtering-target.html}).
+
+\subsection{Draft Purchase Specification}
+
+\begin{table}[ht]
+\centering
+\caption{NbN thin-film purchase specification for D0 milestone.
+  % internal: hardware/nbn\_film\_sourcing.md Sec.~4 (draft spec)
+  All Law~16 quantitative claims cite source URL inline.}
+\label{tab:nbn_spec}
+\small
+\begin{tabular}{@{}p{4cm}p{9cm}@{}}
+\toprule
+Parameter & Specification \\
+\midrule
+Substrate & $c$-plane (0001) sapphire, double-side polished, $\geq 5 \times 5$\,mm$^2$ \\
+Film material & Niobium nitride (NbN), $\delta$-phase (cubic, B1 crystal structure) \\
+Film thickness & $\sim$200\,nm $\pm$ 20\% \\
+$T_c$ & $\geq 15.0$\,K (minimum acceptable); target $\geq 15.7$\,K \\
+% Source: https://ieeexplore.ieee.org/document/10697750/ (T_c = 16.58 K at 200 nm, 150°C substrate)
+Transition width & $\Delta T_c < 1$\,K (10--90\% resistance criterion) \\
+Sheet resistance & 10--100\,$\Omega$/sq at room temperature \\
+Surface quality & $R_a < 1$\,nm RMS (double-side polished substrate) \\
+Delivery format & As-deposited, unpackaged wafer piece in cleanroom packaging \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Recommended Path}
+
+\begin{enumerate}
+  \item \textbf{Primary: UT Arlington NRC in-house deposition.} Jacob is at UT Arlington;
+    no shipping or MOU delays; direct process control. Estimated turnaround 4--8 weeks
+    after NRC confirms N$_2$ gas and Nb target availability.
+    % internal: hardware/nbn_film_sourcing.md Sec.~5 (primary recommendation rationale)
+
+  \item \textbf{Secondary: AJA International contract deposition.} If UT NRC cannot
+    support NbN. Jacob supplies sapphire substrate; AJA deposits NbN to spec.
+    Contact: \texttt{topgun@ajaint.com}; lead time $\sim$3--6 weeks.
+
+  \item \textbf{Tertiary: 2D Semiconductors.} Expedient proof-of-concept only.
+    Standard product has $T_c \approx 12$\,K (below 15\,K requirement); custom sapphire
+    substrate must be requested. Cost: \$590/sample (2026-03-19).
+    \textbf{Not recommended for D0.}
+\end{enumerate}
+
+\subsection{Key Technical Claims (Law~16 Compliance)}
+
+\begin{table}[ht]
+\centering
+\caption{NbN sourcing key facts with source URLs (Law~16).
+  % internal: hardware/nbn\_film\_sourcing.md Sec.~6 (law 16 table)
+  All URLs accessed 2026-03-19.}
+\label{tab:nbn_claims}
+\small
+\begin{tabular}{@{}p{5cm}p{2.5cm}p{6cm}@{}}
+\toprule
+Claim & Value & Source \\
+\midrule
+NbN 200\,nm on sapphire, RF magnetron, 150$^\circ$C $\to T_c$ &
+  16.58\,K & \url{https://ieeexplore.ieee.org/document/10697750/} \\
+NbN films on unoptimized sapphire $T_c$ &
+  9--10\,K & \url{https://www.mdpi.com/2079-6412/15/5/513} \\
+NbN/AlN/sapphire buffer, $\sim$5\,nm NbN $T_c$ &
+  Up to 13.3\,K & \url{https://arxiv.org/html/2511.13917v1} \\
+AJA ORION used for NbN reactive sputtering &
+  Published & \url{https://www.sciencedirect.com/science/article/abs/pii/S0925838820322891} \\
+UT Arlington NRC equipment & AJA ORION UHV confirmed &
+  \url{https://shimadzuinstitute.org/centers/nanotechnology-research-center/} \\
+2D Semiconductors NbN price (SiO$_2$/Si) &
+  \$590 (2026-03-19) & \url{https://2dsemiconductors.com/NbN-thin-film/} \\
+\bottomrule
+\end{tabular}
+\end{table}

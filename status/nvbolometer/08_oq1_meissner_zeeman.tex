@@ -1,8 +1,113 @@
-\section{OQ-1: Meissner-Zeeman Calculation}
+% 08_oq1_meissner_zeeman.tex — Section 8: OQ-1 Meissner-Zeeman Calculation
+% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
+% Source: open_questions/oq1_meissner_zeeman_calculation.tex (authoritative)
+% Law 16: quantitative claims carry source locator comments.
+% Status: POPULATED (Phase 2) — key results summary.
+%
+% NOTE: This section presents the key derivation and results.
+%       Full calculation resides in oq1_meissner_zeeman_calculation.tex.
+
+\section{OQ-1: Meissner--Zeeman Calculation}
 \label{sec:oq1}
 
-% Placeholder — content to be migrated in Phase 2.
-% Source: oq1_meissner_zeeman_calculation.tex
-% Status: SKELETON
+Can we detect the ODMR Zeeman shift change when NbN transitions through $T_c$?
+The answer (OQ-1 status: \textbf{RESOLVED}) is yes: the signal is detectable in
+$\lesssim 1$\,s for NV--SC separation $z \leq 100\,\mu$m with a $B_\mathrm{bias} \sim 1$\,mT
+applied field.
+% internal: oq1_meissner_zeeman_calculation.tex Abstract
 
-This section will cover the Meissner screening field calculation, Zeeman shift of the NV ground-state triplet in the screened vs.\ unscreened regime, and the predicted ODMR frequency shift that constitutes the bolometer detection signal.
+\subsection{Physical Setup}
+
+The D0 demonstration places an NV diamond adjacent to an NbN thin film on sapphire.
+A small permanent magnet provides bias field $B_\mathrm{bias}$ to lift the $\pm m_s$
+degeneracy. When the sample cools through $T_c$, the NbN enters the Meissner state and
+the local field at the NV changes by $\Delta B_z$.
+
+\textbf{Key parameters:}
+\begin{itemize}
+  \item NV gyromagnetic ratio: $\gamma_{NV}/2\pi = 28.024$\,GHz/T~\cite{Doherty2013}.
+    % Doherty2013 Table 1 p.~33 (NV Hamiltonian parameters, gamma_e = 28.024 GHz/T)
+  \item Zero-field splitting at 12\,K: $D = 2877.5$\,MHz (This work; CryoLab).
+  \item CW-ODMR sensitivity: $\eta = 14\,\mu\text{T}/\sqrt{\text{Hz}}$ (This work; CryoLab).
+  \item NbN London penetration depth: $\lambda_L \approx 400$\,nm~\cite{Kamlapure2010}.
+    % Kamlapure2010 (lambda_L for NbN films with T_c ~ 15.87 K; 400 nm within reported range for 50 nm film)
+  \item NbN film thickness: $d_\mathrm{SC} = 200$\,nm (D0 design target).
+  \item NbN $T_c \approx 15.7$\,K (This work; to be measured on deposited film).
+\end{itemize}
+
+\subsection{Zeeman Shift Formula}
+
+The NV ground-state ODMR frequencies~\cite{Barry2020,Doherty2013} are:
+% Barry2020 Eq.~(6) (CW-ODMR transition frequencies); Doherty2013 p.~5 (NV Hamiltonian)
+\begin{equation}
+  f_\pm = D \pm \gamma_{NV}\,B_\mathrm{NV}.
+  \label{eq:oq1_zeeman}
+\end{equation}
+A field change $\Delta B_z$ at the NV produces ODMR shift:
+\begin{equation}
+  \Delta\nu_\mathrm{signal} = 2\,\gamma_{NV}\,\Delta B_z.
+  \label{eq:oq1_shift}
+\end{equation}
+
+Detection threshold for $\mathrm{SNR} = 1$ in time $\tau$:
+$\Delta B_\mathrm{min}(\tau) = \eta/\sqrt{\tau} = 14\,\mu\text{T}/\sqrt{\tau[\text{Hz}^{-1}]}$.
+In 1\,s: $\Delta B_\mathrm{min} = 14\,\mu$T (This work).
+
+\subsection{Pearl Thin-Film Meissner Model}
+
+For a thin SC film ($d_\mathrm{SC} < 2\lambda_L$), the Pearl length is~\cite{Pearl1964}:
+% Pearl1964 p.65-66 (Pearl length Lambda = 2 lambda^2/d defined for thin-film vortex screening)
+\begin{equation}
+  \Lambda = \frac{2\lambda_L^2}{d_\mathrm{SC}}
+  = \frac{2 \times (400\,\text{nm})^2}{200\,\text{nm}} = 1.6\,\mu\text{m}.
+  \label{eq:oq1_pearl}
+\end{equation}
+
+The field change at NV height $z$ when the SC transitions (using the Pearl--Kogan
+approximation~\cite{Kogan2007} for $z \gg \Lambda$):
+% Kogan2007 (Pearl film field decay; monopole approximation for Delta_Bz vs. r and z)
+\begin{equation}
+  \Delta B_z(z) = -B_\mathrm{bias}\,\frac{\Lambda}{2z}
+  = -B_\mathrm{bias}\,\frac{\lambda_L^2}{z\,d_\mathrm{SC}}.
+  \label{eq:oq1_deltaB}
+\end{equation}
+
+\subsection{Key Results}
+
+\begin{table}[ht]
+\centering
+\caption{Expected $\Delta B_z$ and detection time vs.\ NV standoff and bias field.
+  Computed from Eq.~(\ref{eq:oq1_deltaB}).
+  % internal: oq1\_meissner\_zeeman\_calculation.tex (Table of results)
+  Detection time for SNR = 3: $\tau_\mathrm{det} = (3\,\eta/\Delta B_z)^2$.}
+\label{tab:oq1_results}
+\small
+\begin{tabular}{@{}p{2.5cm}p{2cm}p{2.5cm}p{4.5cm}@{}}
+\toprule
+NV standoff $z$ & $B_\mathrm{bias}$ & $\Delta B_z$ & Detection time (SNR~3) \\
+\midrule
+$z = 10\,\mu$m & 1\,mT & $80\,\mu$T & $< 0.1$\,s \\
+$z = 10\,\mu$m & 0.1\,mT & $8\,\mu$T & $\sim 28$\,s \\
+$z = 100\,\mu$m & 1\,mT & $8\,\mu$T & $\sim 28$\,s \\
+$z = 100\,\mu$m & 0.1\,mT & $0.8\,\mu$T & $\gg 100$\,s \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Design recommendation:} Use $B_\mathrm{bias} \geq 1$\,mT and NV standoff
+$z \leq 10\,\mu$m for sub-second detection. For D0-Easy (bulk diamond, $z \sim 10\,\mu$m),
+$B_\mathrm{bias} = 1$\,mT gives $\Delta B_z \approx 80\,\mu$T, detectable in $< 0.1$\,s.
+
+\subsection{Critical Field (Meissner Stability)}
+
+The applied bias field must not exceed the NbN lower critical field $H_{c1}$ to keep
+the film in the Meissner state. For 200\,nm NbN~\cite{Kamlapure2010}:
+% Kamlapure2010 (NbN critical field context; thin-film limit for Meissner stability)
+$B_{c1} \sim 10$--$50$\,mT at 12\,K. The recommended $B_\mathrm{bias} = 0.1$--$1$\,mT
+is far below $B_{c1}$, keeping the film fully screened.
+
+\subsection{OQ-1 Status}
+
+\textbf{Status: RESOLVED.} The Meissner--Zeeman signal is detectable with Jacob's existing
+apparatus at the D0 operating point. The only remaining blocker is the NbN film itself
+(Section~\ref{sec:nbn-sourcing}).

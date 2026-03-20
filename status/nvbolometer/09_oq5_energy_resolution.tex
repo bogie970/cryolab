@@ -1,8 +1,114 @@
+% 09_oq5_energy_resolution.tex — Section 9: OQ-5 Energy Resolution
+% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
+% Source: open_questions/oq5_energy_resolution.tex (rewrite 2026-03-20; authoritative)
+% Law 16: quantitative claims carry source locator comments.
+% Status: POPULATED (Phase 2) — key results summary.
+%
+% NOTE: Authoritative source is oq5_energy_resolution.tex.
+%       The pre-rewrite version (48 eV NEP-based) is archived as
+%       oq5_energy_resolution_pre_rewrite_2026-03-20.tex (incorrect model, retained for audit trail).
+
 \section{OQ-5: Energy Resolution}
 \label{sec:oq5}
 
-% Placeholder — content to be migrated in Phase 2.
-% Source: oq5_energy_resolution.tex
-% Status: SKELETON
+\subsection{Detector Paradigm: Threshold Detector (Corrected)}
 
-This section will cover the projected energy resolution of the NV bolometer, including thermal fluctuation noise, phonon noise, readout noise contributions, and comparison to competing detector technologies.
+\textbf{The previous model was incorrect.} The pre-rewrite version applied a TES
+linear calorimeter formula ($E_\mathrm{res} = \mathrm{NEP} \times \sqrt{\tau}$) and
+obtained a phonon-noise floor of 48\,eV. This was wrong: D0 is a \emph{threshold
+detector}, not a TES calorimeter.
+% internal: oq5_energy_resolution.tex Sec.~1 (paradigm correction)
+
+In a threshold detector, the superconducting film sits at $T_\mathrm{op} < T_c$.
+When an energy deposition heats the pixel above $T_c$, the film transitions to normal
+and the Meissner screening collapses (OQ-1 mechanism). The \emph{physically correct}
+figure of merit is the \textbf{threshold energy}~\cite{Richards1994}:
+% Richards1994 Sec. II.H p.17 (superconducting bolometers operate at the SC transition)
+\begin{equation}
+  \boxed{
+  E_\mathrm{th} = \int_{T_\mathrm{op}}^{T_c} C_\mathrm{total}(T)\,dT
+  \quad [\text{J}]
+  }
+  \label{eq:E_th}
+\end{equation}
+This is a \emph{thermodynamic} property of the pixel, not a noise-limited quantity.
+An energy deposition $E_\mathrm{dep} < E_\mathrm{th}$ cannot trigger the transition
+regardless of readout sensitivity.
+% APPEC2021DirectDetection Sec. 4.6.1 p.28 (threshold model; cryogenic bolometer energy thresholds in sub-K systems)
+
+\subsection{Pixel Heat Capacity Model}
+
+The D0 pixel consists of:
+\begin{enumerate}
+  \item \textbf{NbN thin film} (Sommerfeld model): $C_\mathrm{NbN}(T) = \gamma_V V_\mathrm{NbN} T$,
+    with $V_\mathrm{NbN} = 1.50 \times 10^{-18}$\,m$^3$ ($1.5\times 5.0\times 0.20\,\mu$m pixel).
+    $\gamma_V \approx 313\,\text{J\,m}^{-3}\text{K}^{-2}$ (Drude estimate from
+    Sidorova~\cite{Sidorova2020}).
+    % Sidorova2020 Table III p.11 (N(0) = 4.0e28 eV^-1 m^-3 for disordered NbN films)
+    % Richards1994 Appendix p.23 (gamma = pi^2/3 k_B^2 N(0), Sommerfeld model)
+  \item \textbf{Ge absorber}: $C_\mathrm{Ge}(T) \propto V_\mathrm{Ge} T^3 / \Theta_D^3$
+    (Debye low-T limit~\cite{Richards1994}), % Richards1994 Appendix p.22 (C = 234 N k_B (T/Theta)^3)
+    with $V_\mathrm{Ge} = 7.50 \times 10^{-18}$\,m$^3$ ($1\,\mu$m thick) and
+    $\Theta_D^\mathrm{Ge} = 374$\,K.
+\end{enumerate}
+The Ge absorber dominates total heat capacity ($\sim$80\%) because its volume is $5\times$
+larger than the NbN film.
+% internal: oq5_energy_resolution.tex Sec.~2 (Ge absorber dominates C_total)
+
+\subsection{Threshold Energy Results}
+
+Using $T_c = 15.7$\,K~\cite{Kamlapure2010}:
+% Kamlapure2010 (NbN T_c ~ 15.87 K for epitaxial films; 15.7 K is D0 design value)
+
+\begin{table}[ht]
+\centering
+\caption{Threshold energy $E_\mathrm{th}$ for the D0 pixel ($T_c = 15.7$\,K) vs.\
+  operating temperature. NbN-only = no Ge absorber; Full pixel = NbN + $1\,\mu$m Ge.
+  % internal: oq5\_energy\_resolution.tex Table 2 (E\_th vs. T\_op)
+  Energies computed from Eqs.~(\ref{eq:E_th_NbN_sec9})--(\ref{eq:E_th_total_sec9}).}
+\label{tab:E_th_table}
+\small
+\begin{tabular}{@{}p{2.5cm}p{3cm}p{3cm}p{4cm}@{}}
+\toprule
+$T_\mathrm{op}$ & NbN only & NbN + Ge & Note \\
+\midrule
+12.0\,K & 288\,keV & 1.56\,MeV & D0 operating point (current cryostat) \\
+15.0\,K & 60\,keV & 383\,keV & $T_c - T_\mathrm{op} = 0.7$\,K \\
+15.5\,K & 17.5\,keV & 114\,keV & $0.2$\,K below $T_c$ \\
+15.68\,K & 1.76\,keV & 11.6\,keV & $20$\,mK below $T_c$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The analytic integrals are:
+\begin{align}
+  E_\mathrm{th}^\mathrm{NbN} &= \frac{\gamma_V V_\mathrm{NbN}}{2}
+    \bigl(T_c^2 - T_\mathrm{op}^2\bigr), \label{eq:E_th_NbN_sec9} \\
+  E_\mathrm{th}^\mathrm{Ge}  &= \frac{12\pi^4 n_\mathrm{Ge} V_\mathrm{Ge} k_B}
+    {20\,\Theta_D^3} \bigl(T_c^4 - T_\mathrm{op}^4\bigr). \label{eq:E_th_Ge_sec9} \\
+  E_\mathrm{th}^\mathrm{total} &= E_\mathrm{th}^\mathrm{NbN} + E_\mathrm{th}^\mathrm{Ge}. \label{eq:E_th_total_sec9}
+\end{align}
+
+\subsection{Key Finding: Operating Temperature is the Primary Lever}
+
+At the D0 operating point ($T_\mathrm{op} = 12$\,K), $E_\mathrm{th} \approx 1.56$\,MeV
+for the full NbN+Ge pixel. \textbf{This means: a 5.9\,keV Fe-55 X-ray will NOT trigger
+a Meissner transition at $T_\mathrm{op} = 12$\,K.}
+
+\textbf{The most effective design lever is operating temperature:} approaching $T_c$
+dramatically reduces $E_\mathrm{th}$. At $T_\mathrm{op} = 15.5$\,K (0.2\,K below $T_c$),
+$E_\mathrm{th} \approx 114$\,keV for the full pixel. The implication is that D0-Easy
+(Meissner--Zeeman POC) is the correct first milestone: using a thermal sweep through $T_c$
+rather than single-particle energy deposition.
+
+\textbf{Also effective:} removing the Ge absorber reduces $E_\mathrm{th}$ by $5\times$
+(NbN-only: 288\,keV vs.\ 1.56\,MeV full pixel at 12\,K).
+
+\subsection{Model Limitations}
+
+\needref{NbN thin-film Sommerfeld coefficient $\gamma_V$ from direct calorimetric measurement.
+Estimate $\gamma_V \approx 200$--$600\,\text{J\,m}^{-3}\text{K}^{-2}$ depending on
+film disorder and stoichiometry; Drude estimate used here: $\approx 313\,\text{J\,m}^{-3}\text{K}^{-2}$.}
+The $\gamma_V$ uncertainty propagates directly into $E_\mathrm{th}$ (NbN-only). The Ge
+contribution is insensitive to this uncertainty.
+% internal: oq5_energy_resolution.tex Sec.~5 (limitations: gamma_V uncertainty)

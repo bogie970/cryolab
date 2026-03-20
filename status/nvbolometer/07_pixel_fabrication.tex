@@ -1,8 +1,105 @@
+% 07_pixel_fabrication.tex — Section 7: Pixel Architecture & Fabrication
+% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
+% Source: open_questions/oq7_pixel_architecture.tex (Task #172, Cycle 52)
+% Law 16: quantitative claims carry source locator comments.
+% Status: POPULATED (Phase 2) — summary of OQ-7 key results.
+%
+% NOTE: Authoritative source is oq7_pixel_architecture.tex. This section
+%       presents a condensed overview for the master document.
+%       Extended analysis (Q1--Q7) resides in the standalone OQ-7 document.
+
 \section{Pixel Architecture \& Fabrication}
 \label{sec:pixel-fab}
 
-% Placeholder — content to be migrated in Phase 2.
-% Source: oq7 (pixel design work, in progress)
-% Status: SKELETON
+This section summarises the NbN bolometer pixel design constraints (OQ-7). Full derivations
+are in \texttt{oq7\_pixel\_architecture.tex}.
 
-This section will cover the superconducting pixel geometry, NbN thin-film deposition parameters, diamond-film integration, and fabrication process flow for the bolometer pixel array.
+\subsection{NbN Film Thickness and $T_c$}
+
+The AJA ATC ORION UHV sputtering system is confirmed on-site at the UT Arlington
+Shimadzu NRC (\url{https://shimadzuinstitute.org/centers/nanotechnology-research-center/}).
+Reactive DC magnetron sputtering of Nb in N$_2$/Ar at $\sim\!150^\circ$C substrate temperature
+achieves $T_c = 16.58$\,K at 200\,nm film thickness
+(source: \url{https://ieeexplore.ieee.org/document/10697750/}).
+
+For D0, the design target is 200\,nm NbN on $c$-plane sapphire with $T_c \geq 15.7$\,K.
+Normal-state resistivity $\rho_n \approx 150\,\mu\Omega\,\text{cm}$, used in the
+Wiedemann--Franz thermal conductivity estimate, is from
+Kamlapure et al.~\cite{Kamlapure2010} and Sidorova et al.~\cite{Sidorova2020}.
+% Kamlapure2010 Table I (rho_n for NbN film with T_c ~ 15.87 K)
+% Sidorova2020 Table III (rho_n for NbN films; Wiedemann-Franz thermal conductivity)
+
+\subsection{Pixel Geometry and Energy Resolution Floor}
+
+Phonon-noise-limited energy resolution (linear calorimeter approximation)~\cite{Richards1994}:
+% Richards1994 Eq. (17) p.8 (E_res = sqrt(4 k_B T^2 C); phonon noise floor)
+\begin{equation}
+  E_\mathrm{res}^\mathrm{ph} = \sqrt{4\,k_B\,T^2\,C} \propto \sqrt{V}\,T,
+  \label{eq:pixel_E_res}
+\end{equation}
+where $C = c_v V$ is the pixel heat capacity.
+\textbf{Note:} This formula applies to a TES calorimeter, not the D0 threshold detector.
+Values are retained as geometry comparison figures of merit; the physically correct D0
+sensitivity metric is the threshold energy $E_\mathrm{th}$ (Section~\ref{sec:oq5}).
+
+\begin{table}[ht]
+\centering
+\caption{Energy resolution floor vs.\ pixel geometry at $T = 12$\,K.
+  Computed from Eq.~(\ref{eq:pixel_E_res}) anchored at the 48\,eV baseline.
+  % internal: oq7\_pixel\_architecture.tex Table 2 (E\_res vs. geometry)
+  These are phonon-noise floors of a hypothetical linear calorimeter, not D0 thresholds.}
+\label{tab:pixel_geometry}
+\small
+\begin{tabular}{@{}p{3cm}p{1.5cm}p{2cm}p{3cm}p{3cm}@{}}
+\toprule
+Pixel $L \times W$ ($\mu$m) & $d$ (nm) & $V$ ($\mu$m$^3$) & $E_\mathrm{res}^\mathrm{ph}$ & Fabrication \\
+\midrule
+$1.5 \times 5.0$ (blanket) & 200 & 1.50 & \textbf{48\,eV} & No patterning \\
+$1.0 \times 1.0$ & 200 & 0.20 & \textbf{17.6\,eV} & Contact photolithography \\
+$1.0 \times 1.0$ & 100 & 0.10 & \textbf{12.4\,eV} & Contact litho + thin film \\
+$0.5 \times 0.5$ & 100 & 0.025 & \textbf{6.2\,eV} & E-beam or FIB required \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Demonstrator Specifications}
+
+\textbf{D0-Easy} (current plan): Blanket NbN film on existing diamond in existing cryostat.
+$T_c$ target $\geq 15.7$\,K; NV standoff $z = 10$--$100\,\mu$m; bias field 0.1--1\,mT.
+No pixel patterning required. Success criterion: repeatable ODMR frequency shift correlated
+with $R(T)$ drop at $T_c$.
+% Kamlapure2010 Table I (T_c ~ 15.87 K for epitaxial NbN, confirms >= 15.7 K target)
+
+\textbf{D0-Opt} (parallel design): $1 \times 1 \times 0.20\,\mu$m patterned pixel via
+contact photolithography at Shimadzu NRC. Fe-55 X-ray source (5.9\,keV) as calibration
+input; signal-to-noise of $5900\,\text{eV} / 17.6\,\text{eV} = 335\times$ above the
+phonon floor.
+
+\subsection{Magnetic Crosstalk Constraint (Multi-Pixel Arrays)}
+
+The controlling pitch constraint for multi-pixel arrays is Pearl-field magnetic crosstalk.
+Pearl length for 200\,nm NbN:~\cite{Pearl1964}
+% Pearl1964 p.65-66 (defines Lambda = 2 lambda_L^2 / d)
+\begin{equation}
+  \Lambda = \frac{2\lambda_L^2}{d} = \frac{2 \times (400\,\text{nm})^2}{200\,\text{nm}}
+  = 1.6\,\mu\text{m}.
+  \label{eq:pearl_length_section}
+\end{equation}
+using $\lambda_L = 400$\,nm for NbN at 12\,K~\cite{Kamlapure2010}.
+% Kamlapure2010 (lambda_L = 400 nm from penetration depth measurement; internal: oq1)
+The resulting pitch constraint is $p \gtrsim 3\,z_\mathrm{NV}$.
+For single-pixel D0/D1: magnetic and thermal crosstalk are irrelevant.
+% internal: oq7_pixel_architecture.tex Sec.~4-5 (crosstalk analysis, Q3-Q4)
+
+\subsection{Architecture Evolution to P1/P2}
+
+Temperature scaling from the D0 baseline (48\,eV at 12\,K)~\cite{Richards1994}:
+% Richards1994 Eq. (17) p.8 (E_res propto T^{3/2} sqrt(V))
+\begin{equation}
+  E_\mathrm{res}^\mathrm{ph} \propto T^{3/2}\,\sqrt{V}.
+  \label{eq:T_scaling}
+\end{equation}
+Going to 4.2\,K (LHe) alone reduces the D0-Easy floor from 48\,eV to 3.6\,eV
+(factor $13\times$). P1/P2 targets require $T \leq 2.5$\,K (He-3 sorption cooler) and
+replacement of NbN with Al ($T_c = 1.10$\,K) for the SC film.
+% internal: oq7_pixel_architecture.tex Table 7 (temperature scaling table)

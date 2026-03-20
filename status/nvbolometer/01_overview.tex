@@ -1,8 +1,87 @@
+% 01_overview.tex — Section 1: System Overview & Architecture
+% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
+% Sources: hardware/sipm_fpga/ARCHITECTURE_SUMMARY.tex,
+%          hardware/hardware_readiness_report.tex
+% Law 16: quantitative claims carry source locator comments.
+% Status: POPULATED (Phase 2)
+
 \section{System Overview \& Architecture}
 \label{sec:overview}
 
-% Placeholder — content to be migrated in Phase 2.
-% Source: ARCHITECTURE_SUMMARY.tex
-% Status: SKELETON
+The NV bolometer is a cryogenic particle detector that uses nitrogen-vacancy (NV) centers
+in diamond to read out the Meissner-field collapse of a superconducting NbN thin-film pixel.
+When a particle deposits energy exceeding the thermal threshold $E_\mathrm{th}$ in the NbN
+film, the film transitions from the superconducting (Meissner-screened) to the normal state.
+The change in local magnetic field at the NV layer is detected optically via a shift in the
+optically detected magnetic resonance (ODMR) frequency of the NV ensemble~\cite{Doherty2013}.
+% Doherty2013 p.1--4 (NV centre review: ODMR principle, ZPL at 637 nm)
 
-This section will cover the overall NV-diamond bolometer system architecture, including the sensing principle, readout chain, and milestone roadmap.
+\subsection{Sensing Principle}
+
+The NV$^-$ ground state is a spin-1 triplet with zero-field splitting $D \approx 2877.5$\,MHz
+at $T = 12$\,K (This work; CryoLab measurement).
+% internal: hardware_readiness_report.tex Sec.~2 (D = 2877.5 MHz at 12 K confirmed in lab)
+In the presence of a static bias field $B_\mathrm{bias}$, the $m_s = \pm 1$ sub-levels split
+by $2\gamma_e B_\mathrm{bias}$, where $\gamma_e / 2\pi = 28.0$\,GHz/T~\cite{Doherty2013}.
+% Doherty2013 p.~33, Eq.~(A3) (gyromagnetic ratio of NV electron spin)
+When the NbN film is superconducting, Meissner screening perturbs the local field at the NV
+layer. When the film transitions to the normal state (either thermally or via a particle
+absorption event), this perturbation collapses. The resulting change in field $\Delta B_z$
+produces an ODMR frequency shift $\Delta\nu = \gamma_e \Delta B_z / \pi$, which is the
+detection signal (OQ-1 mechanism; see Section~\ref{sec:oq1}).
+
+\subsection{Milestone Architecture}
+
+\begin{table}[ht]
+\centering
+\caption{NV bolometer milestone roadmap. Energy thresholds are from the threshold-detector
+  model (Section~\ref{sec:oq5}). \% internal: oq5\_energy\_resolution.tex Eq.~(2).
+  D0 uses the existing Montana cryostat (11\,K base, This work).}
+\label{tab:milestones}
+\small
+\begin{tabular}{@{}p{1.4cm}p{2.5cm}p{1.8cm}p{2.5cm}p{4.5cm}@{}}
+\toprule
+Stage & SC Film & $T_\mathrm{op}$ & Readout & Primary Goal \\
+\midrule
+D0-Easy & NbN 200\,nm / sapphire & 12\,K & CW-ODMR & Meissner--Zeeman proof of concept \\
+D0-Opt  & NbN, $1\,\mu\text{m}^2$ pixel & 12\,K & CW-ODMR & Energy-resolving demonstration \\
+D1      & NbN/Al $+$ Ge absorber & 4.2\,K & SiPM + FPGA & Single-pixel bolometric detection \\
+P1      & Al 20\,nm / graphite & 0.75\,K & SiPM + FPGA & Sub-eV dark matter detection \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Full D1 Readout Chain}
+
+The selected D1 readout architecture (Option~A, \texttt{ARCHITECTURE\_SUMMARY.tex}) is:
+% internal: hardware/sipm_fpga/ARCHITECTURE_SUMMARY.tex (architecture decision 2026-03-18)
+\begin{equation*}
+  \underbrace{\text{S14420 SiPM}}_{\text{photon detection}}
+  \;\to\;
+  \underbrace{\text{MAX40658 TIA}}_{\text{current--voltage}}
+  \;\to\;
+  \underbrace{\text{ADCMP601 comp.}}_{\text{pulse discrimination}}
+  \;\to\;
+  \underbrace{\text{Nexys A7 FPGA}}_{\text{timing \& control}}
+  \;\to\; \text{PC}.
+\end{equation*}
+The FPGA runs pulse sequencing, ADF4351 SPI frequency control,
+carry-chain TDC photon timestamping at 17.5\,ps resolution~\cite{Lim2025},
+% Lim2025 Table 4 p.13 (4-tap SCSC LSB = 17.530 ps, Artix-7 CARRY4 chain)
+histogram accumulation, and PC UART communication on a single board.
+
+\subsection{Current Laboratory State}
+
+\begin{itemize}
+  \item \textbf{NV diamond} (HPHT ensemble): $D = 2877.5$\,MHz at 12\,K; ODMR contrast
+    6--7.5\%; $T_1 \approx 230$\,ms at 20--65\,K;
+    sensitivity $\sim\!14\,\mu\text{T}/\sqrt{\text{Hz}}$ at 12\,K.
+    (This work; CryoLab ODMR campaign.)
+  \item \textbf{Montana cryostat}: 11\,K base; ODMR data collected at 12--250\,K.
+  \item \textbf{ADF4351 synthesizer}: 35\,MHz--4.4\,GHz, $+5$\,dBm, SPI-controlled~\cite{ADF4351datasheet}.
+    % ADF4351datasheet p.4 Table 1 (output power, frequency range)
+  \item \textbf{S14420 SiPM}: in hand; cryogenic characterization pending
+    (Section~\ref{sec:sipm-cryo}).
+  \item \textbf{NbN thin film}: deposition pending at UT Arlington Shimadzu NRC
+    (Section~\ref{sec:nbn-sourcing}).
+\end{itemize}

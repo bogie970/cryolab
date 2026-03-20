@@ -1,8 +1,125 @@
+% 04_sipm_characterization.tex — Section 4: SiPM Characterization & Cryo Behavior
+% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
+% Sources: hardware/sipm_noise_characterization.tex,
+%          hardware/sipm_cryo_survey.tex,
+%          hardware/sipm_vbr_temperature_compensation.tex
+% Law 16: quantitative claims carry source locator comments.
+% Status: POPULATED (Phase 2)
+
 \section{SiPM Characterization \& Cryo Behavior}
 \label{sec:sipm-cryo}
 
-% Placeholder — content to be migrated in Phase 2.
-% Source: sipm_noise_characterization.tex, sipm_cryo_survey.tex, sipm_vbr_temperature_compensation.tex
-% Status: SKELETON
+The Hamamatsu S14420-3050MG SiPM is the photon detector for the D1 readout chain.
+This section summarizes its room-temperature specifications, cryogenic dark-count-rate
+(DCR) behavior, and the critical breakdown-voltage temperature dependence that governs
+safe operation at 12\,K.
 
-This section will cover SiPM noise characterization, cryogenic dark count rate behavior, breakdown voltage temperature dependence, and gain stability at operating temperatures.
+\subsection{S14420-3050MG Room-Temperature Parameters}
+
+All values from the Hamamatsu datasheet~\cite{S14420datasheet} (kapd1061e, 2023, PDF in hand).
+% S14420datasheet p.1-3 (specifications table and PDE figure)
+
+\begin{table}[ht]
+\centering
+\caption{S14420-3050MG key parameters at 25$^\circ$C~\cite{S14420datasheet}.
+  \% S14420datasheet p.2 (electrical characteristics table).}
+\label{tab:s14420_params}
+\small
+\begin{tabular}{@{}p{5cm}p{3cm}p{5cm}@{}}
+\toprule
+Parameter & Value & Note \\
+\midrule
+Active area & $3 \times 3$\,mm$^2$ & 3600 microcells \\
+Microcell pitch & 50\,$\mu$m & 50\,$\mu$m cell variant \\
+PDE at 600\,nm & 40\% & Peak PDE~\cite{S14420datasheet} \\
+PDE at 700\,nm (NV emission) & $\sim$25\% & From PDE curve~\cite{S14420datasheet} \\
+% S14420datasheet p.3 Fig. right panel (50 um pitch PDE vs wavelength at Vover = 2.6 V)
+Breakdown voltage $V_\mathrm{BR}$ & $42 \pm 5$\,V at 25$^\circ$C & \cite{S14420datasheet}
+  % S14420datasheet p.2 Table (V_BR min-max)
+  \\
+DCR (typical) & 1600\,kcps & At $V_\mathrm{op}$, 25$^\circ$C~\cite{S14420datasheet}
+  % S14420datasheet p.2 Table (Dark count rate S14420-3050MG Typ.)
+  \\
+Operating temperature (specified) & $-40$--$+50^\circ$C & \textbf{NOT rated below $-40^\circ$C}~\cite{S14420datasheet}
+  % S14420datasheet p.1 Table (Operating temperature range)
+  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Cryogenic DCR: Temperature Model}
+
+Using a Shockley--Read--Hall (SRH) thermal generation model calibrated against published
+cryogenic data for ON~Semiconductor J-Series SiPMs (literature calibration;
+PDF in hand: \texttt{hardware/sipm\_fpga/references/SiPM\_cryo\_submeV\_arXiv2509.11954.pdf}),
+the effective SRH activation energy is $E_a \approx 0.107$\,eV~\cite{SiPMcryoSubmeV2025}.
+% SiPMcryoSubmeV2025 (SiPM cryo characterization: DCR vs. T model, activation energy)
+% internal: hardware/sipm_noise_characterization.tex Sec.~2 (SRH model, E_a ~ 0.107 eV)
+
+At $T = 12$\,K, the thermal SRH contribution is negligibly small.
+The dominant DCR mechanism becomes tunneling-floor current, estimated at
+$\lesssim 0.035$\,counts\,s$^{-1}$ for the S14420 active area under low-overvoltage conditions.
+% internal: hardware/sipm_noise_characterization.tex Abstract (tunneling floor < 0.035 cps at 12 K)
+The project conservative estimate of 10\,cps DCR at 12\,K remains within the
+literature-modeled bound and is not inconsistent with higher-overvoltage operation.
+
+\textbf{OPEN GAP (G-GAP-03):} No S14420-specific cryogenic characterization exists
+in the published literature. A direct cooldown measurement is required to confirm
+the 12\,K DCR, PDE, and breakdown voltage for the S14420 specifically.
+% internal: hardware/sipm_noise_characterization.tex Sec.~4 (G-GAP-03 open item)
+
+\subsection{Critical Safety Constraint: Breakdown Voltage vs.\ Temperature}
+
+\textbf{This is the most important pre-D1 measurement required.}
+
+The S14420 breakdown voltage shifts with temperature at approximately
+$dV_\mathrm{BR}/dT \approx -47$\,mV/$^\circ$C~\cite{Liu2022SiPMLN2}.
+% Liu2022SiPMLN2 (SiPM VBR vs T characterization; ~47-54 mV/K typical for Si APD devices)
+% internal: hardware/sipm_vbr_temperature_compensation.tex (VBR(T) model and extrapolation)
+Extrapolating from room temperature to 12\,K ($\Delta T = 263$\,K):
+\begin{equation}
+  V_\mathrm{BR}(12\,\text{K}) \approx 42\,\text{V} - 0.047\,\text{V/K} \times 263\,\text{K}
+  \approx 28.6\,\text{V}.
+  \label{eq:vbr_cryo}
+\end{equation}
+
+\begin{table}[ht]
+\centering
+\caption{Breakdown voltage and safe operating range at key temperatures.
+  Values extrapolated from $dV_\mathrm{BR}/dT \approx -47$\,mV/K~\cite{Liu2022SiPMLN2}.
+  \textbf{Operating at room-temperature bias at 12\,K is unsafe.}}
+\label{tab:vbr_vs_T}
+\small
+\begin{tabular}{@{}p{2.5cm}p{2.5cm}p{2.5cm}p{5cm}@{}}
+\toprule
+$T$ & $V_\mathrm{BR}(T)$ & Safe $V_\mathrm{op}$ & Note \\
+\midrule
+25$^\circ$C & 42\,V & 44--46\,V & Room-temperature spec~\cite{S14420datasheet} \\
+$-40^\circ$C (233\,K) & 52\,V (est.) & 54--56\,V & Manufacturer's low-T limit \\
+12\,K & 28.6\,V (est.) & 30--31\,V & \textbf{Lab bias must be reprogrammed before cooldown} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{quote}
+\textbf{Operating at the room-temperature bias setting (44\,V) at 12\,K would produce
+$V_\mathrm{over} \approx 15$\,V --- far above the second-breakdown threshold ---
+and must be avoided.} Gate~G-SAFE-01 requires SiPM bias to be reduced to
+$\leq\!31$\,V before the system is cooled below 200\,K.
+\end{quote}
+% internal: hardware/hardware_readiness_report.tex Sec.~4 (safety gate G-SAFE-01)
+
+\subsection{Literature Survey: Comparable SiPMs at Cryogenic Temperature}
+
+Published cryogenic SiPM characterization covers several comparable devices~\cite{SiPMcryoArrays2025,SiPMcryoSubmeV2025,Liu2022SiPMLN2}:
+% SiPMcryoArrays2025 (SiPM cryo 40--300 K, gain and noise behavior)
+% SiPMcryoSubmeV2025 (sub-meV detector SiPM cryo characterization)
+% Liu2022SiPMLN2 (SiPM at LN2 and cryo temperatures: VBR, DCR, gain)
+\begin{itemize}
+  \item At 77\,K (LN2): DCR drops by $3$--$4$ orders of magnitude vs.\ room temperature;
+    gain increases due to lower thermal noise in avalanche region.
+  \item At $< 50$\,K: tunneling-floor DCR dominates; values in the 0.01--100\,cps range
+    depending on device and overvoltage.
+  \item The S14420 is not characterized below $-40^\circ$C in any published study.
+    \textbf{Direct measurement at 12\,K is required (G-GAP-03).}
+\end{itemize}

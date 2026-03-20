@@ -1,8 +1,91 @@
+% 02_nv_sensing.tex — Section 2: NV Sensing Layer
+% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
+% Sources: simulations/bolometer_thermal_model.tex (sensitivity model),
+%          open_questions/oq1_meissner_zeeman_calculation.tex (OQ-1 field calc),
+%          literature/Barry_2020_NV_Magnetometry_Sensitivity_RevModPhys.pdf
+% Law 16: quantitative claims carry source locator comments.
+% Status: POPULATED (Phase 2)
+
 \section{NV Sensing Layer}
 \label{sec:nv-sensing}
 
-% Placeholder — content to be migrated in Phase 2.
-% Source: nv_sensitivity_sim.tex
-% Status: SKELETON
+The NV sensing layer converts the magnetic field change from the NbN Meissner transition
+into an optically detected frequency shift. This section covers the NV ensemble sensitivity
+model, the fluorescence collection chain, and projected performance at $T = 12$\,K.
 
-This section will cover the NV-center ensemble sensitivity model, fluorescence rates, ODMR contrast, and projected noise-equivalent power for the sensing layer.
+\subsection{NV Ensemble Sensitivity}
+
+NV ensemble magnetometry sensitivity scales as~\cite{Barry2020}:
+% Barry2020 Eq. (13) p.~17 (sensitivity eta, general form in terms of contrast, NV density, T2*)
+\begin{equation}
+  \eta \propto \frac{1}{C \sqrt{n_\mathrm{NV}\,V_\mathrm{sens}\,T_2^*}},
+  \label{eq:nv_sensitivity}
+\end{equation}
+where $C$ is the ODMR contrast, $n_\mathrm{NV}$ is the NV density,
+$V_\mathrm{sens}$ is the sensing volume, and $T_2^*$ is the inhomogeneous dephasing
+time. At 12\,K, the measured sensitivity of Jacob's HPHT diamond ensemble is
+$\eta \approx 14\,\mu\text{T}/\sqrt{\text{Hz}}$ (This work; CryoLab ODMR measurement).
+% internal: hardware_readiness_report.tex Sec.~2 (sensitivity ~ 14 uT/sqrt(Hz) at 12 K, This work)
+
+\subsection{Key NV Parameters at 12\,K}
+
+\begin{table}[ht]
+\centering
+\caption{NV sensing parameters at $T = 12$\,K for the D0 HPHT diamond ensemble.
+  ``This work'' entries are CryoLab measurements. Literature values cite PDF-in-hand sources.}
+\label{tab:nv_params}
+\small
+\begin{tabular}{@{}p{5cm}p{3cm}p{5cm}@{}}
+\toprule
+Parameter & Value & Source \\
+\midrule
+Zero-field splitting $D$ & 2877.5\,MHz & This work (CryoLab) \\
+ODMR contrast $C$ & 6--7.5\% & This work (CryoLab) \\
+$T_1$ relaxation time & $\approx 230$\,ms (20--65\,K plateau) & This work~\cite{Jarmola2012}
+  % Jarmola2012 Fig.~3 (T1 vs T; plateau region at intermediate T for HPHT-grade NV)
+  \\
+Sensitivity $\eta$ & $\sim\!14\,\mu\text{T}/\sqrt{\text{Hz}}$ & This work \\
+Emission band & 637--800\,nm (ZPL at 637\,nm) & \cite{Doherty2013}
+  % Doherty2013 Fig.~1(b) p.5 (ZPL at 637 nm; phonon sideband to ~800 nm)
+  \\
+Gyromagnetic ratio $\gamma_e/2\pi$ & 28.0\,GHz/T & \cite{Doherty2013}
+  % Doherty2013 p.~33 Eq.~(A3) (gamma_e = 28.024 GHz/T)
+  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Predicted Detection Time for D0}
+
+For a Meissner-field change $\Delta B_z \approx 8$--$14\,\mu$T at NV standoff
+$z = 10$--$100\,\mu$m (see Section~\ref{sec:oq1}),
+the minimum CW-ODMR integration time for a signal-to-noise ratio of 3 is:
+\begin{equation}
+  \tau_\mathrm{det} = \left(\frac{3\,\eta}{\Delta B_z}\right)^2
+  \approx \left(\frac{3 \times 14\,\mu\text{T}/\sqrt{\text{Hz}}}{10\,\mu\text{T}}\right)^2
+  \approx 18\,\text{s} \quad (\text{SNR} = 3).
+  \label{eq:detection_time}
+\end{equation}
+% internal: oq1_meissner_zeeman_calculation.tex (Delta Bz ~ 8-14 uT at z = 10-100 um)
+% internal: hardware_readiness_report.tex Sec.~2 (detection time 1-3 s, eta = 14 uT/sqrt(Hz))
+This is the static (transition detection) case; the D0 success criterion is a
+\emph{sustained} ODMR frequency shift correlated with $R(T)$ drop at $T_c$, which
+does not require sub-second integration.
+
+\subsection{Fluorescence Collection: Summary}
+
+The NV emission at 637--800\,nm is collected by the cryostat confocal objective.
+% internal: open_questions/oq4_epifluorescence_beamline.tex (collection efficiency model)
+Key collection parameters are addressed in Section~\ref{sec:oq4}. For D0, the confocal
+beam spot ($\sim\!1\,\mu$m$^2$) defines the sensing volume; no NV patterning is required.
+
+\subsection{Diamond Material}
+
+Jacob's HPHT diamond has an estimated NV density in the range $n_\mathrm{NV} \sim 10^{17}$\,cm$^{-3}$
+(consistent with nitrogen-bath-dominated dephasing at high NV density,
+typical of HPHT-grade material~\cite{Barry2020}).
+% Barry2020 Sec. V (optimal concentration ~10^17 cm^{-3} for bulk NV ensemble magnetometry)
+Proton-grade HPHT diamonds commonly achieve $T_2^* \sim 1$--$10\,\mu$s~\cite{Barry2020}.
+% Barry2020 Table I (T2* range for HPHT, nitrogen-dominated dephasing)
+For improved sensitivity in D1, lower-nitrogen CVD diamond with $n_\mathrm{NV} \sim 10^{16}$--$10^{17}$\,cm$^{-3}$
+is preferred; see Section~\ref{sec:pixel-fab} (Q5).

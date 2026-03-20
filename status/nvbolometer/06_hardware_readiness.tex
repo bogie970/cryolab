@@ -1,8 +1,119 @@
+% 06_hardware_readiness.tex — Section 6: Hardware Readiness Assessment
+% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
+% Source: hardware/hardware_readiness_report.tex
+% Law 16: quantitative claims carry source locator comments.
+% Status: POPULATED (Phase 2)
+
 \section{Hardware Readiness Assessment}
 \label{sec:hardware-readiness}
 
-% Placeholder — content to be migrated in Phase 2.
-% Source: hardware_readiness_report.tex
-% Status: SKELETON
+This section is the formal D0 hardware gate: \textbf{Are we ready to run the Meissner--Zeeman
+demonstration?} \textbf{Short answer: not yet, due to two blocking items: (1)~NbN film not yet
+deposited; (2)~SiPM cryogenic bias characterization not yet measured.}
+% internal: hardware/hardware_readiness_report.tex Abstract (gate status summary)
 
-This section will cover the current hardware procurement status, component readiness levels, and gap analysis for the D0 and D1 milestones.
+\subsection{Hardware In Hand and Verified}
+
+\begin{longtable}{@{}p{4cm}p{2.5cm}p{6cm}@{}}
+\toprule
+\textbf{Component} & \textbf{Status} & \textbf{Verification} \\
+\midrule
+\endhead
+532\,nm confocal laser & IN HAND &
+  Actively used; $D = 2877.5$\,MHz confirmed at 12\,K (This work) \\
+Montana cryostat, 11\,K base & IN HAND &
+  ODMR data at 12--250\,K; 11--70\,K operating range (This work) \\
+NV diamond (HPHT ensemble) & IN HAND &
+  Contrast 6--7.5\%; $T_1 \approx 230$\,ms; $\eta \approx 14\,\mu$T/$\sqrt{\text{Hz}}$
+  at 12\,K (This work) \\
+ADF4351 MW synthesizer & IN HAND &
+  35\,MHz--4.4\,GHz; $+5$\,dBm; SPI~\cite{ADF4351datasheet}
+  % ADF4351datasheet p.4 Table 1 (frequency range and output power)
+  \\
+NdFeB bias magnet & IN HAND &
+  Reaches $\sim$46\,G; used in 10.6--210\,G ODMR campaigns (This work) \\
+S14420-3050MG SiPM & IN HAND &
+  PDE = 40\% at 600\,nm; $V_\mathrm{BR} = 42$\,V at 25$^\circ$C~\cite{S14420datasheet}
+  % S14420datasheet p.2-3
+  \\
+MAX40658AUT+ TIA & IN HAND & 18.3\,k$\Omega$; 360--520\,MHz BW~\cite{MAX40658datasheet}
+  % MAX40658datasheet p.3 Table
+  \\
+ADCMP601 comparator & IN HAND & 3.5\,ns prop. delay~\cite{ADCMP601datasheet}
+  % ADCMP601datasheet p.4 Table 1
+  \\
+Nexys A7-100T FPGA & IN HAND &
+  XC7A100T; replaces discontinued Arty A7-100T~\cite{NexysA7refmanual}
+  % NexysA7refmanual p.1 Table
+  \\
+ADL5375 IQ modulator & IN HAND &
+  Datasheet and eval board in hand; D1 upgrade path, not needed for D0~\cite{ADL5375datasheet} \\
+ADL5321 RF driver amp & IN HAND &
+  Gain 11.7\,dB at 2877\,MHz~\cite{ADL5321datasheet}
+  % ADL5321datasheet Table 2 (S21 at 2877 MHz interpolated)
+  \\
+Mather~(1982) nonequilibrium NEP theory & IN HAND &
+  PDF obtained 2026-03-19~\cite{Mather1982}.
+  % Mather1982 (ILL request fulfilled; nonequilibrium corrections to bolometer NEP)
+  \\
+\midrule
+\caption{D0 hardware in hand and verified.}
+\label{tab:hw_in_hand}
+\endlastfoot
+\bottomrule
+\end{longtable}
+
+\subsection{Hardware Blockers and Gates}
+
+\begin{longtable}{@{}p{3.5cm}p{2cm}p{7cm}@{}}
+\toprule
+\textbf{Item} & \textbf{Status} & \textbf{Notes} \\
+\midrule
+\endhead
+NbN thin film on sapphire (200\,nm, $T_c \geq 15$\,K) &
+  \textbf{NEEDED} &
+  \textbf{Primary D0 blocker.} Film must be deposited before D0 can run.
+  UT Arlington Shimadzu NRC deposition is the recommended path
+  (see Section~\ref{sec:nbn-sourcing}). \\[4pt]
+S14420 cryogenic bias characterization (G-GAP-03) &
+  \textbf{NEEDED} &
+  $V_\mathrm{BR}(T)$ must be measured by direct cooldown before D1 SiPM bias is applied
+  at 12\,K. \textbf{Gate G-SAFE-01: bias must be reduced before cooling below 200\,K.}
+  % internal: hardware/hardware_readiness_report.tex Sec.~4 (G-SAFE-01 gate)
+  \\[4pt]
+NbN film $T_c$ verification & \textbf{NEEDED} &
+  As-deposited film must have $T_c \geq 15$\,K confirmed by resistance measurement
+  before D0 experiment can be interpreted.
+  % Kamlapure2010 Table I (T_c ~ 15.87 K for epitaxial NbN; 200 nm target)
+  \\
+\midrule
+\caption{D0 hardware blockers and safety gates.}
+\label{tab:hw_blockers}
+\endlastfoot
+\bottomrule
+\end{longtable}
+
+\subsection{Critical Path to D0}
+
+\begin{enumerate}
+  \item \textbf{Email \texttt{nanofab@uta.edu}} to confirm NbN sputtering target and N$_2$
+    reactive gas availability at UT Arlington Shimadzu NRC.
+  \item If confirmed: submit deposition request; estimated turnaround 4--8 weeks (process
+    development + deposition run). % internal: hardware/nbn_film_sourcing.md Sec.~5 (lead time estimate)
+  \item Deposit and measure $T_c$ by resistance vs.\ temperature.
+  \item Once $T_c \geq 15$\,K confirmed: run D0-Easy experiment
+    (blanket NbN film + existing diamond + existing cryostat + existing ODMR setup).
+  \item \textbf{Separately} (D1): characterize S14420 $V_\mathrm{BR}(T)$ by direct cooldown;
+    program cryogenic bias before any SiPM power-up below 200\,K.
+\end{enumerate}
+
+\subsection{NEP Model Status}
+
+The bolometer NEP model~\cite{Richards1994} is derived from first principles:
+% Richards1994 Eq. (18) p.8 (NEP_phonon = sqrt(4 gamma k_B T^2 G))
+$\mathrm{NEP}_\mathrm{phonon}^2 = 4\gamma k_B T^2 G_{ep}$ at $\gamma = 1$, with
+$G_{ep} = 5\Sigma V T^4 \approx 4.7 \times 10^{-5}$\,W/K at 12\,K for the D0 pixel.
+% internal: simulations/bolometer_thermal_model.tex (G_ep = 4.7e-5 W/K at 12 K)
+Nonequilibrium corrections~\cite{Mather1982} (up to 30\% phonon noise reduction,
+60\% Johnson noise reduction) are quantified in the companion simulation
+(\texttt{bolometer\_thermal\_model.tex}).
