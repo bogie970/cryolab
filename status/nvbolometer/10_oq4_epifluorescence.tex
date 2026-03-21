@@ -1,116 +1,722 @@
-% 10_oq4_epifluorescence.tex — Section 10: OQ-4 Epifluorescence Beamline
-% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
-% Source: open_questions/oq4_epifluorescence_beamline.tex (authoritative)
+% 10_oq4_epifluorescence.tex — Section 10: OQ-4 Epifluorescence Beamline Design
+% Phase 2 full-body migration — Task #210, Cycle NVB, 2026-03-21
+% Source: open_questions/oq4_epifluorescence_design.tex (Task #182, 2026-03-20; authoritative)
 % Law 16: quantitative claims carry source locator comments.
-% Status: POPULATED (Phase 2) — design requirements summary.
+% Status: POPULATED (Phase 2 full body) — full body extracted from oq4_epifluorescence_design.tex
 %
-% NOTE: Authoritative source is oq4_epifluorescence_beamline.tex.
-%       This section presents design requirements and key options.
+% NOTE: \bibliography{} block removed — master handles bibliography.
+%       \jacobdecision{} macro defined in source preamble — defined here as \textcolor{blue}{\textbf{[Jacob decision required:]\ #1}}.
+%       tcolorbox package used for recommendation box — replaced with quote+textbf for portability.
+%       enumitem package usage retained (standard in LaTeX).
+%       All \cite{}, \needref{} retained.
+%
+% ARCHIVE: Previous section content archived as 10_oq4_epifluorescence_phase2_task210_archive_2026-03-21.tex
 
-\section{OQ-4: Epifluorescence Beamline}
+% Local command for Jacob decision flags (not in master preamble)
+\newcommand{\jacobdecision}[1]{\textcolor{blue}{\textbf{[Jacob decision required:} #1\textbf{]}}}
+
+\section{OQ-4: Epifluorescence Beamline Design for D1}
 \label{sec:oq4}
 
-This section covers the D1 epifluorescence optical beamline design for cryogenic NV
-ensemble readout. Full analysis is in \texttt{oq4\_epifluorescence\_beamline.tex}.
+This section provides the first-pass design survey for OQ-4: the cryogenic
+epifluorescence optical path required for the D1 NV bolometer prototype.
+D1 requirements: collect NV$^-$ fluorescence in the 637--800\,nm band while
+rejecting 532\,nm excitation, operating at cryogenic temperatures ($\sim$12\,K
+demonstrator, 4\,K ultimate), compatible with SiPM readout.
+This survey covers: (1) objective lens selection with confirmed specifications
+from Attocube's LT-APO series (standard, LWD, and ULWD variants, all confirmed
+from manufacturer web data), (2) dichroic and filter design with Semrock product
+specifications, (3) collection efficiency analysis with total-internal-reflection
+constraints, (4) solid immersion lens enhancement options (Hadden 2010), and
+(5) SiPM detector characterization using the S14420 datasheet in hand.
+Jacob makes all design decisions; NVB presents options with quantitative trade-offs.
 
-\subsection{Design Requirements}
+\subsection{D1 Design Requirements}
+\label{sec:oq4_requirements}
 
-\begin{table}[ht]
-\centering
-\caption{D1 epifluorescence beamline requirements summary.
-  % internal: oq4\_epifluorescence\_beamline.tex Sec.~2 (requirements table)
-  Items marked [PI DECISION REQUIRED] need a PI decision before hardware can be ordered.}
-\label{tab:oq4_requirements}
-\small
-\begin{tabular}{@{}p{3.5cm}p{3cm}p{6cm}@{}}
+\subsubsection{D1 System Context}
+
+The D1 NV bolometer demonstrator uses NbN thin film on sapphire ($T_c \approx
+15.7$\,K) with NV-diamond readout. Jacob's current cryostat reaches
+$\sim$11--12\,K. The optical readout chain for D1 must accomplish:
+\begin{enumerate}
+  \item Deliver 532\,nm laser excitation to the NV-diamond chip.
+  \item Collect NV$^-$ fluorescence (637--800\,nm phonon sideband).
+  \item Reject 532\,nm laser scatter to OD\,$> 5$ before the SiPM detector.
+  \item Operate without damaging in-cryostat optical components across
+    room-temperature-to-12\,K thermal cycling.
+\end{enumerate}
+
+The NV center is excited at 532\,nm into the phonon sideband of the $^3E$
+excited state.\cite{Rondin2014} % Rondin2014 p.4 Fig.1
+The NV$^-$ emission spectrum consists of the zero-phonon line (ZPL) at
+637\,nm and a phonon sideband extending to $\sim$800\,nm.\cite{Doherty2013}
+% Doherty2013 p.18 Fig.6 (NV emission spectrum)
+At cryogenic temperatures, the ZPL gains relative intensity as
+phonon-assisted transitions are frozen out, but the sideband remains the
+dominant emission channel.\cite{Doherty2013}
+% Doherty2013 p.16 Sec.4.2 (temperature dependence of emission spectrum)
+
+\subsubsection{Architecture Decision: In-Cryostat vs.\ External Objective}
+
+\jacobdecision{The single most consequential architectural choice:
+Is the objective mounted inside the cryostat vacuum space at cryogenic
+temperature, or does it view the sample through a cryostat window from
+outside? This determines every downstream specification.}
+
+\textbf{Architecture A (in-cryostat objective)}: The objective sits at
+cryogenic temperature inside the vacuum, focused on the NV-diamond chip.
+Achieves maximum NA; no window transmission loss; no long working distance
+required. Requires cryogenic-rated objective or proven low-temperature design.
+
+\textbf{Architecture B (external objective through window)}: The objective
+remains at room temperature outside the cryostat, viewing the sample through
+an optical window. Allows any standard objective; easy focus adjustment.
+NA is limited by window aperture and sample-to-window distance.
+
+\jacobdecision{What is the optical access geometry of Jacob's cryostat?
+What is the clear aperture of the optical window and the sample-to-window
+distance at operating temperature? This is required before Architecture B
+can be evaluated.}
+
+\subsubsection{Summary Requirements Table}
+
+\begin{center}
+\begin{tabular}{lll}
 \toprule
-Parameter & Required value & Notes \\
+\textbf{Parameter} & \textbf{Requirement} & \textbf{Basis} \\
 \midrule
-Excitation $\lambda$ & 532\,nm & Nd:YAG doubled, NV off-resonant excitation~\cite{Rondin2014}
-  % Rondin2014 p.4 Fig.1 (NV excitation via 532 nm phonon sideband)
-  \\
-Collection band & 637--800\,nm & NV$^-$ ZPL at 637\,nm + phonon sideband~\cite{Doherty2013}
-  % Doherty2013 Fig.~1(b) p.5 (ZPL at 637 nm, phonon sideband to ~800 nm)
-  \\
-Excitation rejection & OD $>$ 5 at 532\,nm & Dichroic + notch filter combination \\
-Operating temperature & 4--12\,K & Jacob's Montana cryostat \\
-NV target & Ensemble (not single-NV) & Relaxes NA requirement; longer WD acceptable \\
-Architecture choice & \needref{PI decision required} & In-cryostat vs.\ external objective (see below) \\
-Detector & SiPM or sCMOS & \needref{Jacob decides}; different coupling requirements \\
+Excitation $\lambda$ & 532\,nm & Standard NV excitation\cite{Rondin2014} \\
+% Rondin2014 p.4 Sec. II.A (532 nm excitation into phonon sideband)
+Collection band & 637--800\,nm & NV$^-$ emission\cite{Doherty2013} \\
+% Doherty2013 p.18 Fig.6
+Excitation rejection & OD\,$> 5$ at 532\,nm & Background suppression \\
+Operating temperature & 12\,K (D1 demo) & Jacob's cryostat \\
+NV target & Ensemble & Higher SNR than single-NV \\
+Detector & SiPM (S14420)\cite{S14420datasheet} & D1 architecture (OQ-3) \\
+% S14420datasheet: PDF in hand
 \bottomrule
 \end{tabular}
-\end{table}
+\end{center}
 
-\subsection{Objective Architecture Decision}
+\subsection{Objective Lens Selection}
+\label{sec:oq4_objective}
 
-\textbf{The critical choice is whether the objective sits inside or outside the cryostat.}
-This is the single most consequential architectural decision.
+\subsubsection{Architecture A: Cryogenic Objective Inside the Cryostat}
 
-\subsubsection{Architecture A: Objective Inside Cryostat}
+\textbf{Attocube LT-APO Standard (High NA, Short Working Distance):}
+Attocube Systems AG produces the LT-APO (Low-Temperature Apochromat) series,
+purpose-built for cryogenic operation in vacuum and high magnetic fields.
+All specifications below confirmed from Attocube product pages accessed
+2026-03-20.\cite{AttocubeLTAPO_web}
 
-\textbf{Advantages:} No window limits NA or working distance; achieves NA 0.65--0.82
-at sample; no aberration from a cryostat window.
-
-\textbf{Disadvantages:} Objective must survive 4\,K thermal cycling (standard microscope
-objectives contain lubricants that fail at 4\,K); thermal drift during temperature ramp;
-focus adjustment requires piezo scanner inside cryostat.
-
-\textbf{Recommended objective (in-cryostat):} Attocube LT-APO/LWD/VIS/0.64 ---
-NA 0.65; 5.0\,mm working distance; cryo-rated.
-\needref{AttocubeLTAPOLWD\_spec --- datasheet not yet downloaded.}
-
-\subsubsection{Architecture B: Objective External to Cryostat}
-
-\textbf{Advantages:} No cryogenic shock to objective; standard room-temperature optics
-can be used; easier focus adjustment.
-
-\textbf{Disadvantages:} NA limited by cryostat window aperture and distance;
-aberration from window (vacuum viewport or cold window).
-\needref{Cryostat window aperture and sample-to-window distance from Montana Instruments spec.}
-
-\subsection{Filter Chain}
-
-The dichroic and emission filter must:
+\textbf{Available variants and NA values:}
 \begin{itemize}
-  \item Pass: 637--800\,nm (NV$^-$ emission band~\cite{Doherty2013})
-    % Doherty2013 Fig.~1(b) p.5 (ZPL at 637 nm, sideband to ~800 nm)
-  \item Reject: 532\,nm at OD $>$ 5 (dichroic + notch)
-  \item Typical choice: Thorlabs DMLP650 longpass dichroic + Semrock LP03-532RE edge filter
-    \needref{ThorlabsDMLP650\_spec; SemrockLP03-532RE\_spec (datasheets not yet downloaded).}
+  \item LT-APO/VIS/0.82: NA\,$= 0.82$, apochromatic range 465--590\,nm
+  \item LT-APO/VISIR/0.82: NA\,$= 0.82$, apochromatic range 565--770\,nm
+  \item LT-APO/NIR/0.81: NA\,$= 0.81$, apochromatic range 700--985\,nm
+  \item LT-APO/IR/0.81: NA\,$= 0.81$, apochromatic range 985--1350\,nm
 \end{itemize}
 
-\subsection{Collection Efficiency Model}
+\textbf{Physical specifications (all standard LT-APO variants):}
+\begin{itemize}
+  \item Working distance: 0.64--0.70\,mm (variant-dependent); extended
+    to 1.40\,mm when used with solid immersion lenses \cite{AttocubeLTAPO_web}
+  \item Diameter: 24\,mm; length: 48.35\,mm; weight: 43\,g \cite{AttocubeLTAPO_web}
+  \item Clear aperture: 4.7\,mm; focal length: 2.87--2.94\,mm \cite{AttocubeLTAPO_web}
+  \item AR coating: $> 80$\% transmission over 400--1000\,nm (VIS variants) \cite{AttocubeLTAPO_web}
+  \item Environment: cryogenic temperatures, ultra-high vacuum, high
+    magnetic fields \cite{AttocubeLTAPO_web}
+\end{itemize}
 
-Collection efficiency for an NV ensemble as a function of objective NA~\cite{Rondin2014}:
-% Rondin2014 Sec.~IV (collection efficiency and far-field emission pattern)
-\begin{equation}
-  \eta_\mathrm{coll} \approx \frac{1}{2}\left(1 - \cos\theta_\mathrm{max}\right),
-  \quad \theta_\mathrm{max} = \arcsin(\mathrm{NA}/n_\mathrm{diamond}),
-  \label{eq:collection_efficiency}
-\end{equation}
-where $n_\mathrm{diamond} = 2.4$ is the diamond refractive index.
+\textbf{NV-optimized selection:} The LT-APO/VISIR/0.82 covers 565--770\,nm
+apochromatically, which spans both 532\,nm excitation and the 637--770\,nm
+portion of the NV sideband.
+\jacobdecision{Can Jacob mount the
+NbN-on-sapphire chip within 0.7\,mm of the objective front element?}
 
-\begin{table}[ht]
-\centering
-\caption{Collection efficiency vs.\ objective NA for NV emission in diamond ($n = 2.4$).
-  % internal: oq4\_epifluorescence\_beamline.tex Table (collection efficiency table)
-  Values from Eq.~(\ref{eq:collection_efficiency}).}
-\label{tab:collection_efficiency}
+\textbf{Attocube LT-APO/LWD (Long Working Distance):}
+The LWD variant sacrifices NA for increased working distance, while
+maintaining cryogenic compatibility. Specifications confirmed from Attocube
+product page 2026-03-20.\cite{AttocubeLTAPOLWD_web}
+
+\begin{itemize}
+  \item LT-APO/LWD/VIS/0.64: NA\,$= 0.64$, apochromatic range 480--570\,nm
+  \item LT-APO/LWD/VISIR/0.65: NA\,$= 0.65$, apochromatic range 570--730\,nm
+  \item LT-APO/LWD/NIR/0.63: NA\,$= 0.63$, apochromatic range 725--970\,nm
+  \item Working distance: \textbf{5.0\,mm} (all three variants)
+  \item Diameter: 28\,mm; length: 81\,mm; weight: $\sim$100\,g
+  \item AR coating: $> 80$\% transmission over 400--1000\,nm \cite{AttocubeLTAPOLWD_web}
+\end{itemize}
+
+\textbf{NV-optimized selection:} LT-APO/LWD/VISIR/0.65 is the recommended
+starting point for D1. Its apochromatic range (570--730\,nm) covers both
+the 532\,nm excitation delivery and the bulk of the NV$^-$ sideband.
+The 5.0\,mm working distance gives adequate clearance for D1 sample hardware.
+
+\textbf{Attocube LT-APO/ULWD (Ultra-Long Working Distance):}
+A recently added variant designed for high-pressure diamond anvil cell work,
+but useful for applications needing maximum sample-stage clearance.
+Specifications confirmed from Attocube product page 2026-03-20.\cite{AttocubeULWD_web}
+
+\begin{itemize}
+  \item LT-APO/ULWD/VISIR: NA\,$= 0.35$, apochromatic range 520--870\,nm
+  \item LT-APO/ULWD/NIR: NA\,$= 0.35$, apochromatic range 670--1105\,nm
+  \item Working distance: \textbf{12.0\,mm} (both variants)
+  \item Diameter: 24\,mm (standard) or 18.5\,mm (xs variant)
+  \item Focal length: 6.71\,mm \cite{AttocubeULWD_web}
+\end{itemize}
+
+\textbf{Trade-off:} NA\,$= 0.35$ gives substantially lower collection
+efficiency than the LT-APO or LT-APO/LWD (see Section~\ref{sec:oq4_efficiency}).
+The VISIR variant's 520--870\,nm apochromatic range is ideal: it
+covers both 532\,nm and the full NV$^-$ sideband to 800\,nm.
+
+\textbf{Fiber-Based Cryogenic Confocal --- H\"{o}gele 2008 Design:}
+H\"{o}gele et al.\ (2008) demonstrated a fiber-coupled cryogenic confocal
+microscope operating at 4\,K (liquid helium) and 77\,K (liquid nitrogen).\cite{Hogele2008}
+% Hogele2008 p.1 (abstract: "fiber-based confocal microscope operating at cryogenic temperatures from 4 K to room temperature")
+The design uses two aspheric lenses inside the cryostat:
+\begin{itemize}
+  \item Collimating lens: Geltech 350430, $f = 5.0$\,mm, NA\,$= 0.15$ \cite{Hogele2008}
+  \item Focusing lens: Geltech 350140, $f = 1.45$\,mm, NA\,$= 0.55$ \cite{Hogele2008}
+\end{itemize}
+The single-mode fiber acts as both the illumination fiber and the confocal
+pinhole.\cite{Hogele2008}
+% Hogele2008 p.2 Sec.II.A ("the core of the single-mode fiber acts as the confocal pinhole")
+Spectral range is 500--1100\,nm with chromatic correction achieved by adjusting
+the $z$-position of the sample.\cite{Hogele2008}
+% Hogele2008 p.3 Sec.II.B (spectral range and chromatic correction method)
+
+\textbf{Advantages:} Proven to operate at 4\,K with no optical cement failure;
+very low cost (\$100--500 for the aspheric lenses); single-mode fiber gives
+excellent background rejection.\cite{Hogele2008}
+\textbf{Disadvantage:} NA\,$= 0.55$ limits geometric collection efficiency
+to $\sim$7.6\% (see Section~\ref{sec:oq4_efficiency}).
+
+\textbf{Published Cryogenic NV Confocal --- Nikon Plan Apo 40$\times$/0.95:}
+Lim et al.\ (2025) demonstrated a commercial scanning NV magnetometer
+operating in a closed-cycle cryostat (2--300\,K).\cite{arXiv2502.16599}
+% arXiv2502.16599 p.1 (abstract: "closed-cycle cryostat...scanning NV magnetometer")
+The system used an apochromatic low-temperature and high-vacuum compatible
+objective with sub-500\,nm PSF FWHM confirmed at cryogenic
+temperatures.\cite{arXiv2502.16599}
+% arXiv2502.16599 Fig.3 (PSF measurement: FWHM 468(2) nm major, 474(2) nm minor)
+
+Standard Nikon Plan Apo 40$\times$/0.95: WD\,$= 0.14$\,mm confirmed from
+manufacturer specifications accessed 2026-03-20.\cite{NikonPlanApo_web}
+NA\,$= 0.95$ gives the highest geometric collection efficiency of the options
+surveyed.
+
+\textbf{Caution:} Standard Nikon objectives are not rated for cryogenic
+operation. \jacobdecision{Is this a single-use demonstration or will the
+objective undergo repeated 300\,K-to-12\,K cycles?}
+
+\subsubsection{Architecture B: External Objective Through Cryostat Window}
+
+An external (room-temperature) objective requires long working distance to
+reach through the cryostat window to the sample. For a 25\,mm window at
+50\,mm distance, the maximum achievable NA\,$\approx
+\frac{12.5}{50} = 0.24$. The geometric collection efficiency scales as
+$\eta \propto \mathrm{NA}^2$ for small NA, so Architecture B with NA\,$= 0.24$
+yields $\sim$3$\times$ less collection than the Hogele aspheric (NA\,$= 0.55$).
+
+\jacobdecision{What is the window aperture and sample-to-window distance
+in Jacob's cryostat? Architecture B may only be viable if these parameters
+are favorable.}
+
+A Mitutoyo Plan Apo 10$\times$ (NA\,$= 0.28$, WD\,$= 33.5$\,mm)
+\needref{Mitutoyo\_spec}
+is a standard choice for long-WD microscopy outside a cryostat window.
+
+\subsubsection{Objective Comparison Table}
+
+\begin{center}
 \small
-\begin{tabular}{@{}p{4.5cm}p{2.5cm}p{2.5cm}p{3cm}@{}}
+\begin{tabular}{p{4.5cm}cccp{1.8cm}p{1.5cm}}
 \toprule
-Objective & NA & $\eta_\mathrm{coll}$ & Note \\
+\textbf{Option} & \textbf{NA} & \textbf{WD} & \textbf{Cryo-rated} & \textbf{Architecture} & \textbf{Cost est.} \\
 \midrule
-Attocube LT-APO/LWD & 0.65 & 11.1\% & In-cryostat; 5\,mm WD \\
-Attocube LT-APO & 0.82 & 21.4\% & In-cryostat; 0.55\,mm WD \\
-Nikon Plan Apo 40$\times$ & 0.95 & 34.1\% & External; standard air objective \\
+Attocube LT-APO/VISIR/0.82 \cite{AttocubeLTAPO_web}
+  & 0.82 & 0.65\,mm & Yes & A (in-cryo) & High \\[4pt]
+Attocube LT-APO/LWD/VISIR/0.65 \cite{AttocubeLTAPOLWD_web}
+  & 0.65 & 5.0\,mm & Yes & A (in-cryo) & High \\[4pt]
+Attocube LT-APO/ULWD/VISIR/0.35 \cite{AttocubeULWD_web}
+  & 0.35 & 12.0\,mm & Yes & A (in-cryo) & High \\[4pt]
+Hogele aspheric (Geltech 350140) \cite{Hogele2008}
+  & 0.55 & $\sim$1\,mm & Yes (tested 4\,K) & A (in-cryo) & Low \\[4pt]
+Nikon Plan Apo 40$\times$/0.95 \cite{arXiv2502.16599}
+  & 0.95 & 0.14\,mm & No (used) & A (in-cryo) & Medium \\[4pt]
+Mitutoyo 10$\times$/0.28 (external) \needref{Mitutoyo\_spec}
+  & 0.28 & 33.5\,mm & N/A (outside) & B (external) & Low \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{center}
 
-\subsection{OQ-4 Status}
+\subsection{Dichroic Mirror and Filter Selection}
+\label{sec:oq4_filters}
 
-\textbf{Status: OPEN.} The in-cryostat vs.\ external objective decision requires
-a PI decision (\needref{Jacob's decision: objective architecture}).
-The filter chain specifications are established; datasheets must be obtained
-before hardware procurement (\needref{Thorlabs DMLP650 and Semrock LP03-532RE datasheets}).
+The filter chain has two stages:
+\begin{enumerate}
+  \item \textbf{Dichroic beamsplitter at 45$^\circ$:} reflects 532\,nm toward
+    objective (and sample); transmits 637--800\,nm fluorescence toward detector.
+  \item \textbf{Emission filter:} additional suppression of 532\,nm scatter
+    and NV$^0$ emission (575\,nm ZPL) before the SiPM.
+\end{enumerate}
+
+\subsubsection{Dichroic Mirror: 532\,nm Reflect / 637$+$\,nm Transmit}
+
+\textbf{Thorlabs DMLP650} is the standard starting point for ensemble NV
+magnetometry.\cite{Barry2020}
+% Barry2020 Sec. II.B p.6 (filter chain description for ensemble NV: DMLP + longpass)
+
+\begin{itemize}
+  \item Type: Longpass dichroic mirror, 1\,in.\ diameter (25.4\,mm),
+    3.2\,mm thick, UV fused silica substrate \cite{ThorlabsDMLP650_web}
+  \item Cut-on wavelength: 650\,nm \cite{ThorlabsDMLP650_web}
+  \item Coating: ion-beam-sputtered, hard-coated; 40-20 scratch-dig \cite{ThorlabsDMLP650_web}
+  \item Angle of incidence: 45$^\circ$ \cite{ThorlabsDMLP650_web}
+  \item \textbf{Trade-off:} The 650\,nm cut-on excludes the NV$^-$ ZPL at
+    637\,nm and the 637--650\,nm portion of the phonon sideband.
+    \jacobdecision{Is ZPL-resolved spectroscopy planned for D1? If so, a
+    620\,nm-cut-on dichroic is needed.}
+\end{itemize}
+
+Note: Thorlabs passband transmission and OD values at 532\,nm have not been
+confirmed from a downloadable datasheet PDF; those specific numbers are
+omitted pending datasheet download. \needref{ThorlabsDMLP650\_passband}
+
+\subsubsection{Emission Filter: 532\,nm Rejection}
+
+\textbf{Option 1: Semrock NF03-532E-25 (notch filter, now obsolete):}
+Specifications confirmed from Semrock/IDEX product page 2026-03-20.\cite{SemrockNF03_web}
+\begin{itemize}
+  \item Type: StopLine single-notch, 25\,mm dia., 3.5\,mm mounted thickness
+  \item Blocking: OD\,$> 6$ at 532\,nm \cite{SemrockNF03_web}
+  \item Notch bandwidth: 17\,nm FWHM (typical) \cite{SemrockNF03_web}
+  \item Passband transmission: Tavg\,$> 93$\% from 400--513\,nm and
+    550.8--1600\,nm \cite{SemrockNF03_web}
+  \item \textbf{Status:} Product marked obsolete 2026; contact
+    Semrock for current replacement.
+\end{itemize}
+
+\textbf{Option 2: Semrock BLP01-532R-25 (EdgeBasic longpass):}
+Specifications confirmed from Semrock/IDEX product page 2026-03-20.\cite{SemrockBLP01_web}
+\begin{itemize}
+  \item Type: EdgeBasic longpass, 25\,mm dia., 2.0\,mm thickness
+  \item Blocking: OD\,$> 6$ from 425.6--532\,nm \cite{SemrockBLP01_web}
+  \item Edge wavelength (50\% point): 542\,nm \cite{SemrockBLP01_web}
+  \item Passband transmission: Tavg\,$> 93$\% from 546.9--900\,nm \cite{SemrockBLP01_web}
+  \item Transition width: 13.3\,nm \cite{SemrockBLP01_web}
+  \item \textbf{Status:} Product marked obsolete 2026; contact Semrock
+    for current replacement (LP03-532RE-25 or equivalent recommended).
+\end{itemize}
+
+\textbf{Option 3: Combined DMLP650 dichroic + 650\,nm longpass emission filter:}
+The most common configuration in published ensemble NV magnetometry.\cite{Barry2020}
+% Barry2020 Sec. II.B p.6 (standard filter chain for ensemble NV readout)
+\begin{itemize}
+  \item Dichroic: Thorlabs DMLP650 (cut-on 650\,nm) \cite{ThorlabsDMLP650_web}
+  \item Emission filter: 650\,nm longpass (Thorlabs FEL0650 or equivalent)
+    \needref{ThorlabsFEL0650\_spec}
+  \item Pass band: 650--800\,nm (NV$^-$ sideband, excluding ZPL)
+  \item \textbf{Double rejection} of 532\,nm: dichroic + longpass in series.
+  \item \textbf{Advantage:} Highest signal-to-background ratio; rejects
+    NV$^0$ (575\,nm ZPL) and Raman scatter.\cite{Barry2020}
+    % Barry2020 Sec. II.B p.6 (double longpass improves SNR)
+\end{itemize}
+
+\subsubsection{Cryogenic Filter Performance Considerations}
+
+Standard interference filters shift spectrally with temperature due to
+contraction of the thin-film coating layers. The shift coefficient for
+ion-beam-sputtered coatings is typically 0.01--0.02\,nm/K~\cite{AlluxtOpticalFilterThermalShift2026}.
+% AlluxtOpticalFilterThermalShift2026: thermal coefficient = 2--5 pm/°C for hard-coated IBS filters.
+For a 293\,K to 12\,K temperature change (Jacob's D1 demonstrator):
+\begin{equation}
+  \Delta\lambda \approx 0.015\,\frac{\text{nm}}{\text{K}} \times (293 - 12)\,\text{K}
+    \approx 4.2\,\text{nm}
+  \label{eq:oq4_filter_shift}
+  % Derived quantity: midpoint of 0.01-0.02 nm/K range applied to 281 K delta.
+\end{equation}
+
+This shifts the DMLP650 cut-on from 650\,nm to $\sim$645.8\,nm, narrowing
+the gap to the NV$^-$ ZPL at 637\,nm from 13\,nm to $\sim$8.8\,nm.
+
+\jacobdecision{Confirm with Thorlabs/Semrock whether their specific
+filters have been characterized at 12\,K. If not, consider mounting
+filters outside the cryostat (room temperature side of the beamline) to
+avoid thermal shift entirely.}
+
+\subsubsection{Filter Configuration Summary}
+
+\begin{center}
+\small
+\begin{tabular}{p{2.5cm}p{3.5cm}p{3.5cm}p{3.5cm}}
+\toprule
+\textbf{Config} & \textbf{Dichroic} & \textbf{Emission filter} & \textbf{Pass band} \\
+\midrule
+\textbf{Config 1} (recommended) & DMLP650 (cut-on 650\,nm)\cite{ThorlabsDMLP650_web} &
+  650\,nm longpass\needref{ThorlabsFEL0650\_spec} & 650--800\,nm \\[6pt]
+\textbf{Config 2} (max NV sideband) & 562\,nm dichroic (Semrock or Chroma)\needref{Semrock562\_spec} &
+  BLP01-532R-25 (cut-on 542\,nm)\cite{SemrockBLP01_web} & 542--800\,nm \\[6pt]
+\textbf{Config 3} (ZPL access) & 620\,nm dichroic\needref{Chroma620\_spec} &
+  630\,nm longpass\needref{LP630\_spec} & 630--800\,nm \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Config 1 is recommended for D1: it provides the best signal-to-background
+for ensemble ODMR magnetometry, which is the D1 measurement
+mode.\cite{Barry2020}
+% Barry2020 Sec. II.B p.6 (recommendation for ensemble magnetometry filter chain)
+
+\subsection{Collection Efficiency Analysis}
+\label{sec:oq4_efficiency}
+
+\subsubsection{Geometric Collection Efficiency Formula}
+
+For an isotropic point emitter in a homogeneous medium with refractive index $n$,
+the fraction of emitted photons captured by a lens of numerical aperture
+NA\,$= n\sin\theta$ is:\cite{Rondin2014}
+% Rondin2014 Sec.2 p.5 (solid angle formula for collection efficiency)
+\begin{equation}
+  \eta_\text{geom} = \frac{1}{2}\left(1 - \sqrt{1 - \left(\frac{\text{NA}}{n}\right)^2}\right)
+  \label{eq:oq4_eta}
+\end{equation}
+where $\theta$ is the half-angle of the collection cone.
+
+\subsubsection{Total Internal Reflection Limitation in Diamond}
+
+NV centers in bulk diamond emit inside a medium with refractive index
+$n_d \approx 2.4$. Total internal reflection (TIR) at the diamond--air
+interface confines photons emitted at angles beyond the critical angle
+$\theta_c = \arcsin(1/n_d) \approx 24.6^\circ$.
+
+\textbf{Even with a NA\,$= 0.95$ air objective, only $\sim$4\% of NV-emitted
+photons can be extracted through a planar (100)-oriented diamond
+surface.}\cite{Hopper2018}
+% Hopper2018 p.5 Sec.IV: "even assuming an air objective with NA = 0.95, a maximum fraction of only 4% of emitted photons can be extracted through a planar (100)-oriented surface"
+
+This 4\% ceiling applies regardless of objective NA for air-side collection.
+
+\subsubsection{Crystal Orientation Enhancement}
+
+Using a $\{111\}$-cut diamond (as opposed to standard $\{100\}$-cut) aligns
+one NV family axis normal to the surface, optimizing the dipole coupling to
+the collection objective.\cite{Hopper2018}
+% Hopper2018 p.6 Sec.IV.A
+
+\textbf{Using $\{111\}$-cut NV diamond gives a 65\% improvement in collected
+photons at no optical hardware cost.}\cite{Hopper2018}
+% Hopper2018 p.6 Sec.IV.A (65% increase from {111} vs {100} orientation)
+
+\jacobdecision{Can Jacob source or has Jacob's diamond already been
+characterized for crystal orientation? $\{111\}$-cut diamonds are harder
+to obtain but represent a free improvement in SNR.}
+
+\subsubsection{Solid Immersion Lens Enhancement}
+
+A solid immersion lens (SIL) placed between the objective and the diamond
+sample eliminates the diamond--air TIR barrier. For a hemispherical SIL
+made of diamond (or high-index glass matching diamond's refractive index),
+the collection can increase by up to $n_d^2 = 5.76\times$ (hemispherical
+SIL) or $n_d^3 = 13.8\times$ (Weierstrass/supersphere SIL).\cite{Hadden2010SIL}
+% Hadden2010SIL p.1: "the theoretical NA of collection is increased by a value equal to the refractive index (nd = 2.42) of diamond"
+% Hadden2010SIL p.2 FDTD: collection efficiencies 5.6% (planar), 29.8% (hemisphere).
+
+\textbf{This is the highest-impact single improvement for D1 collection
+efficiency.} Micro-fabricated hemispherical SILs etched directly into
+the diamond surface can yield collection efficiencies approaching
+$\sim$30\%, compared to $\sim$5\% without SIL.\cite{Hadden2010SIL}
+% Hadden2010SIL p.2: FDTD simulation gives collection efficiencies 29.8% (hemispherical SIL) vs. 5.6% (planar surface).
+
+\subsubsection{Collection Efficiency Table}
+
+Using Eq.~\eqref{eq:oq4_eta} with $n = 1$ (air-side collection), and the
+TIR ceiling of $\sim$4\% for bulk (100) diamond from Hopper
+(2018),\cite{Hopper2018}
+% Hopper2018 p.5 Sec.IV (4% ceiling at NA=0.95 for planar (100) diamond)
+the achievable extraction fractions are:
+
+\begin{center}
+\small
+\begin{tabular}{lllll}
+\toprule
+\textbf{Objective} & \textbf{NA} & $\theta$ & $\eta_\text{geom}$ (air) & $\eta_\text{extracted}$ (bulk diamond) \\
+\midrule
+LT-APO/ULWD/VISIR & 0.35\cite{AttocubeULWD_web} & 20.5$^\circ$ & 3.1\% & $\sim$1.5--2\% \\
+Hogele aspheric & 0.55\cite{Hogele2008} & 33.4$^\circ$ & 7.6\% & $\sim$2--4\% \\
+% Hogele2008 p.2 Sec.II.A (NA=0.55 for Geltech 350140)
+LT-APO/LWD/VISIR & 0.65\cite{AttocubeLTAPOLWD_web} & 40.5$^\circ$ & 11.1\% & $\sim$3--4\% \\
+LT-APO/VISIR & 0.82\cite{AttocubeLTAPO_web} & 55.1$^\circ$ & 21.4\% & $\sim$4\% \\
+Nikon Plan Apo & 0.95\cite{arXiv2502.16599} & 71.8$^\circ$ & 34.1\% & $\sim$4\% \\
+% arXiv2502.16599 methods (NA=0.95 objective in cryostat)
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textit{Note: the $\eta_\text{extracted}$ column accounts for TIR at the
+diamond--air interface. Above NA\,$\approx 0.65$, increasing NA yields
+diminishing returns for bulk diamond (100) because the TIR limit is already
+being approached.}
+
+\subsubsection{End-to-End Efficiency Budget for D1}
+
+For a realistic D1 estimate using the LT-APO/LWD/VISIR/0.65 objective with
+uncoated (100)-cut bulk NV diamond and Config 1 filter chain:
+
+\begin{center}
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Loss factor} & \textbf{Estimated value} \\
+\midrule
+TIR-limited extraction from (100) bulk diamond\cite{Hopper2018}
+  & $\sim$3--4\% \\
+Fresnel reflection at diamond--air interface
+  & $\sim$83\% transmission \\
+Objective AR coating transmission ($> 80$\%)\cite{AttocubeLTAPOLWD_web}
+  & $\sim$85\% \\
+Dichroic + emission filter transmission (Config 1)\cite{ThorlabsDMLP650_web}
+  & $\sim$85--90\% \\
+Fiber coupling losses (if fiber-coupled SiPM)\cite{Hogele2008}
+  & $\sim$75--85\% \\
+SiPM PDE at 700\,nm (S14420 series)\cite{S14420datasheet}
+  & $\sim$25--30\% \\
+  % S14420datasheet p.3 Fig. KAPDB0386EB (PDE vs. wavelength, 50 um pixel pitch)
+\midrule
+\textbf{Total end-to-end fraction (rough estimate)}
+  & $\mathbf{\sim 0.2\text{--}0.5\%}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+This 0.2--0.5\% end-to-end efficiency is characteristic of NV ensemble confocal
+systems without SIL. For ensemble magnetometry, the high NV density compensates:
+the total photon flux is $\dot{N} = \eta_\text{total} \times R_\text{sat} \times N_\text{NV}$
+where $N_\text{NV}$ is the number of NV centers in the illuminated volume.\cite{Barry2020}
+% Barry2020 Sec. II (ensemble photon flux scales with NV density and volume)
+
+\subsection{SiPM vs.\ sCMOS for D1 Readout}
+\label{sec:oq4_detector}
+
+\subsubsection{SiPM: S14420-3050MG (Jacob's Device)}
+
+Jacob's D1 system uses the Hamamatsu S14420-3050MG, characterized in OQ-6.
+Key specifications from the S14420 datasheet:\cite{S14420datasheet}
+% S14420datasheet: PDF in hand NVBolometer/hardware/sipm_fpga/references/S14420_datasheet.pdf
+\begin{itemize}
+  \item Peak PDE: 40\% at $\lambda = 600$\,nm (Vop\,$=$\,V$_\text{BR}$\,$+$\,5\,V)
+    \cite{S14420datasheet}
+  \item Spectral range: 350--1000\,nm \cite{S14420datasheet}
+  \item Effective photosensitive area: $\phi\,3.0$\,mm \cite{S14420datasheet}
+  \item Dark count rate: 1600\,kcps (typ., $T = 25^\circ$C) \cite{S14420datasheet}
+  \item Gain: $3.6 \times 10^6$ (typ.) \cite{S14420datasheet}
+  \item Breakdown voltage: $V_\text{BR} = 42$\,V (typ., $T = 25^\circ$C)
+    \cite{S14420datasheet}
+\end{itemize}
+
+\textbf{PDE at NV wavelengths:} At 700\,nm the PDE is estimated at $\sim$25--30\%.\cite{S14420datasheet}
+% S14420datasheet p.3 Fig. KAPDB0386EB "Photon detection efficiency vs. wavelength":
+% Peak PDE = 40\% at 600 nm (S14420-**50MG, Vop = VBR + 5V, Ta = 25 degC).
+% At 700 nm the 50 um pixel pitch curve reads approximately 25-30\%.
+% Locator: S14420datasheet p.3 Fig. KAPDB0386EB.
+
+\textbf{Cryogenic operation:} The S14420 is rated to $-40^\circ$C (233\,K)
+per manufacturer specification but not to 12\,K.\cite{S14420datasheet}
+Dark count rate drops dramatically below 77\,K, which is favorable for
+NV fluorescence detection.\cite{SiPMcryoArrays2025}
+% SiPMcryoArrays2025 (arXiv:2502.02235): SiPM dark count characterization 40-300K
+The $V_\text{BR}$ shift from 42\,V (300\,K) to $\sim$28.6\,V (12\,K)
+requires temperature compensation (see OQ-6 and
+\texttt{hardware/sipm\_vbr\_temperature\_compensation.tex}).
+
+\subsubsection{sCMOS: Widefield Imaging Option}
+
+For D2/D3 multi-pixel imaging, a scientific CMOS (sCMOS) camera provides
+simultaneous spatial readout of the NV ensemble.
+\begin{itemize}
+  \item Typical sCMOS quantum efficiency at 637--800\,nm: $\sim$70--80\%
+    (e.g., Andor Zyla or Hamamatsu ORCA series).\needref{sCMOS\_QE\_spec}
+  \item \textbf{Advantage:} Full widefield image of all pixels simultaneously;
+    enables array operation for D2/D3.
+  \item \textbf{Disadvantage for D1:} Requires widefield illumination (no
+    scanning confocal); more complex readout; higher cost.
+\end{itemize}
+
+\jacobdecision{For D1 (single NbN pixel), SiPM is the simpler and lower-cost
+choice. sCMOS becomes essential for D2/D3 array readout. Does Jacob want D1
+to demonstrate widefield imaging as a proof-of-concept for D2/D3?}
+
+\subsection{Conceptual Beamline Schematic}
+\label{sec:oq4_schematic}
+
+Figure~\ref{fig:oq4_beamline} shows the conceptual epifluorescence layout
+for the recommended Option B (LT-APO/LWD in-cryostat confocal with
+fiber-coupled SiPM).
+
+\begin{figure}[h!]
+\centering
+\fbox{\parbox{12cm}{\centering
+\textbf{Conceptual Epifluorescence Beamline (Option B)}\\[6pt]
+\texttt{532 nm laser} $\rightarrow$ \texttt{SMF patch cable}
+$\rightarrow$ \texttt{fiber collimator (Geltech 350430, f=5mm)}\\
+$\downarrow$\\
+\texttt{Dichroic mirror at 45$^\circ$ (DMLP650):}
+reflects 532\,nm $\rightarrow$ \texttt{objective inside cryostat}
+$\rightarrow$ \texttt{NV-diamond + NbN (12 K)}\\
+NV fluorescence (637--800\,nm) $\rightarrow$ back through objective
+$\rightarrow$ transmitted by DMLP650\\
+$\downarrow$\\
+\texttt{650 nm longpass filter} $\rightarrow$ \texttt{focusing lens}
+$\rightarrow$ \texttt{SMF collection fiber (pinhole)}
+$\rightarrow$ \texttt{S14420 SiPM}
+}}
+\caption{Conceptual epifluorescence beamline for NV bolometer D1.
+The dichroic mirror separates excitation (532\,nm) from emission
+(637--800\,nm) in a standard epifluorescence geometry. The cryostat
+contains only the objective and sample; all filters and the detector
+are at room temperature outside the cryostat. Figure is schematic
+only; component dimensions not to scale.}
+\label{fig:oq4_beamline}
+\end{figure}
+
+\subsection{Design Recommendations for D1}
+\label{sec:oq4_recommendations}
+
+NVB presents three options ordered by cost and implementation complexity.
+\textbf{Jacob makes all design decisions.}
+
+\textbf{Option A: Minimal Path (External Objective):}
+\begin{center}
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Component} & \textbf{Selection} \\
+\midrule
+Objective & Long-WD air objective through cryostat window (NA $\leq$ 0.28) \\
+Dichroic & Thorlabs DMLP650\cite{ThorlabsDMLP650_web} \\
+Emission filter & 650\,nm longpass \\
+Detector & S14420-3050MG SiPM\cite{S14420datasheet} \\
+Estimated end-to-end & $\sim$0.05--0.2\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Pro:} No cryogenic objective required; fastest to implement.
+\textbf{Con:} Very low collection efficiency; requires favorable cryostat
+window geometry; may not achieve sufficient SNR for ODMR contrast detection.
+
+\textbf{Option B: Low-Cost In-Cryostat (H\"{o}gele 2008 Design):}
+\begin{center}
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Component} & \textbf{Selection} \\
+\midrule
+Focusing lens & Geltech 350140, $f = 1.45$\,mm, NA\,$= 0.55$\cite{Hogele2008} \\
+Collimating lens & Geltech 350430, $f = 5.0$\,mm, NA\,$= 0.15$\cite{Hogele2008} \\
+Fiber & SMF, 5.8\,$\mu$m MFD (acts as confocal pinhole)\cite{Hogele2008} \\
+Dichroic + filter & DMLP650\cite{ThorlabsDMLP650_web} + 650\,nm longpass \\
+Detector & S14420-3050MG SiPM\cite{S14420datasheet} \\
+Estimated end-to-end & $\sim$0.2--0.5\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Pro:} Proven to 4\,K; low cost (\$200--500 in lens/fiber components);
+no proprietary hardware needed.
+\textbf{Con:} NA\,$= 0.55$ limits collection; requires chromatic $z$-adjustment
+for 532 vs. 637\,nm.\cite{Hogele2008}
+% Hogele2008 p.3 Sec.II.B (chromatic shift correction method)
+
+\textbf{Option C: Commercial Cryogenic Objective (Best Performance):}
+\begin{center}
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Component} & \textbf{Selection} \\
+\midrule
+Objective & Attocube LT-APO/LWD/VISIR/0.65 (NA\,$= 0.65$, WD\,$= 5.0$\,mm)\cite{AttocubeLTAPOLWD_web} \\
+Dichroic & Thorlabs DMLP650\cite{ThorlabsDMLP650_web} or Semrock 562\,nm dichroic\needref{Semrock562\_spec} \\
+Emission filter & 650\,nm longpass (Config 1)\needref{ThorlabsFEL0650\_spec} \\
+Detector & S14420-3050MG SiPM\cite{S14420datasheet} (D1) or sCMOS (D2/D3) \\
+Estimated end-to-end & $\sim$0.3--0.6\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Pro:} Cryogenic-rated; 5\,mm WD gives ample sample hardware clearance;
+apochromatic 570--730\,nm covers NV band and 532 excitation.
+\textbf{Con:} High cost (quote from Attocube required; estimated \$5K--15K
+range). \jacobdecision{Is this within the D1 budget?}
+
+\begin{quote}
+\textbf{NVB Recommendation Summary (Options for Jacob):}
+\begin{itemize}
+  \item \textbf{Option A (External, cheapest):} Only viable if Jacob's cryostat
+    has favorable window geometry (window aperture $\geq 20$\,mm, sample-to-window
+    distance $\leq 40$\,mm). Lowest SNR.
+  \item \textbf{Option B (Hogele aspheric, proven):} Recommended for rapid
+    prototyping at D1 scale. Low cost. Proven at 4\,K. NA\,$= 0.55$.
+  \item \textbf{Option C (Attocube LT-APO/LWD, best):} Best collection per
+    hardware cost unit. 5\,mm WD. NA\,$= 0.65$.
+  \item \textbf{ULWD option (Attocube 0.35):} Only if hardware geometry
+    absolutely requires 12\,mm clearance. Significant collection penalty.
+  \item \textbf{Filter chain:} Config 1 (DMLP650\,$+$\,650LP) is recommended
+    for D1 ODMR magnetometry. Config 3 if ZPL spectroscopy is planned.
+  \item \textbf{Free improvement:} Source $\{111\}$-cut NV diamond for
+    $\sim$65\% more photons.\cite{Hopper2018}
+    % Hopper2018 p.6 Sec.IV.A (65% increase from {111} vs {100})
+  \item \textbf{High-impact enhancement:} Diamond SIL can increase
+    collection by $\sim$10$\times$ over planar surface.\cite{Hadden2010SIL}
+    % Hadden2010SIL p.4 Fig. 3(d): ~10x enhancement measured.
+\end{itemize}
+\end{quote}
+
+\subsection{Open Questions and Jacob Decisions Required}
+\label{sec:oq4_openquestions}
+
+\begin{enumerate}
+  \item \textbf{[CRITICAL] Cryostat optical access geometry:}
+    Window aperture, sample-to-window distance at 12\,K. This gates the
+    Architecture A vs.\ B decision.
+  \item \textbf{[CRITICAL] In-cryostat space near sample:}
+    Attocube LT-APO/LWD is 28\,mm diameter $\times$ 81\,mm long. Will
+    it fit inside Jacob's cryostat near the sample stage?
+  \item \textbf{[CRITICAL] Budget:}
+    Attocube LT-APO/LWD: $\sim$\$5K--15K (quote required).
+    Option B (Hogele design): \$200--500.
+  \item \textbf{[IMPORTANT] Diamond orientation:}
+    Is the available NV diamond $\{100\}$ or $\{111\}$ cut?
+    $\{111\}$ gives 65\% more photons.\cite{Hopper2018}
+    % Hopper2018 p.6 Sec.IV.A
+  \item \textbf{[IMPORTANT] ZPL access:}
+    Is cryogenic ZPL spectroscopy planned for D1? This determines whether
+    Config 1 (650LP, simple) or Config 3 (620 dichroic\,$+$\,630LP) is needed.
+  \item \textbf{[IMPORTANT] Detector choice:}
+    SiPM (single-channel, OQ-3 design) or sCMOS (widefield, needed for D2/D3)?
+  \item \textbf{[FOLLOW-UP] Attocube minimum temperature:}
+    Website says ``cryogenic temperatures'' but does not specify lower limit.
+    Contact Attocube to confirm operation to 12\,K is verified.
+  \item \textbf{[FOLLOW-UP] Filter thermal shift at 12\,K:}
+    Confirm with Thorlabs/Semrock whether DMLP650 is characterized at 12\,K.
+    Estimated 4\,nm shift (Eq.~\ref{eq:oq4_filter_shift}) needs verification.
+\end{enumerate}
+
+\subsubsection{Literature Download Priorities (Unresolved Claims)}
+
+\begin{enumerate}
+  \item \textbf{Hadden et al., APL 97, 241901 (2010), DOI 10.1063/1.3519847}:
+    SIL enhancement factor and collection efficiency data. arXiv:1006.2093.
+    \emph{Download before citing SIL enhancement numbers.}
+  \item \textbf{Thorlabs DMLP650 datasheet PDF}: passband transmission ($>$T\%)
+    and OD at 532\,nm. Required to cite filter efficiency numbers.
+  \item \textbf{Attocube LT-APO and LWD datasheets}: NA and WD are currently
+    cited from web pages; full PDF datasheets should be requested directly from Attocube.
+  \item \textbf{S14420 PDE spectral curve at 700\,nm}: The S14420 PDF is in
+    hand but PDE at 700\,nm requires reading the spectral response plot.
+    A human must read the figure from the PDF to confirm 30--35\% estimate.
+\end{enumerate}
+
+\textbf{OQ-4 Status: OPEN.} The in-cryostat vs.\ external objective decision requires
+a PI decision. The filter chain specifications are established; datasheets must be obtained
+before hardware procurement.

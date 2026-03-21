@@ -1,105 +1,702 @@
-% 07_pixel_fabrication.tex — Section 7: Pixel Architecture & Fabrication
-% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
-% Source: open_questions/oq7_pixel_architecture.tex (Task #172, Cycle 52)
+% 07_pixel_fabrication.tex — Section 7: OQ-7 Pixel Architecture & Fabrication
+% Phase 2 full-body migration — Task #210, Cycle NVB, 2026-03-21
+% Source: open_questions/oq7_pixel_architecture.tex (Task #172, Cycle 52; authoritative)
 % Law 16: quantitative claims carry source locator comments.
-% Status: POPULATED (Phase 2) — summary of OQ-7 key results.
+% Status: POPULATED (Phase 2 full body) — full body extracted from oq7_pixel_architecture.tex
 %
-% NOTE: Authoritative source is oq7_pixel_architecture.tex. This section
-%       presents a condensed overview for the master document.
-%       Extended analysis (Q1--Q7) resides in the standalone OQ-7 document.
+% NOTE: \bibliography{} block removed — master handles bibliography.
+%       \usepackage{mdframed}, \usepackage{siunitx} used in source — master preamble must include these.
+%       keyfinding environment requires mdframed — replaced with \begin{quote}\textbf{KEY FINDING:}
+%       to avoid preamble dependency on mdframed in master.
+%       All \cite{}, \needref{} retained. siunitx \si{} commands retained.
+%
+% ARCHIVE: Previous section content archived as 07_pixel_fabrication_phase2_task210_archive_2026-03-21.tex
+%
+% NEEDREF REMAINING (updated Task #178, 2026-03-20):
+%   Semenov2009     --- NbN T_c vs thickness (bib entry added Task #177; PDF not yet obtained)
+%   Touloukian1977  --- sapphire kappa(T) at 12 K (bib entry added Task #177; PDF not yet obtained)
+%   Keesom1955      --- graphite c_v at 0.75 K (no bib entry; PDF not in hand)
+%   Ohno2012 / Pachon2019 --- CVD delta-doping NV layer protocol (no bib entry; PDFs not in hand)
+%   Kittel2005      --- Al Sommerfeld coeff (bib entry added Task #177; PDF not yet obtained)
+%   NRC equipment   --- e-beam lithography capability (web inquiry, not a PDF citation)
+%   UT Arlington rad safety --- Fe-55 source protocol (institutional document)
 
-\section{Pixel Architecture \& Fabrication}
+\section{OQ-7: Pixel Architecture \& Fabrication}
 \label{sec:pixel-fab}
 
-This section summarises the NbN bolometer pixel design constraints (OQ-7). Full derivations
-are in \texttt{oq7\_pixel\_architecture.tex}.
+This section analyses the pixel architecture design constraints for the NbN superconducting
+thin-film bolometer array. Seven questions are addressed: (Q1)~film thickness and
+lateral dimension limits imposed by the Shimadzu Nanotechnology Research Center
+(NRC) fabrication capabilities; (Q2)~energy resolution versus pixel geometry at
+$T_\mathrm{op} = 12$\,K; (Q3)~thermal crosstalk and minimum pixel pitch for
+sapphire substrate; (Q4)~magnetic crosstalk from Pearl-field spreading at the NV
+standoff distance; (Q5)~NV density and patterning options for pixel-scale sensing;
+(Q6)~demonstrator specifications for the D0-Easy and D0-Opt designs; and
+(Q7)~architecture evolution from the D0 demonstrator to P1/P2 dark-matter pixel
+targets via temperature scaling and material substitution.
 
-\subsection{NbN Film Thickness and $T_c$}
+\subsection{Context from PI}
+\label{sec:q1_context}
+
+Jacob (2026-03-20):
+
+\begin{quote}
+``P1 and P2 are the dark matter detectors --- lowest energy detection possible.
+D0 is the demonstrator. For the demonstrator, the goal is something easy to
+produce at Shimadzu nanofab and UT Arlington. It should have a repeatable energy
+target --- doesn't matter what it is, but we need to be able to hit it repeatedly.
+Low energy may actually be more challenging for a first demonstrator --- picking a
+target above the noise floor might be smarter first. BUT also design a version that
+has 48\,eV capability --- that's actually amazing and should be a parallel design
+goal.''
+``He may have NbN deposited within the week.''
+\end{quote}
+
+This section responds to this context by defining two parallel D0 designs (D0-Easy
+and D0-Opt) and charting the architecture evolution toward P1/P2.
+
+\subsection{Q1: Pixel Size and Thickness Limits}
+\label{sec:q1}
+
+\subsubsection{NbN Film Thickness}
+\label{sec:q1_thickness}
 
 The AJA ATC ORION UHV sputtering system is confirmed on-site at the UT Arlington
-Shimadzu NRC (\url{https://shimadzuinstitute.org/centers/nanotechnology-research-center/}).
-Reactive DC magnetron sputtering of Nb in N$_2$/Ar at $\sim\!150^\circ$C substrate temperature
-achieves $T_c = 16.58$\,K at 200\,nm film thickness
+Shimadzu NRC (see
+\url{https://shimadzuinstitute.org/centers/nanotechnology-research-center/}).
+Reactive DC magnetron sputtering of Nb in N$_2$/Ar ambient on sapphire achieves
+$T_c = 16.58$\,K at 200\,nm film thickness and
+$\sim\!150\,^\circ\mathrm{C}$ substrate temperature
 (source: \url{https://ieeexplore.ieee.org/document/10697750/}).
 
-For D0, the design target is 200\,nm NbN on $c$-plane sapphire with $T_c \geq 15.7$\,K.
-Normal-state resistivity $\rho_n \approx 150\,\mu\Omega\,\text{cm}$, used in the
-Wiedemann--Franz thermal conductivity estimate, is from
-Kamlapure et al.~\cite{Kamlapure2010} and Sidorova et al.~\cite{Sidorova2020}.
-% Kamlapure2010 Table I (rho_n for NbN film with T_c ~ 15.87 K)
-% Sidorova2020 Table III (rho_n for NbN films; Wiedemann-Franz thermal conductivity)
+\textbf{Minimum viable thickness for NbN superconductivity:}
+NbN $T_c$ degrades below $\sim\!10$\,nm due to disorder and proximity to the
+non-superconducting substrate. Published results show $T_c$ remains above 12\,K for
+$d \geq 20$\,nm on optimized substrates
+\needref{Semenov2009 or Annunziata2010 --- NbN SNSPD ultrathin film $T_c$ vs.\ thickness}.
+For $d \geq 50$\,nm, bulk-like $T_c$ ($>15$\,K on sapphire) is routinely
+achievable.
 
-\subsection{Pixel Geometry and Energy Resolution Floor}
-
-Phonon-noise-limited energy resolution (linear calorimeter approximation)~\cite{Richards1994}:
-% Richards1994 Eq. (17) p.8 (E_res = sqrt(4 k_B T^2 C); phonon noise floor)
-\begin{equation}
-  E_\mathrm{res}^\mathrm{ph} = \sqrt{4\,k_B\,T^2\,C} \propto \sqrt{V}\,T,
-  \label{eq:pixel_E_res}
-\end{equation}
-where $C = c_v V$ is the pixel heat capacity.
-\textbf{Note:} This formula applies to a TES calorimeter, not the D0 threshold detector.
-Values are retained as geometry comparison figures of merit; the physically correct D0
-sensitivity metric is the threshold energy $E_\mathrm{th}$ (Section~\ref{sec:oq5}).
+\textbf{Practical thickness range for Jacob's process development:}
 
 \begin{table}[ht]
 \centering
-\caption{Energy resolution floor vs.\ pixel geometry at $T = 12$\,K.
-  Computed from Eq.~(\ref{eq:pixel_E_res}) anchored at the 48\,eV baseline.
-  % internal: oq7\_pixel\_architecture.tex Table 2 (E\_res vs. geometry)
-  These are phonon-noise floors of a hypothetical linear calorimeter, not D0 thresholds.}
-\label{tab:pixel_geometry}
+\caption{NbN film thickness trade-off for D0 process development.}
+\label{tab:q1_thickness}
 \small
-\begin{tabular}{@{}p{3cm}p{1.5cm}p{2cm}p{3cm}p{3cm}@{}}
+\begin{tabular}{@{}lll@{}}
 \toprule
-Pixel $L \times W$ ($\mu$m) & $d$ (nm) & $V$ ($\mu$m$^3$) & $E_\mathrm{res}^\mathrm{ph}$ & Fabrication \\
+$d$ & Status & Note \\
 \midrule
-$1.5 \times 5.0$ (blanket) & 200 & 1.50 & \textbf{48\,eV} & No patterning \\
-$1.0 \times 1.0$ & 200 & 0.20 & \textbf{17.6\,eV} & Contact photolithography \\
-$1.0 \times 1.0$ & 100 & 0.10 & \textbf{12.4\,eV} & Contact litho + thin film \\
-$0.5 \times 0.5$ & 100 & 0.025 & \textbf{6.2\,eV} & E-beam or FIB required \\
+$\sim\!20$\,nm & Minimum ($T_c$ degraded but SC) & Useful for SNSPD-type devices \\
+200\,nm & Target for D0/D1 & Proven, robust $T_c \geq 15.7$\,K \\
+                   %  internal: NVB_TRAINING.md Sec. 8 (T_c design value 15.7 K)
+$\leq 500$\,nm & Maximum & Thicker films: higher $C$, worse resolution \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Demonstrator Specifications}
+\noindent Energy resolution scales with volume at fixed $T$ and material:
+$E_\mathrm{res} \propto \sqrt{V} \propto \sqrt{L \times W \times d}$. % internal: oq5_energy_resolution.tex Sec. 3 (E_res = sqrt(4kT^2C), C propto V)
+See Section~\ref{sec:q2} for the full table.
 
-\textbf{D0-Easy} (current plan): Blanket NbN film on existing diamond in existing cryostat.
-$T_c$ target $\geq 15.7$\,K; NV standoff $z = 10$--$100\,\mu$m; bias field 0.1--1\,mT.
-No pixel patterning required. Success criterion: repeatable ODMR frequency shift correlated
-with $R(T)$ drop at $T_c$.
-% Kamlapure2010 Table I (T_c ~ 15.87 K for epitaxial NbN, confirms >= 15.7 K target)
+\subsubsection{Lateral Pixel Dimensions}
+\label{sec:q1_lateral}
 
-\textbf{D0-Opt} (parallel design): $1 \times 1 \times 0.20\,\mu$m patterned pixel via
-contact photolithography at Shimadzu NRC. Fe-55 X-ray source (5.9\,keV) as calibration
-input; signal-to-noise of $5900\,\text{eV} / 17.6\,\text{eV} = 335\times$ above the
-phonon floor.
+\textbf{Patterning methods at Shimadzu NRC:}
+The NRC is equipped with photolithography capability. Contact photolithography
+achieves minimum feature sizes of approximately 1--2\,$\mu$m (wavelength-limited).
+E-beam lithography capability is not confirmed on-site.
+\needref{NRC equipment list --- confirm e-beam writer or SEM patterning capability at
+\url{https://shimadzuinstitute.org/centers/nanotechnology-research-center/}}
 
-\subsection{Magnetic Crosstalk Constraint (Multi-Pixel Arrays)}
+For D0 (proof-of-concept Meissner--Zeeman demo): \textbf{no pixel patterning is
+required} --- a blanket NbN film on sapphire suffices to demonstrate the $T_c$
+transition via ODMR.
 
-The controlling pitch constraint for multi-pixel arrays is Pearl-field magnetic crosstalk.
-Pearl length for 200\,nm NbN:~\cite{Pearl1964}
-% Pearl1964 p.65-66 (defines Lambda = 2 lambda_L^2 / d)
+For D1 (energy-resolving pixel): $1\,\mu$m$^2$ pixel area is at the
+contact-lithography limit. Sub-$\mu$m lateral dimensions require e-beam
+lithography (EBL) or focused ion beam (FIB).
+
+\begin{quote}
+\textbf{KEY FINDING:}
+Jacob's estimate of $\sim\!1\,\mu$m$^2$ pixel area, tens of nm thick, is
+consistent with contact-lithography feasibility: 1\,$\mu$m lateral,
+200\,nm thickness for first run; thinner films for later iterations.
+\end{quote}
+
+\subsection{Q2: Energy Resolution vs.\ Geometry at $T = 12$\,K}
+\label{sec:q2}
+
+From OQ-5 analysis~\cite{Richards1994}: % Richards1994 Eq. (17) p. 8 (E_res = sqrt(4 k_B T^2 C), phonon-noise-limited floor)
+the phonon-noise-limited energy resolution for a bolometric calorimeter is
 \begin{equation}
-  \Lambda = \frac{2\lambda_L^2}{d} = \frac{2 \times (400\,\text{nm})^2}{200\,\text{nm}}
-  = 1.6\,\mu\text{m}.
-  \label{eq:pearl_length_section}
+  E_\mathrm{res}^\mathrm{ph} = \sqrt{4\,k_B\,T^2\,C}
+  \quad [\text{J}],
+  \label{eq:q2_E_res_phonon}
 \end{equation}
-using $\lambda_L = 400$\,nm for NbN at 12\,K~\cite{Kamlapure2010}.
-% Kamlapure2010 (lambda_L = 400 nm from penetration depth measurement; internal: oq1)
-The resulting pitch constraint is $p \gtrsim 3\,z_\mathrm{NV}$.
-For single-pixel D0/D1: magnetic and thermal crosstalk are irrelevant.
-% internal: oq7_pixel_architecture.tex Sec.~4-5 (crosstalk analysis, Q3-Q4)
+with $C = c_v \times V$. Thus $E_\mathrm{res} \propto \sqrt{V}$ at fixed $T$ and
+material. Note: per OQ-5 (rewrite, 2026-03-20), this formula applies to a TES
+calorimeter, not a threshold detector. The values below are \emph{phonon-noise
+floors} of a hypothetical linear calorimeter, retained here as geometry-comparison
+figures of merit.
+% internal: oq5_energy_resolution.tex Sec. 1 (paradigm discussion -- threshold vs. calorimeter)
 
-\subsection{Architecture Evolution to P1/P2}
+Baseline: $1.5 \times 5.0 \times 0.20\,\mu$m pixel
+($V = 1.5\,\mu$m$^3$) $\to E_\mathrm{res}^\mathrm{ph} = 48.1$\,eV at $T=12$\,K.
+% internal: oq5_energy_resolution_pre_rewrite_2026-03-20.tex Table 1 (E_res = 48 eV, NEP-based)
 
-Temperature scaling from the D0 baseline (48\,eV at 12\,K)~\cite{Richards1994}:
-% Richards1994 Eq. (17) p.8 (E_res propto T^{3/2} sqrt(V))
+\begin{table}[ht]
+\centering
+\caption{Energy resolution vs.\ pixel geometry at $T = 12$\,K (phonon-noise floor).
+  $c_v$ proportional to $V$ (same NbN material composition). Ge absorber not included.
+  Values from Eq.~(\ref{eq:q2_E_res_phonon}) using $C = c_v V$ with $c_v = C_\mathrm{ref}/V_\mathrm{ref}$
+  anchored to the blanket-film baseline (48\,eV at $V = 1.5\,\mu$m$^3$).}
+\label{tab:q2_E_res_geometry}
+\small
+\begin{tabular}{@{}llllll@{}}
+\toprule
+Pixel $L \times W$ ($\mu$m) & $d$ (nm) & $V$ ($\mu$m$^3$)
+  & $E_\mathrm{res}^\mathrm{ph}$ at 12\,K & Fabrication path \\
+\midrule
+$1.5 \times 5.0$ & 200 & 1.50 & \textbf{48\,eV} & Blanket film, no patterning \\
+                 % internal: oq5_energy_resolution_pre_rewrite tex, baseline result
+$1.0 \times 1.0$ & 200 & 0.20 & \textbf{17.6\,eV} & Contact photolithography \\
+$1.0 \times 1.0$ & 100 & 0.10 & \textbf{12.4\,eV} & Contact litho + thinner process \\
+$1.0 \times 1.0$ & 50  & 0.05 & \textbf{8.8\,eV}  & Contact litho + thin film \\
+$0.5 \times 0.5$ & 100 & 0.025 & \textbf{6.2\,eV} & E-beam or FIB required \\
+$0.3 \times 0.3$ & 100 & 0.009 & \textbf{3.7\,eV} & E-beam required \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{quote}
+\textbf{KEY FINDING:}
+The $1 \times 1 \times 0.20\,\mu$m pixel (17.6\,eV floor) is achievable at
+Shimadzu NRC with contact photolithography and delivers $2.7\times$ improvement
+over the blanket film. The 48\,eV result from the blanket film is the \emph{easiest
+to fabricate} --- no patterning, lowest risk for a first demonstration.
+\end{quote}
+
+\textbf{Parallel design goal:} Build both:
+\begin{enumerate}
+  \item \textbf{D0-Easy:} Blanket NbN ($1.5 \times 5\,\mu$m or full chip)
+    $\to 48$\,eV floor, no patterning, lowest fabrication risk.
+  \item \textbf{D0-Opt:} $1 \times 1 \times 0.20\,\mu$m patterned pixel
+    $\to 17.6$\,eV floor, requires one photolithography step.
+\end{enumerate}
+
+\subsection{Q3: Pixel Pitch --- Thermal Crosstalk}
+\label{sec:q3}
+
+\subsubsection{In-Pixel Thermal Spreading (Within One Pulse Event)}
+\label{sec:q3_intra}
+
+Thermal diffusivity of the NbN film at 12\,K is estimated via the Wiedemann--Franz law:
+\begin{align}
+  \sigma &= 1/\rho_n = 6.7 \times 10^5\,\text{S\,m}^{-1} \notag \\
+         % Kamlapure2010 Table I (rho_n ~ 150 uOhm cm for NbN with T_c = 15.87 K)
+  \kappa &= L_0 \sigma T = 2.44 \times 10^{-8} \times 6.7 \times 10^5 \times 12
+           \approx 0.20\,\text{W\,m}^{-1}\,\text{K}^{-1},
+  \label{eq:q3_kappa_WF}
+\end{align}
+where $\rho_n \approx 150\,\mu\Omega$\,cm from Kamlapure et al.~\cite{Kamlapure2010}
+% Kamlapure2010 Table I (rho_n column for film with T_c ~ 15.87 K)
+and confirmed by Sidorova et al.~\cite{Sidorova2020}, % Sidorova2020 Table III (rho_n for NbN films used in Wiedemann-Franz thermal conductivity estimate)
+and $L_0 = 2.44 \times 10^{-8}$\,W\,$\Omega$\,K$^{-2}$ is the Lorenz number.
+
+\textbf{CAVEAT:} This uses the normal-state Wiedemann--Franz estimate; actual
+cryogenic thermal conductivity of NbN films is substrate-limited and
+geometry-dependent.
+\needref{Direct $\kappa(T)$ measurement for NbN thin films at 12\,K.}
+
+Volumetric heat capacity from OQ-5 thermal model:
+$c_v = C/V = 7.48 \times 10^{-15}$\,J\,K$^{-1}$ / $1.5 \times 10^{-18}$\,m$^3$
+$= 4987$\,J\,m$^{-3}$\,K$^{-1}$. % internal: oq5_energy_resolution_pre_rewrite tex (C = 7.48e-15 J/K at 12 K)
+
+Thermal diffusivity: $D = \kappa / c_v \approx 0.20 / 4987 \approx 4 \times 10^{-5}$\,m$^2$\,s$^{-1}$.
+
+Thermal diffusion length during the thermal recovery time constant
+$\tau = C/G_{ep} = 0.16$\,ns (from OQ-5):
+% internal: oq5_energy_resolution_pre_rewrite tex (tau = 0.16 ns at 12 K, G_ep = 4.67e-5 W/K)
 \begin{equation}
-  E_\mathrm{res}^\mathrm{ph} \propto T^{3/2}\,\sqrt{V}.
-  \label{eq:T_scaling}
+  L_\mathrm{th} = \sqrt{D \cdot \tau}
+  = \sqrt{4 \times 10^{-5} \times 1.6 \times 10^{-10}}
+  \approx 80\,\text{nm}.
+  \label{eq:q3_L_th}
 \end{equation}
-Going to 4.2\,K (LHe) alone reduces the D0-Easy floor from 48\,eV to 3.6\,eV
-(factor $13\times$). P1/P2 targets require $T \leq 2.5$\,K (He-3 sorption cooler) and
-replacement of NbN with Al ($T_c = 1.10$\,K) for the SC film.
-% internal: oq7_pixel_architecture.tex Table 7 (temperature scaling table)
+
+\noindent\textbf{Within-pixel spreading is $\sim\!80$\,nm} --- much smaller than a 1\,$\mu$m
+pixel. The thermal pulse is spatially confined during a detection event.
+
+\subsubsection{Substrate-Mediated Inter-Pixel Thermal Crosstalk}
+\label{sec:q3_inter}
+
+For pixels on a sapphire substrate at 12\,K:
+$\kappa_\mathrm{sapphire} \approx 10$\,W\,m$^{-1}$\,K$^{-1}$ at 12\,K.
+\needref{$\kappa(T)$ data for $c$-plane sapphire at 12\,K --- Touloukian (1970) or
+Berman (1952) thermal conductivity data.}
+
+Lateral thermal conductance between adjacent pixels on an unpatterned substrate:
+\begin{equation}
+  G_\mathrm{lat} \approx \frac{\kappa_\mathrm{sap}\,d_\mathrm{sub}\,w_\mathrm{pix}}{p}
+  \approx \frac{10 \times 500 \times 10^{-6} \times 1 \times 10^{-6}}{p}
+  = \frac{5 \times 10^{-9}}{p}\,\text{W\,K}^{-1},
+  \label{eq:q3_G_lat}
+\end{equation}
+where $p$ is the pixel pitch (in metres) and $d_\mathrm{sub} = 500\,\mu$m is a
+representative substrate thickness.
+
+Electron-phonon thermal conductance for the D0 pixel:
+$G_{ep} = 4.67 \times 10^{-5}$\,W\,K$^{-1}$.
+% internal: oq5_energy_resolution_pre_rewrite tex (G_ep = 5 Sigma V T^4 = 4.67e-5 W/K at 12 K)
+
+For $G_\mathrm{lat} \ll G_{ep}$ (factor 100 isolation): pitch must satisfy
+$p \gg 5 \times 10^{-9} / (4.67 \times 10^{-7}) \approx 10\,\mu$m.
+
+\textbf{Thermal isolation estimate: pixel pitch $\gtrsim 10\,\mu$m} for
+passive sapphire substrate. Improving isolation requires etched trenches, suspended
+membrane geometry, or thinned substrate.
+
+\textbf{For single-pixel D0/D1 demonstrator: thermal crosstalk is irrelevant.}
+This constraint applies only to D2--D3 arrays.
+
+\subsection{Q4: Pixel Pitch --- Magnetic Crosstalk}
+\label{sec:q4}
+
+Two sources of magnetic crosstalk between adjacent pixels:
+
+\subsubsection{Superconducting Pearl-Field Spreading}
+\label{sec:q4_pearl}
+
+When pixel A undergoes a $T_c$ transition, its Meissner screening collapses.
+The change in $B$-field at the NV layer spreads laterally over the Pearl
+length~\cite{Pearl1964}: % Pearl1964 p. 65-66 (defines Lambda = 2 lambda_L^2 / d for thin SC films)
+\begin{equation}
+  \Lambda = \frac{2\lambda_L^2}{d_\mathrm{SC}}
+  = \frac{2 \times (400\,\text{nm})^2}{200\,\text{nm}}
+  = 1.6\,\mu\text{m},
+  \label{eq:q4_pearl_length}
+\end{equation}
+using $\lambda_L = 400$\,nm for NbN at 12\,K.
+% internal: oq1_meissner_zeeman_calculation.tex (lambda_L = 400 nm for NbN 200 nm from Kamlapure2010)
+
+The $\Delta B_z$ field from a Meissner transition decays at lateral distance $r$
+from the pixel centre approximately as~\cite{Kogan2007}: % Kogan2007 (monopole approx. for Pearl film field decay, r >> Lambda)
+\begin{equation}
+  \Delta B_z(r, z) \propto \frac{1}{(r^2 + z^2)^{3/2}}
+  \quad (r \gg \Lambda,\;\text{point-source approximation}).
+  \label{eq:q4_pearl_decay}
+\end{equation}
+
+For pixel A to produce $<10\%$ crosstalk at pixel B at pitch $p$ and NV standoff $z$:
+$(z/p)^3 < 0.1$, i.e.\ $p > z / (0.1)^{1/3} \approx 2.15\,z$.
+
+\begin{table}[ht]
+\centering
+\caption{Magnetic crosstalk: minimum pixel pitch for $<10\%$ Pearl-field crosstalk
+  at the NV sensing position. Source: Eq.~(\ref{eq:q4_pearl_decay}) monopole
+  approximation~\cite{Kogan2007}.} % Kogan2007 (Pearl film field formula used in monopole limit)
+\label{tab:q4_mag_crosstalk}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+NV standoff $z$ & Min.\ pitch for $<10\%$ crosstalk & Notes \\
+\midrule
+$z = 10\,\mu$m & $p > 22\,\mu$m & Thin diamond / near-surface NV \\
+$z = 50\,\mu$m & $p > 108\,\mu$m & Bulk diamond standoff \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Magnetic crosstalk limit from SC Pearl field:} pitch $\gtrsim 3\,z_\mathrm{NV}$.
+Minimising NV standoff (thin diamond or implanted NV layer) is therefore desirable
+for compact arrays.
+
+\subsubsection{NV Spin Cross-Sensing Between Pixels}
+\label{sec:q4_nv}
+
+NVs below pixel A also lie within the sensing range of pixel B if the pixel pitch
+is comparable to the Pearl field decay length. The spatial constraint is the same
+as Section~\ref{sec:q4_pearl}: \textbf{pixel pitch $\gtrsim 3\,z_\mathrm{NV}$}
+for $<10\%$ inter-pixel NV sensing crosstalk.
+
+\textbf{Additional NV concern:} NV--NV dipolar coupling between NVs across a pixel
+boundary could create a spin-mediated crosstalk channel, but this operates over
+distances of $\sim\!\mathrm{nm}$ and is negligible at $\mu$m pixel pitch
+scales.~\cite{Doherty2013} % Doherty2013 p. 15-18 (NV-NV dipolar coupling range, dipolar ~ r^{-3}, negligible at um scales)
+
+\subsubsection{Summary of Pitch Constraints}
+\label{sec:q4_summary}
+
+\begin{table}[ht]
+\centering
+\caption{Summary of pixel pitch constraints for multi-pixel arrays.}
+\label{tab:q4_pitch_summary}
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Constraint & Minimum pitch \\
+\midrule
+Thermal (passive sapphire substrate, 100:1 isolation) & $\gtrsim 10\,\mu$m \\
+Magnetic Pearl-field ($z = 10\,\mu$m NV standoff) & $\gtrsim 22\,\mu$m \\
+Magnetic Pearl-field ($z = 50\,\mu$m NV standoff) & $\gtrsim 108\,\mu$m \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{quote}
+\textbf{KEY FINDING:}
+Pearl-field magnetic crosstalk at the NV standoff distance is the controlling
+pitch constraint. Minimising NV standoff ($z \to$ smaller) reduces required pitch
+proportionally. Sub-10\,$\mu$m standoff (thin diamond or implanted NV layer)
+is therefore desirable for compact arrays.
+\end{quote}
+
+\subsection{Q5: NV Density and Patterning}
+\label{sec:q5}
+
+\subsubsection{Optimal NV Density for Magnetometry}
+\label{sec:q5_density}
+
+From Barry et al.~\cite{Barry2020}, NV ensemble magnetometry sensitivity scales as:
+% Barry2020 Eq. (13) (or equivalent) -- sensitivity eta propto 1/(C sqrt(n_NV V_sens T2*))
+\begin{equation}
+  \eta \propto \frac{1}{C \sqrt{n_\mathrm{NV}\,V_\mathrm{sens}\,T_2^*}},
+  \label{eq:q5_NV_sensitivity}
+\end{equation}
+where $C$ is ODMR contrast, $n_\mathrm{NV}$ is NV density, $V_\mathrm{sens}$ is
+sensing volume, and $T_2^*$ is the inhomogeneous dephasing time.
+
+Optimal density balances:
+\begin{itemize}
+  \item \textbf{Higher $n_\mathrm{NV}$:} better photon shot noise (more NV signal).
+  \item \textbf{Higher $n_\mathrm{NV}$:} worse $T_2^*$ (NV--NV dipolar dephasing,
+    $^{13}$C nuclear spin bath).
+  \item Typical optimal for bulk ensemble sensing: $n_\mathrm{NV} \sim 10^{17}$\,cm$^{-3}$.
+    % Barry2020 Sec. V (concentration optimisation, typical optimal ~ 10^17 cm^-3 for bulk NV)
+\end{itemize}
+
+Jacob's current diamond is HPHT grade (estimated $T_2 \sim 1$--$10\,\mu$s,
+consistent with nitrogen-bath dominated dephasing at high NV density).
+% internal: NVB_TRAINING.md Sec. 3 (HPHT grade diamond, T2 ~ 1-10 us)
+For improved sensitivity, lower-nitrogen diamond with
+$n_\mathrm{NV} \sim 10^{16}$--$10^{17}$\,cm$^{-3}$ is preferred.
+
+\subsubsection{Patterning Approaches}
+\label{sec:q5_patterning}
+
+Two practical paths for confining NV sensitivity to pixel regions:
+
+\textbf{Option~A --- Ion implantation (post-growth):}
+\begin{itemize}
+  \item N$^+$ ions implanted through a mask (PMMA or hard mask with pixel-sized windows).
+  \item Implant depth controlled by ion energy: 5--100\,nm depth for 5--50\,keV N$^+$.
+  \item Annealing at 800--900$^\circ$C (1--2\,h in vacuum) activates NV centres.
+  \item Lateral resolution: $\sim\!$pixel size (lithography-defined mask).
+  \item Drawback: implantation damage reduces $T_2$ by $\sim$1--2 orders of magnitude
+    vs.\ native NV.~\cite{Doherty2013} % Doherty2013 Sec. 4 (implantation-induced damage, T2 degradation discussion)
+\end{itemize}
+
+\textbf{Option~B --- Delta-doping during CVD growth:}
+\begin{itemize}
+  \item During diamond CVD, inject N$_2$ gas pulse for a few seconds at controlled
+    growth rate.
+  \item Creates a thin (1--10\,nm) NV-enriched layer at a specific depth.
+  \item Better $T_2$ than implantation (no damage-induced decoherence).
+  \item Less spatial control laterally (entire wafer doped at same depth in that growth step).
+  \item Pixel-specific patterning requires combined masked overgrowth or etching.
+  \needref{CVD delta-doping NV layer protocol --- Ohno2012 (Appl.\ Phys.\ Lett.) or Pachon2019 equivalent.}
+\end{itemize}
+
+\textbf{For D0/D1 (single pixel):} No NV patterning needed. Use bulk diamond NV layer.
+The confocal beam spot defines the sensing volume.
+
+\textbf{For D2--D3 (arrays):} Delta-doping or masked ion implantation preferred.
+Delta-doping gives better $T_2$ (less damage). Masked implantation is more available
+at standard nanofab facilities.
+
+\subsection{Q6: Demonstrator Specification}
+\label{sec:q6}
+
+\subsubsection{D0-Easy: Meissner--Zeeman Proof of Concept (Current Plan)}
+\label{sec:q6_d0easy}
+
+This is the existing OQ-1 design. No energy resolution target --- just demonstrate
+that ODMR shifts at $T_c$.
+
+\begin{table}[ht]
+\centering
+\caption{D0-Easy demonstrator specification.}
+\label{tab:q6_d0easy}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Parameter & Value & Source \\
+\midrule
+SC film & NbN 200\,nm on $c$-plane sapphire
+  & \cite{Kamlapure2010}; \texttt{nbn\_film\_sourcing.md} \\
+         % Kamlapure2010 Table I (T_c ~ 15.87 K for 200 nm NbN)
+Pixel area & Blanket film (no patterning) & --- \\
+$T_c$ target & $\geq 15.7$\,K & Literature; \texttt{NVB\_TRAINING.md} \\
+             % internal: NVB_TRAINING.md Sec. 8 (T_c = 15.7 K design value)
+$T_\mathrm{op}$ & 12\,K (Jacob's cryostat base) & Jacob's data \\
+Bias field $B_\mathrm{bias}$ & 0.1--1\,mT, normal to film
+  & \texttt{oq1\_meissner\_zeeman\_calculation.tex} \\
+NV standoff $z$ & 10--100\,$\mu$m (bulk diamond)
+  & \texttt{oq1\_meissner\_zeeman\_calculation.tex} \\
+Expected $\Delta B_z$ & 8--14\,$\mu$T
+  & \texttt{oq1\_meissner\_zeeman\_calculation.tex} \\
+                       % internal: oq1 (Meissner field decay at z = 10-100 um)
+Detection time & 1--3\,s (CW-ODMR averaging)
+  & OQ-1 calculation; $\eta = 14\,\mu$T\,Hz$^{-1/2}$ \\
+Success criterion & Repeatable ODMR frequency shift correlated with $R(T)$ drop at $T_c$
+  & --- \\
+Fabrication & AJA ORION reactive sputtering at UT Arlington NRC
+  & \texttt{nbn\_film\_sourcing.md} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Status:} Calculation complete (OQ-1 resolved). Pending: NbN deposition (OQ-2).
+Jacob reports NbN deposition may occur within the week.
+
+\subsubsection{D0-Opt: Energy-Resolving Demonstrator}
+\label{sec:q6_d0opt}
+
+A parallel design path to demonstrate true bolometric energy deposition detection,
+using a known energy source for calibration.
+
+\begin{table}[ht]
+\centering
+\caption{D0-Opt demonstrator specification --- two variants.}
+\label{tab:q6_d0opt}
+\small
+\begin{tabular}{@{}p{4.5cm}p{3.5cm}p{4cm}@{}}
+\toprule
+Parameter & D0-Opt-A (conservative) & D0-Opt-B (optimised) \\
+\midrule
+SC film & NbN 200\,nm & NbN 200\,nm \\
+Pixel area & $1.5 \times 5\,\mu$m (blanket cut) & $1 \times 1\,\mu$m (photolithography) \\
+Pixel volume & 1.5\,$\mu$m$^3$ & 0.2\,$\mu$m$^3$ \\
+$E_\mathrm{res}^\mathrm{ph}$ at 12\,K & \textbf{48\,eV} & \textbf{17.6\,eV} \\
+                                         % internal: Eq.~(\ref{eq:q2_E_res_phonon}), V-scaling
+Energy source & Fe-55 X-ray (5.9\,keV) & Fe-55 X-ray (5.9\,keV) \\
+Signal/noise & 5900\,eV / 48\,eV $= 123\times$ & 5900\,eV / 17.6\,eV $= 335\times$ \\
+Calibration method & Resistive heater on pixel & Resistive heater on pixel \\
+                     % Richards1994 Sec. IV p. 15 (resistive heater calibration standard for bolometers)
+Success criterion & Detect 5.9\,keV events as discrete ODMR pulses, reproducible $\Delta T$
+  & Same \\
+Additional fabrication & None beyond D0-Easy film & One photolithography step \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Calibration note:} A thin-film resistive heater wire (Cr or Au, e-beam
+evaporated) deposited on the pixel surface allows injection of known electrical
+energy $Q = I^2 R t$. This is standard in TES/NTD bolometer calibration.~\cite{Richards1994}
+% Richards1994 Sec. IV p. 15-17 (calibration of bolometers via resistive heater; Q = I^2 R t standard method)
+
+\textbf{Recommended energy source:} $^{55}$Fe radioactive source (5.9\,keV Mn
+K$\alpha$ X-ray). At 5.9\,keV, this is $123\times$ above the 48\,eV noise floor ---
+a comfortable first demonstration. Success criterion: reproducible ODMR pulse
+amplitude proportional to 5.9\,keV, consistent with thermal model prediction.
+
+\needref{Verify UT Arlington radiation safety protocol for $^{55}$Fe source acquisition.}
+
+\subsubsection{What ``Successful Demonstration'' Looks Like}
+\label{sec:q6_merit}
+
+\begin{enumerate}
+  \item \textbf{Transition detection:} ODMR frequency shift $\Delta B_z$ observed
+    and correlates with $R(T)$ drop at $T_c$ (OQ-1 target).
+  \item \textbf{Pulse mode:} Individual X-ray absorption events produce discrete
+    ODMR transients with rise time $\tau_\mathrm{rise}$ and decay time
+    $\tau = C/G_{ep} = 0.16$\,ns (or longer if dominated by other thermal links).
+    % internal: oq5_energy_resolution_pre_rewrite tex (tau = 0.16 ns)
+  \item \textbf{Amplitude consistency:} ODMR pulse amplitude scales with deposited
+    energy; heater calibration matches X-ray events within 20\%.
+  \item \textbf{Reproducibility:} Same pulse amplitude within $\pm10\%$ for
+    repeated events from same source.
+\end{enumerate}
+
+\subsection{Q7: Path from D0 to P1/P2 --- Sub-eV Architecture}
+\label{sec:q7}
+
+\subsubsection{Temperature Scaling Table (Phonon Floor)}
+\label{sec:q7_temperature}
+
+For a metal bolometer with $C \propto VT$:
+$E_\mathrm{res}^\mathrm{ph} \propto T^{3/2} \sqrt{V}$.~\cite{Richards1994}
+% Richards1994 Eq. (17) p. 8 (E_res = sqrt(4 k_B T^2 C), C propto T => E_res propto T^{3/2} sqrt(V))
+Anchoring to D0-Easy at $T = 12$\,K ($E_\mathrm{res} = 48$\,eV,
+$V = 1.5\,\mu$m$^3$):
+% internal: oq5_energy_resolution_pre_rewrite tex (baseline: 48 eV at 12 K, V = 1.5 um^3)
+
+\begin{table}[ht]
+\centering
+\caption{Temperature scaling of phonon-noise-limited energy resolution.
+  Columns show NbN film only (no Ge absorber) for each pixel volume.
+  Scaling: $E_\mathrm{res} \propto T^{3/2} \sqrt{V}$, anchored at D0-Easy baseline.~\cite{Richards1994}}
+  % Richards1994 Eq. (17) p. 8
+\label{tab:q7_T_scaling}
+\small
+\begin{tabular}{@{}lllll@{}}
+\toprule
+$T_\mathrm{op}$ & $E_\mathrm{res}^\mathrm{ph}$ ($V = 1.5\,\mu$m$^3$)
+  & $E_\mathrm{res}^\mathrm{ph}$ ($V = 0.2\,\mu$m$^3$)
+  & Cooling required \\
+\midrule
+12\,K (NbN D0)   & 48\,eV   & 17.6\,eV  & Jacob's cryostat \\
+4.2\,K           & 3.6\,eV  & 1.3\,eV   & LHe (external) \\
+2.55\,K          & 1.0\,eV  & 0.37\,eV  & He-3 sorption cooler \\
+1.0\,K           & 96\,meV  & 35\,meV   & He-3 or ADR \\
+0.75\,K (P1/P2)  & 43\,meV  & 16\,meV   & He-3 cooler ($\geq 300$\,mK) \\
+0.16\,K          & 1.0\,meV & 0.37\,meV & Dilution refrigerator \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{quote}
+\textbf{KEY FINDING:}
+Going from 12\,K to 4.2\,K (LHe immersion) alone brings the 1.5\,$\mu$m$^3$
+pixel from 48\,eV to 3.6\,eV --- a factor $13\times$ for minimal added capital cost.
+For sub-eV detection (P1/P2): requires $T \leq 2.5$\,K, needing a He-3
+sorption cooler ($\sim\!\$50$\,K, reaches 300\,mK) or ADR system (OQ-9).
+\end{quote}
+
+\subsubsection{Material Changes for Sub-K Operation}
+\label{sec:q7_material}
+
+P1 uses Al ($T_c = 1.10$\,K) $+$ graphite absorber instead of NbN $+$ Ge
+(Demonstrator). Three advantages of Al at 0.75\,K over NbN at 12\,K:
+
+\begin{enumerate}
+  \item \textbf{Lower $T_c$ = finer energy threshold:}
+    $\Delta E_\mathrm{max} \approx C \times (T_c - T_\mathrm{op})$.
+    Al at 0.75\,K: $\Delta T_\mathrm{margin} = 0.35$\,K.
+    NbN at 12\,K: $\Delta T_\mathrm{margin} = 3.7$\,K --- much larger,
+    requiring proportionally more deposited energy to trigger detection.
+
+  \item \textbf{BCS-suppressed heat capacity:}
+    Below $T_c$, Al electronic heat capacity is exponentially suppressed:
+    $C_e^\mathrm{BCS} \sim C_e^n \exp(-\Delta/k_B T)$.
+    At $T/T_c = 0.68$ (i.e.\ $T = 0.75$\,K), the suppression factor
+    $\exp(-1.76\,T_c/T) \approx 0.08$.~\cite{Richards1994}
+    % Richards1994 Appendix p. 23 (BCS heat capacity suppression below T_c, exp(-Delta/kT))
+    This gives fundamentally lower $C$ than any normal metal at the same $T$.
+
+  \item \textbf{Graphite absorber:}
+    Graphite has very low phonon heat capacity at sub-K temperatures due to
+    anisotropic Debye structure ($c$-axis $\Theta_D \approx 50$\,K, giving
+    strong $T^3$ suppression below 5\,K).
+    \needref{Low-$T$ heat capacity of graphite: Keesom (1955) or equivalent;
+    no PDF in hand yet for specific $c_v$ values at 0.75\,K.}
+\end{enumerate}
+
+\textbf{Order-of-magnitude P1 energy resolution estimate}
+(using BCS suppression for Al and Debye phonon formula for graphite at 0.75\,K):
+
+\begin{align}
+  C_\mathrm{Al}^\mathrm{SC} &\approx
+    8.5\,\gamma_\mathrm{vol}\,T_c\,\exp(-1.76\,T_c/T)\,V_\mathrm{Al}
+    \approx 1.9 \times 10^{-18}\,\text{J\,K}^{-1} \quad\text{(dominant)} \notag \\
+  C_\mathrm{graphite} &\approx 2.4 \times 10^{-19}\,\text{J\,K}^{-1}
+    \quad\text{(Debye estimate, $\Theta_D = 50$\,K)} \notag \\
+  C_\mathrm{P1,total} &\approx 2.15 \times 10^{-18}\,\text{J\,K}^{-1} \notag
+\end{align}
+% CAVEAT: Al gamma_vol = 135 J/(m^3 K^2) is a standard reference value.
+% \needref{Al Sommerfeld coefficient from Kittel or Ashcroft-Mermin -- check NVBolometer/literature/}
+
+\begin{equation}
+  E_\mathrm{res}^\mathrm{P1}
+  \approx \sqrt{4 \times 1.38 \times 10^{-23} \times (0.75)^2 \times 2.15 \times 10^{-18}}
+  \approx 51\,\text{meV}.
+  \label{eq:q7_E_P1}
+\end{equation}
+
+\textbf{CAVEAT:} This is an order-of-magnitude estimate. Graphite $c_v$ at 0.75\,K is
+highly orientation-dependent (anisotropic Debye). Al BCS formula uses
+$\gamma_\mathrm{vol} = 135$\,J\,m$^{-3}$\,K$^{-2}$.
+\needref{Al Sommerfeld coefficient $\gamma_\mathrm{vol}$ direct measurement ---
+check Kittel or Ashcroft--Mermin in NVBolometer/literature/.}
+Precise P1 $E_\mathrm{res}$ requires literature values in hand.
+
+\subsubsection{Architecture Evolution Table}
+\label{sec:q7_arch}
+
+\begin{table}[ht]
+\centering
+\caption{Architecture evolution from D0 demonstrator to P1/P2 dark-matter pixels.}
+\label{tab:q7_arch_evolution}
+\small
+\begin{tabular}{@{}p{1.5cm}p{2cm}p{2cm}p{1.5cm}p{2.5cm}p{2cm}p{2.5cm}@{}}
+\toprule
+Stage & SC film & Absorber & $T_\mathrm{op}$ & Cooling & $E_\mathrm{res}$ (floor) & Primary goal \\
+\midrule
+D0-Easy & NbN 200\,nm & None (film only) & 12\,K & Existing cryostat & 48\,eV & Meissner--Zeeman POC \\
+D0-Opt & NbN 200\,nm & --- & 12\,K & Existing cryostat & 17.6\,eV & Energy-resolving with $1 \times 1\,\mu$m pixel \\
+D1 & NbN or Al & NbN/Ge or Al/Gr & 4.2\,K & LHe dewar & 1--4\,eV & First single-pixel bolometer \\
+P1 & Al 20\,nm & Graphite 200\,nm & 0.75\,K & He-3 cooler & $\sim\!51$\,meV & Sub-eV DM detection (3--15\,eV range) \\
+P2 & Al 200\,nm & Graphite 300\,nm & 0.85\,K & He-3 cooler & $\sim\!150$\,meV (est.) & 5--300\,eV range \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Open Items Generated by This Analysis}
+\label{sec:q7_open_items}
+
+\begin{table}[ht]
+\centering
+\caption{Open items requiring literature download before claims can be verified.}
+\label{tab:q7_open_items}
+\small
+\begin{tabular}{@{}p{5cm}p{3cm}p{2cm}@{}}
+\toprule
+Item & Status & Priority \\
+\midrule
+Minimum NbN thickness vs.\ $T_c$ (SNSPD literature: Semenov2009?)
+  & NEEDREF & High \\
+$\kappa(T)$ of NbN thin film at 12\,K
+  & NEEDREF & Medium \\
+$\kappa(T)$ of $c$-plane sapphire at 12\,K (Touloukian / Berman)
+  & NEEDREF & Medium \\
+Graphite $c_v$ at 0.75\,K (Keesom1955 or similar)
+  & NEEDREF & High \\
+Al Sommerfeld coefficient (Kittel / Ashcroft--Mermin in hand?)
+  & Check literature/ & High \\
+CVD delta-doping NV layer protocol (Ohno2012 or similar)
+  & NEEDREF & Medium \\
+Confirm NRC e-beam lithography capability
+  & Check NRC equipment list & High \\
+Heater calibration literature
+  & \cite{Richards1994} Sec.~IV (in hand) & Already covered \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Immediate Recommended Actions for Jacob}
+\label{sec:q7_actions}
+
+\begin{enumerate}
+  \item \textbf{This week (NbN deposition ready):} Run D0-Easy experiment.
+    Blanket NbN film on existing diamond in existing cryostat. Detect ODMR shift at
+    $T_c$. This is the OQ-1 target. No new hardware required.
+
+  \item \textbf{Parallel (within 2 weeks):} Pattern one $1 \times 1\,\mu$m
+    NbN pixel via contact photolithography at Shimadzu NRC. Attach resistive heater
+    wire for energy calibration (standard bolometer method~\cite{Richards1994}).
+    % Richards1994 Sec. IV p. 15-17 (calibration via resistive heater)
+    This becomes D0-Opt.
+
+  \item \textbf{Energy source:} Obtain commercial $^{55}$Fe source (5.9\,keV Mn
+    K$\alpha$, e.g.\ Spectrum Techniques UCS-30). Common in X-ray detection labs.
+    \needref{Verify UT Arlington radiation safety source acquisition protocol.}
+
+  \item \textbf{Temperature step:} After D0-Easy success, explore LHe dewar access
+    (external collaboration or Frost node cold finger). Going from 12\,K to 4.2\,K
+    reduces the 48\,eV floor to 3.6\,eV --- factor $13\times$ for minimal cost.
+
+  \item \textbf{Long term:} He-3 sorption cooler for P1/P2 sub-K operation (OQ-9
+    path). Capital cost $\sim\!\$50$\,K; reaches 300\,mK.
+\end{enumerate}

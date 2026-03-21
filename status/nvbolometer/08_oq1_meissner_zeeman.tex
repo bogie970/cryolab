@@ -1,113 +1,245 @@
 % 08_oq1_meissner_zeeman.tex — Section 8: OQ-1 Meissner-Zeeman Calculation
-% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
-% Source: open_questions/oq1_meissner_zeeman_calculation.tex (authoritative)
+% Phase 2 full-body migration — Task #210, Cycle NVB, 2026-03-21
+% Source: open_questions/oq1_meissner_zeeman_calculation.tex (Task #145, 2026-03-20; authoritative)
 % Law 16: quantitative claims carry source locator comments.
-% Status: POPULATED (Phase 2) — key results summary.
+% Status: POPULATED (Phase 2 full body) — full body extracted from oq1_meissner_zeeman_calculation.tex
 %
-% NOTE: This section presents the key derivation and results.
-%       Full calculation resides in oq1_meissner_zeeman_calculation.tex.
+% NOTE: \thebibliography block removed — master document handles bibliography via references/references.bib.
+%       All \cite{} keys retained. \needref{} macros retained.
+%       \jacobdecision macro not present in this source — no substitution needed.
+%
+% ARCHIVE: Previous section content (summary) archived as 08_oq1_meissner_zeeman_phase2_task210_archive_2026-03-21.tex
 
-\section{OQ-1: Meissner--Zeeman Calculation}
+\section{OQ-1: Meissner--Zeeman Detection Feasibility}
 \label{sec:oq1}
 
-Can we detect the ODMR Zeeman shift change when NbN transitions through $T_c$?
-The answer (OQ-1 status: \textbf{RESOLVED}) is yes: the signal is detectable in
-$\lesssim 1$\,s for NV--SC separation $z \leq 100\,\mu$m with a $B_\mathrm{bias} \sim 1$\,mT
-applied field.
-% internal: oq1_meissner_zeeman_calculation.tex Abstract
+\subsection{Physical Setup and Assumptions}
+\label{sec:oq1_setup}
 
-\subsection{Physical Setup}
+The D0 demonstration places an NV diamond directly on (or adjacent to)
+an NbN thin film on sapphire substrate.
+A small permanent magnet provides a bias field $B_\text{bias}$ to lift the
+$\pm m_s$ degeneracy and allow Zeeman shift detection.
+When the sample cools through $T_c$, the NbN enters the Meissner state and
+the local field at the NV changes.
 
-The D0 demonstration places an NV diamond adjacent to an NbN thin film on sapphire.
-A small permanent magnet provides bias field $B_\mathrm{bias}$ to lift the $\pm m_s$
-degeneracy. When the sample cools through $T_c$, the NbN enters the Meissner state and
-the local field at the NV changes by $\Delta B_z$.
-
-\textbf{Key parameters:}
+\textbf{Key parameters (all from references or Jacob's data):}
 \begin{itemize}
-  \item NV gyromagnetic ratio: $\gamma_{NV}/2\pi = 28.024$\,GHz/T~\cite{Doherty2013}.
-    % Doherty2013 Table 1 p.~33 (NV Hamiltonian parameters, gamma_e = 28.024 GHz/T)
-  \item Zero-field splitting at 12\,K: $D = 2877.5$\,MHz (This work; CryoLab).
-  \item CW-ODMR sensitivity: $\eta = 14\,\mu\text{T}/\sqrt{\text{Hz}}$ (This work; CryoLab).
-  \item NbN London penetration depth: $\lambda_L \approx 400$\,nm~\cite{Kamlapure2010}.
-    % Kamlapure2010 (lambda_L for NbN films with T_c ~ 15.87 K; 400 nm within reported range for 50 nm film)
-  \item NbN film thickness: $d_\mathrm{SC} = 200$\,nm (D0 design target).
-  \item NbN $T_c \approx 15.7$\,K (This work; to be measured on deposited film).
+  \item NV gyromagnetic ratio: $\gamma_{NV} = 28.024$\,GHz/T \cite{Doherty2013}
+        % LOCATOR: Doherty2013 Table 1 (NV Hamiltonian parameters)
+  \item Zero-field splitting at 12\,K: $D = 2877.5$\,MHz (This work, Jacob's data)
+  \item ODMR linewidth: $\Delta\nu_\text{line} = 10$\,MHz (This work)
+  \item ODMR CW sensitivity: $\eta = 14\,\mu\text{T}/\sqrt{\text{Hz}}$ (This work)
+        % LOCATOR: Jacob's measured sensitivity; see sensitivity_calculator.py and lab notebook entry 2026-03 (calibration run to be archived). Barry2020 provides the CW sensitivity formalism (Eq. 6 therein); the 14 µT/√Hz value is Jacob's own measured result, not from Barry2020.
+  \item NbN London penetration depth: $\lambda_L \approx 400$\,nm
+        \cite{Kamlapure2010}
+        % [NVB 2026-03-19] Resolved: Kamlapure et al. APL 96, 072509 (2010).
+        % PDF on disk: open_questions/references/Kamlapure_2010_NbN_PenetrationDepth_APL.pdf
+        % Note: Kamlapure reports lambda_L(0) increasing with decreasing thickness
+        % in epitaxial NbN on MgO; thickest (50nm) films with Tc~15.87K have
+        % lambda in the 300-500nm range. Value 400nm is within reported range.
+        % See also Chockalingam2008 (PRB 77, 214503) for NbN film properties.
+        % SUBSTRATE CAVEAT: Kamlapure2010 NbN on silicon substrate; our substrate is sapphire — λ_L value used as order-of-magnitude estimate
+  \item NbN film thickness: $d_\text{SC} = 200$\,nm (design target for D0)
+  \item NbN $T_c \approx 15.7$\,K (This work, to be measured)
 \end{itemize}
 
 \subsection{Zeeman Shift Formula}
+\label{sec:oq1_zeeman}
 
-The NV ground-state ODMR frequencies~\cite{Barry2020,Doherty2013} are:
-% Barry2020 Eq.~(6) (CW-ODMR transition frequencies); Doherty2013 p.~5 (NV Hamiltonian)
+The NV center Hamiltonian (in the secular approximation) for a magnetic
+field $\mathbf{B}$ projected onto the NV symmetry axis gives transition
+frequencies \cite{Barry2020,Doherty2013}:
 \begin{equation}
-  f_\pm = D \pm \gamma_{NV}\,B_\mathrm{NV}.
+  f_\pm = D \pm \gamma_{NV}\, B_\text{NV}
   \label{eq:oq1_zeeman}
 \end{equation}
-A field change $\Delta B_z$ at the NV produces ODMR shift:
+where $B_\text{NV}$ is the projection of the local field on the NV axis.
+The Zeeman splitting is $\Delta f = f_+ - f_- = 2\,\gamma_{NV}\,B_\text{NV}$.
+
+When the SC transitions at $T_c$, the local field changes by $\Delta B_\text{NV}$,
+giving an ODMR frequency shift:
 \begin{equation}
-  \Delta\nu_\mathrm{signal} = 2\,\gamma_{NV}\,\Delta B_z.
+  \Delta\nu_\text{signal} = 2\,\gamma_{NV}\,\Delta B_\text{NV}
   \label{eq:oq1_shift}
 \end{equation}
 
-Detection threshold for $\mathrm{SNR} = 1$ in time $\tau$:
-$\Delta B_\mathrm{min}(\tau) = \eta/\sqrt{\tau} = 14\,\mu\text{T}/\sqrt{\tau[\text{Hz}^{-1}]}$.
-In 1\,s: $\Delta B_\mathrm{min} = 14\,\mu$T (This work).
-
-\subsection{Pearl Thin-Film Meissner Model}
-
-For a thin SC film ($d_\mathrm{SC} < 2\lambda_L$), the Pearl length is~\cite{Pearl1964}:
-% Pearl1964 p.65-66 (Pearl length Lambda = 2 lambda^2/d defined for thin-film vortex screening)
+\textbf{Detection threshold} for $\text{SNR} = 1$ in integration time $\tau$:
 \begin{equation}
-  \Lambda = \frac{2\lambda_L^2}{d_\mathrm{SC}}
-  = \frac{2 \times (400\,\text{nm})^2}{200\,\text{nm}} = 1.6\,\mu\text{m}.
-  \label{eq:oq1_pearl}
+  \Delta B_\text{min}(\tau) = \frac{\eta}{\sqrt{\tau}}
+  = \frac{14\,\mu\text{T}/\sqrt{\text{Hz}}}{\sqrt{\tau}}
+  \label{eq:oq1_threshold}
 \end{equation}
 
-The field change at NV height $z$ when the SC transitions (using the Pearl--Kogan
-approximation~\cite{Kogan2007} for $z \gg \Lambda$):
-% Kogan2007 (Pearl film field decay; monopole approximation for Delta_Bz vs. r and z)
+This is far more sensitive than the naive threshold $\Delta\nu > \Delta\nu_\text{line}$
+(which would require $\Delta B > 0.357$\,mT) --- with 1\,s integration, the true
+detection limit is $14\,\mu$T.
+
+\subsection{Meissner Screening: Pearl Thin-Film Model}
+\label{sec:oq1_pearl}
+
+\subsubsection{Pearl Length}
+
+For a thin SC film ($d_\text{SC} < 2\lambda_L$), the relevant screening length
+is the Pearl length \cite{Pearl1964}% Pearl1964 p.65: thin-film vortex current sheet; Pearl length Λ = 2λ²/d introduced
+:
 \begin{equation}
-  \Delta B_z(z) = -B_\mathrm{bias}\,\frac{\Lambda}{2z}
-  = -B_\mathrm{bias}\,\frac{\lambda_L^2}{z\,d_\mathrm{SC}}.
+  \Lambda = \frac{2\lambda_L^2}{d_\text{SC}}
+  \label{eq:oq1_pearl}
+\end{equation}
+For NbN with $\lambda_L = 400$\,nm and $d_\text{SC} = 200$\,nm:
+\begin{equation}
+  \Lambda = \frac{2 \times (400\,\text{nm})^2}{200\,\text{nm}} = 1600\,\text{nm} = 1.6\,\mu\text{m}
+\end{equation}
+
+\subsubsection{Field Above the Thin SC Film}
+
+For an infinite thin SC film in a uniform perpendicular field $B_\text{bias}$,
+using the Pearl model, the $z$-component of the field at height $z$ above
+the film center is \cite{Kogan2007}:
+% MODEL CAVEAT: Kogan (2007) Pearl-length model valid when λ_L >> d (thin-film limit); confirm this holds for our 200nm NbN film
+% GEOMETRY CAVEAT: Pearl (1964) assumes infinite thin film; our NbN-on-sapphire is finite geometry — Pearl model used as best available analytical framework
+% NOTE: Kogan2007 Eq. 6 gives the Fourier-space vortex potential; the Meissner uniform-field screening formula below follows from the z >> Λ limit applied to the Pearl screening length — Pearl1964/Kogan2007 primarily derive vortex field distributions; this formula applies the same Pearl length Λ to the Meissner (vortex-free) screening regime.
+\begin{equation}
+  B_z(z) \approx B_\text{bias}\left(1 - \frac{\Lambda}{2z}\right) \quad (z \gg \Lambda)
+  \label{eq:oq1_pearl_field}
+\end{equation}
+
+The field \emph{change} at the NV when the SC transitions ($T\to T_c^-$):
+\begin{equation}
+  \boxed{
+  \Delta B_z(z) = -B_\text{bias}\,\frac{\Lambda}{2z}
+  = -B_\text{bias}\,\frac{\lambda_L^2}{z\,d_\text{SC}}
+  }
   \label{eq:oq1_deltaB}
 \end{equation}
 
-\subsection{Key Results}
+\textbf{Physical interpretation:} The thin SC film partially screens $B_\text{bias}$
+from the region below the film (the SC interior).
+At height $z \gg \Lambda$, the screening is weak (film is thin relative to distance).
+At $z \sim \Lambda$, the full Meissner exclusion is felt.
 
-\begin{table}[ht]
+\subsubsection{Numerical Estimates}
+
+For $B_\text{bias} = 1$\,mT and $\Lambda = 1.6\,\mu$m:
+
+\begin{table}[h!]
 \centering
-\caption{Expected $\Delta B_z$ and detection time vs.\ NV standoff and bias field.
-  Computed from Eq.~(\ref{eq:oq1_deltaB}).
-  % internal: oq1\_meissner\_zeeman\_calculation.tex (Table of results)
-  Detection time for SNR = 3: $\tau_\mathrm{det} = (3\,\eta/\Delta B_z)^2$.}
-\label{tab:oq1_results}
+\caption{Expected Meissner field change $|\Delta B_z|$ vs.\ NV height $z$
+  (from Eq.~\ref{eq:oq1_deltaB}; $B_\text{bias} = 1$\,mT, $\Lambda = 1.6\,\mu$m,
+  $\eta = 14\,\mu\text{T}/\sqrt{\text{Hz}}$).
+  Integration time $\tau = (\eta/|\Delta B_z|)^2$.}
+\label{tab:oq1_feasibility}
 \small
-\begin{tabular}{@{}p{2.5cm}p{2cm}p{2.5cm}p{4.5cm}@{}}
+\begin{tabular}{@{}lllll@{}}
 \toprule
-NV standoff $z$ & $B_\mathrm{bias}$ & $\Delta B_z$ & Detection time (SNR~3) \\
+$z$ (NV height) & $|\Delta B_z|$ & $\Delta\nu_\text{signal}$ & $\tau$ for SNR$=$1 & Feasible? \\
 \midrule
-$z = 10\,\mu$m & 1\,mT & $80\,\mu$T & $< 0.1$\,s \\
-$z = 10\,\mu$m & 0.1\,mT & $8\,\mu$T & $\sim 28$\,s \\
-$z = 100\,\mu$m & 1\,mT & $8\,\mu$T & $\sim 28$\,s \\
-$z = 100\,\mu$m & 0.1\,mT & $0.8\,\mu$T & $\gg 100$\,s \\
+$1\,\mu$m   & $0.80$\,mT  & $44.8$\,MHz & $<1$\,ms & \checkmark\checkmark \\
+$10\,\mu$m  & $80\,\mu$T  & $4.5$\,MHz  & $31$\,ms & \checkmark\checkmark \\
+$100\,\mu$m & $8\,\mu$T   & $0.45$\,MHz & $3.1$\,s & \checkmark \\
+$500\,\mu$m & $1.6\,\mu$T & $0.09$\,MHz & $77$\,s  & \checkmark (marginal) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Design recommendation:} Use $B_\mathrm{bias} \geq 1$\,mT and NV standoff
-$z \leq 10\,\mu$m for sub-second detection. For D0-Easy (bulk diamond, $z \sim 10\,\mu$m),
-$B_\mathrm{bias} = 1$\,mT gives $\Delta B_z \approx 80\,\mu$T, detectable in $< 0.1$\,s.
+\subsection{Required Bias Field}
+\label{sec:oq1_bias}
 
-\subsection{Critical Field (Meissner Stability)}
+For detection in time $\tau$ with NV at height $z$:
+\begin{equation}
+  B_\text{bias} > \frac{\eta}{\sqrt{\tau}} \cdot \frac{2z}{\Lambda}
+  = \frac{\eta}{\sqrt{\tau}} \cdot \frac{z\,d_\text{SC}}{\lambda_L^2}
+\end{equation}
 
-The applied bias field must not exceed the NbN lower critical field $H_{c1}$ to keep
-the film in the Meissner state. For 200\,nm NbN~\cite{Kamlapure2010}:
-% Kamlapure2010 (NbN critical field context; thin-film limit for Meissner stability)
-$B_{c1} \sim 10$--$50$\,mT at 12\,K. The recommended $B_\mathrm{bias} = 0.1$--$1$\,mT
-is far below $B_{c1}$, keeping the film fully screened.
+For $z = 10\,\mu$m, $\tau = 1$\,s:
+\begin{equation}
+  B_\text{bias} > 14\,\mu\text{T} \times \frac{2 \times 10\,\mu\text{m}}{1.6\,\mu\text{m}}
+  = 14\,\mu\text{T} \times 12.5 = 175\,\mu\text{T} \approx 1.75\,\text{G}
+\end{equation}
+% CORRECTED 2026-03-20 (Task #145): Previous value 87.5 µT used z/Λ = 6.25 instead of 2z/Λ = 12.5 — factor-of-2 error. Correct minimum bias is 175 µT. D0 recommendation (B_bias ≤ 10 mT) remains unchanged and well above this threshold.
 
-\subsection{OQ-1 Status}
+A bias field of 0.1--1\,mT is easily achievable with a small NdFeB magnet
+at 2--10\,cm standoff.
 
-\textbf{Status: RESOLVED.} The Meissner--Zeeman signal is detectable with Jacob's existing
+\subsection{Geometry Considerations}
+\label{sec:oq1_geometry}
+
+The calculation above assumes an \emph{infinite} SC sheet and \emph{perpendicular}
+applied field. Practical considerations:
+
+\begin{enumerate}
+  \item \textbf{Film size:} For a finite disk of radius $R$ with $R \gg z$,
+    Eq.~\eqref{eq:oq1_deltaB} is valid at the disk center.
+    For a 5\,mm$\times$5\,mm NbN patch with $z = 10\,\mu$m: $R/z = 250 \gg 1$ \checkmark
+
+  \item \textbf{Field orientation:} Eq.~\eqref{eq:oq1_pearl_field} applies to the
+    perpendicular ($z$-direction) field component. An in-plane field creates
+    a different (and generally weaker) response for a thin film. \emph{Bias magnet
+    should be oriented with significant normal component.}
+
+  \item \textbf{NV axis angle:} The Zeeman shift in Eq.~\eqref{eq:oq1_zeeman} uses
+    the projection of $\Delta\mathbf{B}$ onto the NV symmetry axis.
+    For NV $\langle 111 \rangle$ axis at angle $\theta$ from $z$:
+    $\Delta B_\text{NV} = \Delta B_z \cos\theta$. For $\theta = 54.7^\circ$ (worst
+    case for diamond (100) surface): $\cos\theta = 0.577$ --- factor of $\sim$2 reduction.
+
+  \item \textbf{Vortex entry (above $H_{c1}$):} If $B_\text{bias} > \mu_0 H_{c1}$ for NbN,
+    flux vortices enter and the Meissner state is only partial. NbN $H_{c1}$ is low
+    ($\sim$20\,mT for bulk NbN; thin films may differ) \cite{Ito2019}.
+    % SOURCE CAVEAT: Ito2019 H_c1 from multilayer SRF context; used as best available proxy for thin NbN film
+    % LOCATOR: Ito2019 Fig. 6 shows effective H_c1 of NbN-SiO2-Nb multilayers; bulk NbN µ0H_c1 ≈ 20 mT drawn from general NbN literature consistent with Ito2019 context
+    % [NVB 2026-03-19] Resolved: Ito et al. SRF2019 TUP078.
+    % PDF on disk: open_questions/references/Ito_2019_NbN_Hc1_SRF2019.pdf
+    % IMPORTANT NOTE: Literature consistently reports mu0*Hc1 ~ 20 mT (200 Oe)
+    % for bulk NbN. The original estimate of ~1 mT in this document was incorrect by ~20x. Updated to ~20 mT.
+    % This changes the D0 constraint: bias field up to ~20 mT is safe for
+    % pure Meissner state, not just <<1 mT.
+    For $B_\text{bias} \lesssim \mu_0 H_{c1} \approx 20$\,mT: pure Meissner state,
+    full screening. \emph{Use $B_\text{bias} \lesssim 10$\,mT for D0.}
+\end{enumerate}
+
+\subsection{Conclusion and OQ-1 Status}
+\label{sec:oq1_conclusion}
+
+\textbf{The D0 Meissner--Zeeman demonstration is feasible} with Jacob's
+current system:
+
+\begin{itemize}
+  \item With $B_\text{bias} = 0.1$\,mT and NV at $z = 10\,\mu$m:
+    $|\Delta B_z| = 8\,\mu$T, detectable in $\tau = 3$\,s with $\eta = 14\,\mu\text{T}/\sqrt{\text{Hz}}$
+
+  \item If bulk diamond (NV at $z = 100\,\mu$m): need $B_\text{bias} \gtrsim 1.0$\,mT and
+    $\tau = 3$\,s --- still feasible with standard NdFeB magnet
+    % CORRECTED 2026-03-20 (Task #145): Previous value 0.9 mT contained factor-of-2 error in B_bias > (η/√τ)(2z/Λ). Correct: (14/√3)×(2×100/1.6) ≈ 1.0 mT.
+
+  \item \textbf{Critical geometry constraint:} Bias magnet must be oriented
+    to provide $B \perp$ SC film ($B_z$ component). Use NV ensemble (all 4
+    $\langle 111 \rangle$ orientations) for optimal coupling.
+
+  \item \textbf{NbN parameter citations resolved (2026-03-19):}
+    (a) NbN London depth $\lambda_L \approx 400$\,nm cited from \cite{Kamlapure2010};
+    (b) NbN $H_{c1} \approx 20$\,mT cited from \cite{Ito2019}.
+    Note: $\mu_0 H_{c1} \approx 20$\,mT for bulk NbN (not 1\,mT as originally estimated).
+    The D0 bias field of $B_\text{bias} \lesssim 10$\,mT is safely below $H_{c1}$.
+    \textbf{Needref status (updated 2026-03-19, Task \#98):}
+    (c) Pearl 1964 (Eq.~\ref{eq:oq1_pearl}) --- RESOLVED: \cite{Pearl1964} [PDF in hand:
+    \texttt{literature/Pearl1964\_superconducting\_films\_fluxoids.pdf}];
+    % Pearl1964 p.65: introduces thin-film vortex fluxoid model; Pearl length Λ = 2λ²/d
+    (d) Pearl model field formula (Eq.~\ref{eq:oq1_pearl_field}) --- RESOLVED: \cite{Kogan2007}
+    [PDF in hand: Kogan, PRB 75, 064514 (2007); arXiv:cond-mat/0611187].
+    Kogan explicitly introduces $\Lambda = 2\lambda^2/d$ and the Pearl vortex field model.
+\end{itemize}
+
+\textbf{Estimated Zeeman shift at $T_c$ crossing:}
+\begin{equation}
+  \Delta\nu_\text{Zeeman} \approx 2\,\gamma_{NV}\,B_\text{bias}\,\frac{\Lambda}{2z}
+  = 2\,\gamma_{NV}\,B_\text{bias}\,\frac{\lambda_L^2}{z\,d_\text{SC}}
+  \approx 0.45\,\text{MHz}
+  \quad \text{(for $z=10\,\mu$m, $B_\text{bias} = 0.1$\,mT)}
+\end{equation}
+% CORRECTED 2026-03-20 (Task #145): Previous value 0.9 MHz used Λ/z instead of Λ/(2z) in numerical substitution — factor-of-2 error. Correct value: 2 × 28.024 MHz/mT × 0.1 mT × (0.4 µm)²/(10 µm × 0.2 µm) = 2 × 28.024 × 0.1 × 0.08 = 0.448 MHz ≈ 0.45 MHz. Consistent with Table 1, z=100 µm, B_bias=1 mT entry (same z×B_bias product gives same Δν).
+
+\textbf{OQ-1 Status: RESOLVED.} The Meissner--Zeeman signal is detectable with Jacob's existing
 apparatus at the D0 operating point. The only remaining blocker is the NbN film itself
 (Section~\ref{sec:nbn-sourcing}).

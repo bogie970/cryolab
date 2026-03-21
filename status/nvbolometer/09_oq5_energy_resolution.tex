@@ -1,114 +1,590 @@
-% 09_oq5_energy_resolution.tex — Section 9: OQ-5 Energy Resolution
-% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
+% 09_oq5_energy_resolution.tex — Section 9: OQ-5 Energy Resolution (Threshold Detector)
+% Phase 2 full-body migration — Task #210, Cycle NVB, 2026-03-21
 % Source: open_questions/oq5_energy_resolution.tex (rewrite 2026-03-20; authoritative)
 % Law 16: quantitative claims carry source locator comments.
-% Status: POPULATED (Phase 2) — key results summary.
+% Status: POPULATED (Phase 2 full body) — full body extracted from oq5_energy_resolution.tex
 %
-% NOTE: Authoritative source is oq5_energy_resolution.tex.
-%       The pre-rewrite version (48 eV NEP-based) is archived as
-%       oq5_energy_resolution_pre_rewrite_2026-03-20.tex (incorrect model, retained for audit trail).
+% NOTE: \bibliography{} block removed — master document handles bibliography.
+%       All \cite{}, \needref{} retained. siunitx macros (\si{}, \SI{}) retained.
+%       The master preamble loads amsmath, amssymb but NOT siunitx — see compile notes.
+%
+% ARCHIVE: Previous section content (summary) archived as 09_oq5_energy_resolution_phase2_task210_archive_2026-03-21.tex
+%
+% COMPILE NOTE: This section uses \si{} and \SI{} from the siunitx package.
+%   Add \usepackage{siunitx} to nvbolometer_master.tex preamble if not already present.
 
-\section{OQ-5: Energy Resolution}
+\section{OQ-5: Threshold Energy of the NbN Bolometer Pixel}
 \label{sec:oq5}
 
-\subsection{Detector Paradigm: Threshold Detector (Corrected)}
+\subsection{Detector Paradigm: Threshold vs.\ Calorimeter}
+\label{sec:oq5_paradigm}
 
-\textbf{The previous model was incorrect.} The pre-rewrite version applied a TES
-linear calorimeter formula ($E_\mathrm{res} = \mathrm{NEP} \times \sqrt{\tau}$) and
-obtained a phonon-noise floor of 48\,eV. This was wrong: D0 is a \emph{threshold
-detector}, not a TES calorimeter.
-% internal: oq5_energy_resolution.tex Sec.~1 (paradigm correction)
+The distinction between a \emph{threshold detector} and a \emph{linear
+calorimeter} is fundamental to interpreting energy sensitivity
+\cite{Richards1994}. % Richards1994 Sec. II.H, p. 17 (superconducting bolometers operate at the SC transition)
 
-In a threshold detector, the superconducting film sits at $T_\mathrm{op} < T_c$.
-When an energy deposition heats the pixel above $T_c$, the film transitions to normal
-and the Meissner screening collapses (OQ-1 mechanism). The \emph{physically correct}
-figure of merit is the \textbf{threshold energy}~\cite{Richards1994}:
-% Richards1994 Sec. II.H p.17 (superconducting bolometers operate at the SC transition)
+\subsubsection{Linear Calorimeter (Previous Model --- Incorrect for D0)}
+
+In the linear calorimeter paradigm, the bolometer operates at a fixed
+temperature on the resistive transition slope. A small energy deposition
+$\delta E$ produces a proportional temperature perturbation
+$\delta T = \delta E / C$, which is read out via a change in resistance.
+The minimum detectable energy is set by the noise floor:
+\begin{equation}
+  E_\mathrm{res} = \mathrm{NEP}_\mathrm{total} \times \sqrt{\tau}
+  \quad [\text{J}].
+  \label{eq:oq5_E_res_calorimeter}
+\end{equation}
+This is the correct model for a transition-edge sensor (TES) operated with
+electrothermal feedback that holds the film at a stable bias point on the
+transition~\cite{Richards1994}. % Richards1994 Sec. II.H, p. 17 (TES operational description)
+The Wollman/Hattori optical TES, for example, achieves $67$\,meV
+FWHM energy resolution at $T_c = 115$\,mK using this
+approach~\cite{Wollman2022OpticalTES}. % Wollman2022OpticalTES Abstract p. 1, Table 1 p. 4
+
+\textbf{The previous version of this document applied
+Eq.~(\ref{eq:oq5_E_res_calorimeter}) to D0 and obtained
+$E_\mathrm{res}^\mathrm{ph} = 48$\,eV. This was an error.} D0 does
+not operate as a TES. It has no electrothermal feedback loop, no SQUID
+readout, and no voltage bias to maintain a stable operating point. D0 uses a
+CW-ODMR readout of an adjacent NV centre, which detects the magnetic field
+change when the NbN film transitions from the superconducting (Meissner) to
+the normal state.
+
+\subsubsection{Threshold Detector (Correct Model for D0)}
+
+In a threshold detector, the superconducting film sits at
+$T_\mathrm{op} < T_c$ in the fully Meissner-screened state. When an energy
+deposition heats the pixel above $T_c$, the film transitions to the normal
+state and the Meissner screening collapses. The NV centre detects this
+collapse via the change in local magnetic field (OQ-1 mechanism).
+
+The minimum energy required to trigger the transition is the \emph{thermal
+threshold energy}: the heat needed to raise the pixel from $T_\mathrm{op}$
+to $T_c$,
 \begin{equation}
   \boxed{
   E_\mathrm{th} = \int_{T_\mathrm{op}}^{T_c} C_\mathrm{total}(T)\,dT
-  \quad [\text{J}]
+  \quad [\text{J}].
   }
-  \label{eq:E_th}
+  \label{eq:oq5_E_th_def}
 \end{equation}
-This is a \emph{thermodynamic} property of the pixel, not a noise-limited quantity.
-An energy deposition $E_\mathrm{dep} < E_\mathrm{th}$ cannot trigger the transition
-regardless of readout sensitivity.
-% APPEC2021DirectDetection Sec. 4.6.1 p.28 (threshold model; cryogenic bolometer energy thresholds in sub-K systems)
+This is \emph{not} a noise-limited quantity; it is a thermodynamic property
+of the pixel. An energy deposition $E_\mathrm{dep} < E_\mathrm{th}$ cannot
+trigger the transition regardless of readout sensitivity.
 
-\subsection{Pixel Heat Capacity Model}
+This is analogous to the threshold model used in TES-based particle
+detectors, where the relevant quantity is the energy needed to drive the
+sensor above the superconducting
+transition~\cite{APPEC2021DirectDetection}. % APPEC2021DirectDetection Sec. 4.6.1, p. 28 (cryogenic bolometer energy thresholds 30--70 eV in sub-K systems)
 
-The D0 pixel consists of:
+\subsection{Thermal Model: Heat Capacity of the D0 Pixel}
+\label{sec:oq5_thermal_model}
+
+The D0 pixel consists of two thermally coupled layers:
 \begin{enumerate}
-  \item \textbf{NbN thin film} (Sommerfeld model): $C_\mathrm{NbN}(T) = \gamma_V V_\mathrm{NbN} T$,
-    with $V_\mathrm{NbN} = 1.50 \times 10^{-18}$\,m$^3$ ($1.5\times 5.0\times 0.20\,\mu$m pixel).
-    $\gamma_V \approx 313\,\text{J\,m}^{-3}\text{K}^{-2}$ (Drude estimate from
-    Sidorova~\cite{Sidorova2020}).
-    % Sidorova2020 Table III p.11 (N(0) = 4.0e28 eV^-1 m^-3 for disordered NbN films)
-    % Richards1994 Appendix p.23 (gamma = pi^2/3 k_B^2 N(0), Sommerfeld model)
-  \item \textbf{Ge absorber}: $C_\mathrm{Ge}(T) \propto V_\mathrm{Ge} T^3 / \Theta_D^3$
-    (Debye low-T limit~\cite{Richards1994}), % Richards1994 Appendix p.22 (C = 234 N k_B (T/Theta)^3)
-    with $V_\mathrm{Ge} = 7.50 \times 10^{-18}$\,m$^3$ ($1\,\mu$m thick) and
-    $\Theta_D^\mathrm{Ge} = 374$\,K.
+  \item \textbf{NbN thin film} (superconducting screen): $200$\,nm
+    thick, footprint $1.5 \times 5$\,$\mu$m$^2$.
+  \item \textbf{Ge absorber}: $1$\,$\mu$m thick, same footprint.
 \end{enumerate}
-The Ge absorber dominates total heat capacity ($\sim$80\%) because its volume is $5\times$
-larger than the NbN film.
-% internal: oq5_energy_resolution.tex Sec.~2 (Ge absorber dominates C_total)
 
-\subsection{Threshold Energy Results}
+\noindent Both layers share the same footprint area
+$A = 7.5$\,$\mu$m$^2$.
 
-Using $T_c = 15.7$\,K~\cite{Kamlapure2010}:
-% Kamlapure2010 (NbN T_c ~ 15.87 K for epitaxial films; 15.7 K is D0 design value)
+\subsubsection{NbN Electronic Heat Capacity (Sommerfeld Model)}
+\label{sec:oq5_C_NbN}
+
+For a metal in the normal state, the electronic heat capacity per unit
+volume follows the Sommerfeld (free-electron) model~\cite{Richards1994}: % Richards1994 Appendix p. 23 (C_el = gamma*T for metals)
+\begin{equation}
+  c_e = \gamma_V\,T \quad [\text{J\,m}^{-3}\,\text{K}^{-1}],
+  \label{eq:oq5_sommerfeld}
+\end{equation}
+where $\gamma_V$ is the volumetric Sommerfeld coefficient
+[$\text{J\,m}^{-3}\,\text{K}^{-2}$]. In the Drude model,
+$\gamma_V = (\pi^2/3)\,k_B^2\,N(0)$, where $N(0)$ is the electronic
+density of states at the Fermi level (both
+spins)~\cite{Richards1994}. % Richards1994 Appendix p. 23 (gamma = pi^2 k^2 m N / hbar^2 (3pi^2 N/V)^{2/3})
+
+Sidorova et al.~\cite{Sidorova2020} report the single-spin density of
+states $N(0) = 3.0$--$5.0 \times 10^{28}$\,eV$^{-1}$\,m$^{-3}$ for
+disordered NbN thin films on Si/SiO$_2$, extracted from Hall and transport
+measurements. % Sidorova2020 Table III, p. 11 (N(0) column: 3.02--4.98 e28 eV^-1 m^-3)
+Using the Drude relation with total (both-spin) DOS:
+\begin{equation}
+  \gamma_V = \frac{\pi^2}{3}\,k_B^2 \times 2\,N(0).
+  \label{eq:oq5_gamma_drude}
+\end{equation}
+For $N(0) = 4.0 \times 10^{28}$\,eV$^{-1}$\,m$^{-3}$
+($= 2.50 \times 10^{47}$\,J$^{-1}$\,m$^{-3}$), this gives
+$\gamma_V \approx 313$\,J\,m$^{-3}$\,K$^{-2}$.
+% Sidorova2020 Table III p.11 (N(0) = 4.0e28 eV^-1 m^-3, mid-range of reported values)
+
+\needref{NbN thin-film Sommerfeld coefficient $\gamma_V$ from direct
+calorimetric measurement. Literature suggests $\gamma_V \approx
+200$--$600$\,J\,m$^{-3}$\,K$^{-2}$ depending on film disorder and
+stoichiometry.}
+
+\textbf{Note on the superconducting state:} For $T < T_c$, the BCS
+electronic heat capacity is exponentially suppressed by the gap:
+$C_e^\mathrm{BCS} \sim C_e^n \exp(-\Delta/k_B T)$. At $T/T_c = 0.76$
+(i.e.\ $T_\mathrm{op} = 12$\,K), the suppression factor is
+$\exp(-1.76\,T_c/T) \approx 0.1$. However, for computing
+$E_\mathrm{th}$ we integrate through the transition: the film
+\emph{must} pass through $T_c$ to trigger detection. Near $T_c$ the
+electronic heat capacity rises sharply to its normal-state value (and
+overshoots due to the BCS jump). Using the normal-state Sommerfeld
+model throughout the integral is therefore a \emph{conservative
+(lower-bound)} approximation, since the BCS heat capacity jump at $T_c$
+adds energy that must be
+supplied~\cite{Richards1994}. % Richards1994 Appendix p. 23 (BCS heat capacity rises sharply at T_c)
+
+The total NbN film heat capacity is
+\begin{equation}
+  C_\mathrm{NbN}(T) = \gamma_V\,V_\mathrm{NbN}\,T,
+  \label{eq:oq5_C_NbN}
+\end{equation}
+with $V_\mathrm{NbN} = L \times W \times d = 5.0\,\mu\text{m} \times
+1.5\,\mu\text{m} \times 200\,\text{nm} =
+1.50 \times 10^{-18}$\,m$^3$. % internal: NVB_TRAINING.md Sec. 4 (Demonstrator pixel geometry)
+
+\subsubsection{Ge Absorber Heat Capacity (Debye $T^3$ Law)}
+\label{sec:oq5_C_Ge}
+
+The Ge absorber is an insulator (intrinsic Ge at cryogenic $T$), so its
+heat capacity is purely phononic. In the Debye low-temperature limit
+($T \ll \Theta_D$)~\cite{Richards1994}: % Richards1994 Appendix p. 22 (C = 234 N k_B (T/Theta)^3 per atom)
+\begin{equation}
+  C_\mathrm{Ge}(T)
+  = \frac{12\,\pi^4}{5}\,n_\mathrm{Ge}\,V_\mathrm{Ge}\,k_B
+    \left(\frac{T}{\Theta_D^\mathrm{Ge}}\right)^3
+  \quad [\text{J/K}],
+  \label{eq:oq5_C_Ge}
+\end{equation}
+where $n_\mathrm{Ge}$ is the atomic number density, $V_\mathrm{Ge}$ is the
+absorber volume, and $\Theta_D^\mathrm{Ge} = 374$\,K is the Debye
+temperature of Ge. % Richards1994 Appendix p. 22 (Ge(363 K) listed; standard value 374 K from Flubacher1959)
+
+The Ge absorber parameters are:
+\begin{align}
+  d_\mathrm{Ge}   &= 1.0\,\mu\text{m}, \notag \\
+  V_\mathrm{Ge}   &= 1.5\,\mu\text{m} \times 5.0\,\mu\text{m}
+                      \times 1.0\,\mu\text{m}
+                    = 7.50 \times 10^{-18}\,\text{m}^3, \notag \\
+  \rho_\mathrm{Ge} &= 5323\,\text{kg\,m}^{-3}, \quad
+  M_\mathrm{Ge}    = 72.63\,\text{g\,mol}^{-1}, \notag \\
+  n_\mathrm{Ge}   &= \frac{\rho_\mathrm{Ge}\,N_A}{M_\mathrm{Ge}}
+                    = 4.41 \times 10^{28}\,\text{m}^{-3}.
+  \label{eq:oq5_Ge_params}
+\end{align}
+% internal: standard Ge material properties (rho, M from periodic table/CRC handbook)
+
+\subsubsection{Total Pixel Heat Capacity}
+
+The total heat capacity of the NbN+Ge pixel is
+\begin{equation}
+  C_\mathrm{total}(T) = C_\mathrm{NbN}(T) + C_\mathrm{Ge}(T)
+  = \gamma_V V_\mathrm{NbN}\,T
+    + \frac{12\pi^4}{5}\,n_\mathrm{Ge}\,V_\mathrm{Ge}\,k_B
+      \left(\frac{T}{\Theta_D}\right)^3.
+  \label{eq:oq5_C_total}
+\end{equation}
+
+Table~\ref{tab:oq5_heat_cap} compares the two contributions at selected
+temperatures. The Ge absorber dominates the total heat capacity at all
+relevant temperatures by a factor of $3$--$6\times$, because its volume is
+$5\times$ larger than the NbN film and the Debye $T^3$ phonon heat capacity
+grows rapidly with temperature.
 
 \begin{table}[ht]
 \centering
-\caption{Threshold energy $E_\mathrm{th}$ for the D0 pixel ($T_c = 15.7$\,K) vs.\
-  operating temperature. NbN-only = no Ge absorber; Full pixel = NbN + $1\,\mu$m Ge.
-  % internal: oq5\_energy\_resolution.tex Table 2 (E\_th vs. T\_op)
-  Energies computed from Eqs.~(\ref{eq:E_th_NbN_sec9})--(\ref{eq:E_th_total_sec9}).}
-\label{tab:E_th_table}
+\caption{Heat capacities of the D0 pixel components at selected
+temperatures. $C_\mathrm{NbN}$ uses the Sommerfeld model with
+$\gamma_V = 600$\,J\,m$^{-3}$\,K$^{-2}$ (conservative upper estimate).
+$C_\mathrm{Ge}$ uses the Debye $T^3$ law with $\Theta_D = 374$\,K.
+Source: Eqs.~(\ref{eq:oq5_C_NbN}), (\ref{eq:oq5_C_Ge}).}
+\label{tab:oq5_heat_cap}
 \small
-\begin{tabular}{@{}p{2.5cm}p{3cm}p{3cm}p{4cm}@{}}
+\begin{tabular}{@{}llllll@{}}
 \toprule
-$T_\mathrm{op}$ & NbN only & NbN + Ge & Note \\
+$T$ [K] & $C_\mathrm{NbN}$ [J/K] & $C_\mathrm{Ge}$ [J/K] &
+$C_\mathrm{total}$ [J/K] & $C_\mathrm{Ge}/C_\mathrm{NbN}$ \\
 \midrule
-12.0\,K & 288\,keV & 1.56\,MeV & D0 operating point (current cryostat) \\
-15.0\,K & 60\,keV & 383\,keV & $T_c - T_\mathrm{op} = 0.7$\,K \\
-15.5\,K & 17.5\,keV & 114\,keV & $0.2$\,K below $T_c$ \\
-15.68\,K & 1.76\,keV & 11.6\,keV & $20$\,mK below $T_c$ \\
+12.0 & $1.08 \times 10^{-14}$ & $3.53 \times 10^{-14}$ &
+  $4.61 \times 10^{-14}$ & $3.3$ \\
+  % internal: Python calculation verified by hand
+15.0 & $1.35 \times 10^{-14}$ & $6.89 \times 10^{-14}$ &
+  $8.24 \times 10^{-14}$ & $5.1$ \\
+15.5 & $1.40 \times 10^{-14}$ & $7.61 \times 10^{-14}$ &
+  $9.00 \times 10^{-14}$ & $5.5$ \\
+15.7 & $1.41 \times 10^{-14}$ & $7.90 \times 10^{-14}$ &
+  $9.32 \times 10^{-14}$ & $5.6$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The analytic integrals are:
+\textbf{Key observation:} The $1\,\mu$m Ge absorber contributes
+$\sim\!80\%$ of the total pixel heat capacity. If the goal is to minimise
+$E_\mathrm{th}$, reducing the Ge thickness is the single most effective
+design lever.
+
+\subsection{Results: Threshold Energy vs.\ Operating Temperature}
+\label{sec:oq5_results}
+
+\subsubsection{Analytical Integration}
+
+The integrals in Eq.~(\ref{eq:oq5_E_th_def}) evaluate analytically for both
+components:
 \begin{align}
-  E_\mathrm{th}^\mathrm{NbN} &= \frac{\gamma_V V_\mathrm{NbN}}{2}
-    \bigl(T_c^2 - T_\mathrm{op}^2\bigr), \label{eq:E_th_NbN_sec9} \\
-  E_\mathrm{th}^\mathrm{Ge}  &= \frac{12\pi^4 n_\mathrm{Ge} V_\mathrm{Ge} k_B}
-    {20\,\Theta_D^3} \bigl(T_c^4 - T_\mathrm{op}^4\bigr). \label{eq:E_th_Ge_sec9} \\
-  E_\mathrm{th}^\mathrm{total} &= E_\mathrm{th}^\mathrm{NbN} + E_\mathrm{th}^\mathrm{Ge}. \label{eq:E_th_total_sec9}
+  E_\mathrm{th}^\mathrm{NbN}
+    &= \int_{T_\mathrm{op}}^{T_c} \gamma_V V_\mathrm{NbN}\,T\,dT
+     = \frac{\gamma_V V_\mathrm{NbN}}{2}
+       \left(T_c^2 - T_\mathrm{op}^2\right),
+  \label{eq:oq5_E_th_NbN} \\[4pt]
+  E_\mathrm{th}^\mathrm{Ge}
+    &= \int_{T_\mathrm{op}}^{T_c}
+       \frac{12\pi^4}{5}\,n_\mathrm{Ge}\,V_\mathrm{Ge}\,k_B
+       \left(\frac{T}{\Theta_D}\right)^3 dT
+     = \frac{12\pi^4\,n_\mathrm{Ge}\,V_\mathrm{Ge}\,k_B}
+            {20\,\Theta_D^3}
+       \left(T_c^4 - T_\mathrm{op}^4\right),
+  \label{eq:oq5_E_th_Ge} \\[4pt]
+  E_\mathrm{th}^\mathrm{total}
+    &= E_\mathrm{th}^\mathrm{NbN} + E_\mathrm{th}^\mathrm{Ge}.
+  \label{eq:oq5_E_th_total}
 \end{align}
 
-\subsection{Key Finding: Operating Temperature is the Primary Lever}
+\subsubsection{Threshold Energy Table}
 
-At the D0 operating point ($T_\mathrm{op} = 12$\,K), $E_\mathrm{th} \approx 1.56$\,MeV
-for the full NbN+Ge pixel. \textbf{This means: a 5.9\,keV Fe-55 X-ray will NOT trigger
-a Meissner transition at $T_\mathrm{op} = 12$\,K.}
+Using $T_c = 15.7$\,K (project
+standard~\cite{Kamlapure2010}), % Kamlapure2010 (NbN T_c ~ 15.87 K for epitaxial films); internal: NVB_TRAINING.md Sec. 8 (T_c = 15.7 K design value)
+$\gamma_V = 600$\,J\,m$^{-3}$\,K$^{-2}$
+(\needref{NbN $\gamma_V$ direct measurement}; estimate, see
+Sec.~\ref{sec:oq5_limitations}),
+and the Ge parameters from Eq.~(\ref{eq:oq5_Ge_params}), we compute
+$E_\mathrm{th}$ at four operating temperatures.
 
-\textbf{The most effective design lever is operating temperature:} approaching $T_c$
-dramatically reduces $E_\mathrm{th}$. At $T_\mathrm{op} = 15.5$\,K (0.2\,K below $T_c$),
-$E_\mathrm{th} \approx 114$\,keV for the full pixel. The implication is that D0-Easy
-(Meissner--Zeeman POC) is the correct first milestone: using a thermal sweep through $T_c$
-rather than single-particle energy deposition.
+\begin{table}[ht]
+\centering
+\caption{Threshold energy $E_\mathrm{th}$ for the D0 pixel
+($T_c = 15.7$\,K) as a function of operating temperature
+$T_\mathrm{op}$. ``NbN only'' = no Ge absorber.
+``NbN+Ge'' = full pixel with $1\,\mu$m Ge absorber.
+All energies computed from Eqs.~(\ref{eq:oq5_E_th_NbN})--(\ref{eq:oq5_E_th_total}).}
+\label{tab:oq5_E_th}
+\small
+\begin{tabular}{@{}lllll@{}}
+\toprule
+$T_\mathrm{op}$ [K] &
+$E_\mathrm{th}^\mathrm{NbN}$ [eV] &
+$E_\mathrm{th}^\mathrm{Ge}$ [eV] &
+$E_\mathrm{th}^\mathrm{total}$ [eV] &
+Status \\
+\midrule
+12.0  & $2.88 \times 10^5$ & $1.28 \times 10^6$ & $1.56 \times 10^6$ &
+  D0 operating point \\
+  % internal: Python calculation — E_NbN = 287893 eV, E_Ge = 1275559 eV
+15.0  & $6.04 \times 10^4$ & $3.23 \times 10^5$ & $3.83 \times 10^5$ &
+  $T_c - T_\mathrm{op} = 0.7$\,K \\
+  % internal: Python calculation — E_NbN = 60365 eV, E_Ge = 322937 eV
+15.5  & $1.75 \times 10^4$ & $9.68 \times 10^4$ & $1.14 \times 10^5$ &
+  $0.2$\,K below $T_c$ \\
+  % internal: Python calculation — E_NbN = 17528 eV, E_Ge = 96803 eV
+15.68 & $1.76 \times 10^3$ & $9.85 \times 10^3$ & $1.16 \times 10^4$ &
+  $0.02$\,K below $T_c$ \\
+  % internal: Python calculation — E_NbN = 1763 eV, E_Ge = 9848 eV
+$\geq 15.7$ & --- & --- & --- &
+  Not detectable \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\textbf{Also effective:} removing the Ge absorber reduces $E_\mathrm{th}$ by $5\times$
-(NbN-only: 288\,keV vs.\ 1.56\,MeV full pixel at 12\,K).
+\noindent \textbf{Key results from Table~\ref{tab:oq5_E_th}:}
 
-\subsection{Model Limitations}
+\begin{itemize}
+  \item At $T_\mathrm{op} = 12$\,K (the nominal D0 operating point),
+    the threshold energy is $E_\mathrm{th} \approx 1.56$\,MeV
+    (NbN+Ge) or $\approx 288$\,keV (NbN only).
+    This is an \emph{MeV-scale} threshold --- D0 can detect alpha
+    particles ($\sim 5$\,MeV) but not keV-scale X-rays.
+    % internal: Python calculation verified
+  \item The Ge absorber contributes $\sim 80\%$ of $E_\mathrm{th}$ at all
+    operating temperatures. Eliminating or thinning the Ge absorber is the
+    most direct route to lowering the detection threshold.
+  \item Operating at $T_\mathrm{op} = 15.5$\,K ($0.2$\,K below
+    $T_c$) reduces $E_\mathrm{th}$ by $\sim 14\times$ relative to
+    $12$\,K, reaching $\sim 114$\,keV (NbN+Ge).
+  \item At $T_\mathrm{op} \geq T_c = 15.7$\,K, the film is already
+    in the normal state; no threshold crossing is possible.
+\end{itemize}
 
-\needref{NbN thin-film Sommerfeld coefficient $\gamma_V$ from direct calorimetric measurement.
-Estimate $\gamma_V \approx 200$--$600\,\text{J\,m}^{-3}\text{K}^{-2}$ depending on
-film disorder and stoichiometry; Drude estimate used here: $\approx 313\,\text{J\,m}^{-3}\text{K}^{-2}$.}
-The $\gamma_V$ uncertainty propagates directly into $E_\mathrm{th}$ (NbN-only). The Ge
-contribution is insensitive to this uncertainty.
-% internal: oq5_energy_resolution.tex Sec.~5 (limitations: gamma_V uncertainty)
+\subsubsection{Comparison: Old ``48\,eV'' Result vs.\ New Threshold Model}
+
+The previous version of this document reported
+$E_\mathrm{res}^\mathrm{ph} = 48$\,eV as the ``phonon-noise-limited
+energy resolution.'' This quantity was derived from
+\begin{equation}
+  E_\mathrm{res}^\mathrm{ph}
+  = \sqrt{4\,k_B\,T^2\,C}
+  \quad [\text{J}],
+  \label{eq:oq5_old_NEP}
+\end{equation}
+which is the thermal fluctuation limit for a linear
+calorimeter~\cite{Richards1994}. % Richards1994 Eq. (17), p. 8 (thermal fluctuation <(Delta u)^2> = k_B T^2 C)
+Equation~(\ref{eq:oq5_old_NEP}) answers the question: ``What is the smallest
+energy perturbation detectable \emph{on top of} thermal fluctuations at
+temperature $T$?'' This is the correct question for a TES or microcalorimeter
+with continuous readout.
+
+For D0, the correct question is: ``How much energy must be deposited to push
+the film \emph{across} $T_c$?'' The answer ---
+$E_\mathrm{th} = \int C\,dT$ --- is $10^3$--$10^7\times$ larger than the
+old $48$\,eV result, depending on $T_\mathrm{op}$.
+
+\textbf{The ``$48$\,eV'' figure is hereby retired and must not appear
+in any D0 sensitivity discussion.} The correct D0 sensitivity metric is
+$E_\mathrm{th}$ from Table~\ref{tab:oq5_E_th}.
+
+\subsection{Readout Speed Mismatch: Thermal Recovery vs.\ CW-ODMR Integration}
+\label{sec:oq5_readout_mismatch}
+
+Even if an energy deposition exceeds $E_\mathrm{th}$ and triggers the
+superconducting-to-normal transition, D0 must \emph{detect} that the
+transition occurred. The detection mechanism is CW-ODMR of the adjacent NV
+centre, which senses the change in local magnetic field when Meissner
+screening collapses. There is a fundamental speed mismatch between the
+thermal dynamics and the NV readout:
+
+\begin{enumerate}
+  \item \textbf{Thermal recovery timescale.}
+    After the NbN film is heated above $T_c$, it cools back below $T_c$
+    with a time constant $\tau = C/G_{ep}$. At $T = 12$\,K, the
+    electron-phonon thermal conductance
+    $G_{ep} = 5\,\Sigma\,V_\mathrm{NbN}\,T^4 \sim
+    4.7 \times 10^{-5}$\,W/K (using
+    $\Sigma \approx 3 \times 10^8$\,W\,m$^{-3}$\,K$^{-5}$, see
+    \cite{Richards1994} Sec.~II.J),
+    % Richards1994 Sec. II.J, p. 19 (hot-electron regime G_ep = 5*Sigma*V*T^4)
+    and the quasiparticle recombination time in NbN is
+    $\tau_{ep} \sim 10$--$18$\,ps at
+    $10$\,K~\cite{Sidorova2020}. % Sidorova2020 Table III, p. 11 (tau_e-ph(10K) = 11.9--17.5 ps)
+    The NbN film can return to the superconducting state within
+    $\sim\!\mathrm{ns}$ timescales.
+
+  \item \textbf{CW-ODMR integration timescale.}
+    A CW-ODMR measurement of the NV centre ODMR spectrum requires sweeping
+    the microwave frequency across the resonance while collecting
+    photoluminescence. Typical integration times are
+    $\sim 0.1$--$10$\,s per spectrum, depending on required
+    signal-to-noise ratio, NV brightness, and collection
+    efficiency.
+    \needref{CW-ODMR integration time estimate for single NV at cryogenic
+    temperature.}
+
+  \item \textbf{The mismatch.}
+    The thermal recovery is $\sim 10^{9}$--$10^{10}\times$ faster than the
+    ODMR integration. A single threshold-crossing event (particle impact
+    deposits $E > E_\mathrm{th}$, film goes normal, then recovers to SC
+    within nanoseconds) would appear as a transient glitch in the NV readout
+    that is far shorter than the integration window.
+\end{enumerate}
+
+\subsubsection{Does the Threshold Crossing Cause a Persistent Change?}
+
+For D0 to function as a threshold detector with CW-ODMR readout, one of the
+following must hold:
+
+\begin{enumerate}
+  \item[(a)] \textbf{Persistent normal state.} The energy deposition heats
+    the film above $T_c$ and the film \emph{remains} in the normal state
+    (latched). This requires either: (i) Joule heating from bias current
+    sustains the normal state (thermal runaway), or (ii) the cooling power
+    is insufficient to bring the film back below $T_c$ before the next
+    energy deposition.
+
+  \item[(b)] \textbf{Pulsed readout.} The ODMR measurement is replaced by a
+    pulsed NV protocol that can detect transient magnetic field changes on
+    nanosecond timescales (e.g.\ Ramsey interferometry, spin echo). This
+    would require substantial redesign of the readout scheme.
+
+  \item[(c)] \textbf{Statistical detection.} Repeated energy depositions
+    (e.g.\ from a steady particle flux) cause the film to spend a fraction
+    of time in the normal state, shifting the time-averaged ODMR signal.
+    The CW-ODMR measurement then detects the \emph{average} normal-state
+    occupancy.
+
+  \item[(d)] \textbf{Calorimetric mode after all.} If the film does not
+    latch in the normal state and the readout cannot resolve individual
+    events, D0 may need to operate as a calorimeter (measuring temperature
+    rise via the NV ZFS shift, not via threshold crossing). In this case,
+    the NEP-based energy resolution from the original model becomes
+    relevant again --- but with the caveat that the readout noise is set by
+    the NV ODMR sensitivity, not by the bolometer's intrinsic thermal noise.
+\end{enumerate}
+
+\textbf{This readout mismatch is flagged as an open question.} The D0
+operating mode (threshold vs.\ calorimeter) depends critically on whether a
+persistent state change occurs after the threshold crossing. This must be
+resolved before D0 sensitivity can be definitively stated. The Meissner--Zeeman
+demonstration (OQ-1) will provide the first experimental data on the
+timescale of the NV response to a superconducting transition.
+
+\subsection{Comparison to Relevant Energy Scales}
+\label{sec:oq5_comparison}
+
+\begin{table}[ht]
+\centering
+\caption{D0 detection capabilities at $T_\mathrm{op} = 12$\,K
+(NbN+Ge pixel, $E_\mathrm{th} \approx 1.56$\,MeV) and at
+$T_\mathrm{op} = 15.5$\,K ($E_\mathrm{th} \approx 114$\,keV).
+NbN-only pixel values are $\sim 5\times$ lower.}
+\label{tab:oq5_comparison}
+\small
+\begin{tabular}{@{}lllp{5cm}@{}}
+\toprule
+Signal & $E_\mathrm{dep}$ & Detectable? & Notes \\
+\midrule
+Alpha particle (5 MeV) & $5$\,MeV & \textbf{YES} (12\,K) &
+  $E_\mathrm{dep} \gg E_\mathrm{th}$ \\
+Fission fragment & $\sim 80$\,MeV & \textbf{YES} &
+  Massive surplus \\
+keV X-ray (1\,keV) & $1$\,keV & \textbf{NO} (12\,K); marginal (15.5\,K, NbN-only) &
+  NbN-only $E_\mathrm{th}(15.5) = 17.5$\,keV \\
+IR photon ($1$\,eV) & $1.24$\,eV & \textbf{NO} &
+  $10^6\times$ below threshold \\
+CEvNS recoil ($\sim$keV) & $\lesssim 1$\,keV & \textbf{NO} &
+  Requires sub-K
+  operation~\cite{Akimov2017COHERENT} \\
+  % Akimov2017COHERENT Sec. II p. 3 Eq. (1)
+DM candidate ($\sim$eV) & $\sim 1$\,eV & \textbf{NO} &
+  Requires sub-K + sub-nm film~\cite{APPEC2021DirectDetection} \\
+  % APPEC2021DirectDetection Sec. 4.6.1 p. 28
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent D0 at $12$\,K is a \emph{MeV-scale} threshold detector,
+sensitive to alpha particles and other heavily ionising radiation but
+insensitive to X-rays, optical photons, or sub-keV particle physics signals.
+This is consistent with the primary D0 science goal (Meissner--Zeeman
+demonstration, OQ-1), which does not require energy-resolved particle
+detection.
+
+\subsection{Model Limitations and Uncertainty Budget}
+\label{sec:oq5_limitations}
+
+\begin{enumerate}
+
+\item \textbf{Sommerfeld coefficient $\gamma_V$ is uncertain by
+  $\sim 2\times$.}
+  The task specification uses $\gamma_V \approx 600$\,J\,m$^{-3}$\,K$^{-2}$.
+  Our Drude estimate from the Sidorova~\cite{Sidorova2020} density of states % Sidorova2020 Table III p. 11
+  gives $\gamma_V \approx 313$\,J\,m$^{-3}$\,K$^{-2}$ (using
+  $N(0) = 4.0 \times 10^{28}$\,eV$^{-1}$\,m$^{-3}$). The discrepancy
+  is within the expected range for disordered NbN: stoichiometry,
+  granularity, and electron mass renormalisation all affect $\gamma_V$.
+  We use $\gamma_V = 600$\,J\,m$^{-3}$\,K$^{-2}$ as a conservative
+  (higher) estimate; the NbN contribution to $E_\mathrm{th}$ could be up
+  to $\sim 2\times$ lower. Since Ge dominates the total heat capacity, this
+  uncertainty affects $E_\mathrm{th}^\mathrm{total}$ by only
+  $\sim 20$--$30\%$.
+  \needref{NbN thin-film $\gamma_V$ from calorimetric measurement on
+  200\,nm film.}
+
+\item \textbf{Ge Debye temperature uses bulk value.}
+  We use $\Theta_D^\mathrm{Ge} = 374$\,K (bulk crystalline Ge).
+  Thin-film or amorphous Ge may have a reduced Debye temperature,
+  which would \emph{increase} $C_\mathrm{Ge}$ and therefore
+  \emph{increase} $E_\mathrm{th}$.
+  % Richards1994 Appendix p. 22 (Ge Debye temp listed as 363 K; standard value 374 K from Flubacher1959)
+
+\item \textbf{BCS heat capacity jump neglected.}
+  At $T_c$, the BCS theory predicts a heat capacity discontinuity
+  $\Delta C / C_n = 1.43$ (weak-coupling BCS). For NbN (strong-coupling),
+  the jump ratio can be larger ($\sim 2$). This means the actual energy
+  required to push the film \emph{through} $T_c$ is somewhat larger than
+  our integral with the normal-state Sommerfeld model predicts.
+  Our $E_\mathrm{th}$ values are therefore \emph{lower bounds}.
+  % Richards1994 Appendix p. 23 (BCS heat capacity jump discussion)
+
+\item \textbf{Thermal coupling between NbN and Ge layers.}
+  We assume perfect thermal coupling: a phonon deposited in the Ge
+  instantly thermalises with the NbN. In reality, the Kapitza boundary
+  resistance at the NbN/Ge interface may partially decouple the two
+  layers, especially on sub-nanosecond timescales. If the layers are
+  thermally decoupled, $E_\mathrm{th}$ for triggering the NbN transition
+  is determined by $C_\mathrm{NbN}$ alone (the ``NbN-only'' column in
+  Table~\ref{tab:oq5_E_th}), which is $\sim 5\times$
+  lower~\cite{Richards1994}. % Richards1994 Appendix p. 23 (boundary resistance B/T^3)
+
+\item \textbf{Nonequilibrium phonon spectrum.}
+  A particle impact produces a nonequilibrium phonon distribution, not a
+  uniform temperature rise. The fraction of deposited energy that
+  thermalises in the NbN film (``phonon collection efficiency'') depends
+  on the phonon ballistic length, film-substrate interface
+  transmission~\cite{Sidorova2020}, % Sidorova2020 Sec. IV.B p. 17 (acoustic mismatch model, phonon escape time)
+  and detector geometry. Our threshold model implicitly assumes 100\%
+  energy thermalisation in the pixel.
+
+\item \textbf{Readout sensitivity not modelled.}
+  The threshold energy $E_\mathrm{th}$ is a thermodynamic quantity. Whether
+  D0 can \emph{detect} a threshold crossing depends on the NV readout
+  sensitivity, which is a separate open question (OQ-1 and Sec.~\ref{sec:oq5_readout_mismatch}).
+
+\item \textbf{Old ``$48$\,eV'' value was physically wrong, not just
+  numerically inaccurate.}
+  The NEP-based $48$\,eV result from the previous version was a
+  correct calculation of the thermal fluctuation limit for a hypothetical
+  NbN calorimeter. The error was in applying it to D0, which is not a
+  calorimeter. The $48$\,eV number itself is mathematically correct
+  given the parameters used; it simply answers the wrong question.
+
+\end{enumerate}
+
+\subsection{Summary and Conclusions}
+\label{sec:oq5_conclusions}
+
+\begin{table}[ht]
+\centering
+\caption{Summary: OQ-5 Threshold Energy Analysis for D0 (corrected model).}
+\label{tab:oq5_summary}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Item & Result & Confidence \\
+\midrule
+Detector paradigm & \textbf{Threshold} (not calorimeter) & Firm \\
+$E_\mathrm{th}$ at 12\,K (NbN+Ge) & $\sim 1.56$\,MeV &
+  $\pm 2\times$ ($\gamma_V$ uncertainty) \\
+$E_\mathrm{th}$ at 12\,K (NbN only) & $\sim 288$\,keV &
+  $\pm 2\times$ \\
+$E_\mathrm{th}$ at 15.5\,K (NbN+Ge) & $\sim 114$\,keV &
+  $\pm 2\times$ \\
+$E_\mathrm{th}$ at 15.68\,K (NbN+Ge) & $\sim 11.6$\,keV &
+  $\pm 2\times$ \\
+Ge dominance of heat capacity & $\sim 80\%$ of total & Firm \\
+Readout mismatch & \textcolor{red}{\textbf{OPEN}} &
+  Sub-ns recovery vs.\ s-scale ODMR \\
+Old ``48\,eV'' result & \textbf{RETIRED} & Wrong detector paradigm \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent \textbf{Answer to OQ-5 (corrected):} The NbN Demonstrator pixel
+D0 is a threshold detector, not a linear calorimeter. The minimum energy
+required to trigger a superconducting-to-normal transition is
+$E_\mathrm{th} = \int_{T_\mathrm{op}}^{T_c} C(T)\,dT$, which evaluates to
+$\sim 1.56$\,MeV at $T_\mathrm{op} = 12$\,K for the full
+NbN+Ge pixel. The previously reported ``$48$\,eV phonon-noise-limited
+energy resolution'' applied the wrong detector paradigm and is retired. D0
+at 12\,K is sensitive to alpha particles and fission fragments but not to
+keV-scale X-rays, eV-scale photons, or sub-eV particle physics signals.
+
+The critical open question is whether the threshold crossing produces a
+persistent (or at least readout-resolvable) state change, given the
+$\sim 10^{10}\times$ mismatch between thermal recovery time
+($\sim\!\mathrm{ns}$) and CW-ODMR integration time ($\sim\!\mathrm{s}$). If
+no persistent change occurs, D0 may need to operate in calorimetric mode
+(sensing time-averaged temperature shifts via the NV ZFS), in which case the
+sensitivity metric reverts to a readout-noise-limited figure --- but one
+determined by NV ODMR sensitivity, not by the NbN thermal noise floor.
