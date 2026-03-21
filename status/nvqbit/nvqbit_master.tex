@@ -15,6 +15,10 @@
 \usepackage{fancyhdr}
 \usepackage{titlesec}
 \usepackage{cleveref}
+\usepackage{tcolorbox}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{siunitx}
 
 % --- Hyperref setup ---
 \hypersetup{
@@ -34,6 +38,25 @@
 % --- Section formatting ---
 \titleformat{\section}{\Large\bfseries}{}{0pt}{}[\vspace{-0.5em}\rule{\textwidth}{0.4pt}]
 \titleformat{\subsection}{\large\bfseries}{}{0pt}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{}{0pt}{}
+
+% --- tcolorbox styles (for Section 13 dark matter sensing) ---
+\tcbuselibrary{most}
+\newtcolorbox{resultbox}{
+  colback=blue!4, colframe=blue!50!black,
+  fonttitle=\bfseries, title={Key Result},
+  sharp corners, boxrule=0.8pt
+}
+\newtcolorbox{warningbox}{
+  colback=red!4, colframe=red!60!black,
+  fonttitle=\bfseries, title={Warning / Open Question},
+  sharp corners, boxrule=0.8pt
+}
+\newtcolorbox{novelbox}{
+  colback=purple!4, colframe=purple!60!black,
+  fonttitle=\bfseries, title={Novel Contribution},
+  sharp corners, boxrule=0.8pt
+}
 
 % --- Custom commands ---
 \newcommand{\ket}[1]{\left|#1\right\rangle}
@@ -51,6 +74,10 @@
 \newcommand{\needref}[1]{\textcolor{red}{\textbf{[NEEDREF: #1]}}}
 \newcommand{\SU}{\mathrm{SU}}
 \newcommand{\UU}{\mathrm{U}}
+% --- Additional commands for Section 13 (dark matter sensing) ---
+\newcommand{\tr}{\mathrm{Tr}}
+\newcommand{\Srot}{S_\mathrm{rot}}
+\newcommand{\Taxion}{\mathcal{T}_a}
 
 \begin{document}
 
@@ -73,7 +100,8 @@
 \input{sections/10_simulation_results}
 \input{sections/11_open_questions}
 \input{sections/12_sensing_applications}
-\input{sections/13_experimental_protocol}
+\input{sections/13_dark_matter_sensing}
+\input{sections/14_experimental_protocol}
 
 \bibliography{training/references}
 \bibliographystyle{unsrt}
