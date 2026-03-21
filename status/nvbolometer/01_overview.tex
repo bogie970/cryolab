@@ -1,60 +1,195 @@
 % 01_overview.tex — Section 1: System Overview & Architecture
-% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
-% Sources: hardware/sipm_fpga/ARCHITECTURE_SUMMARY.tex,
-%          hardware/hardware_readiness_report.tex
+% Phase 2 content migration — Task #193, Cycle 59 NVB-1, 2026-03-20
+% Primary source: hardware/hardware_readiness_report.tex
 % Law 16: quantitative claims carry source locator comments.
-% Status: POPULATED (Phase 2)
+% Status: POPULATED (Phase 2, Cycle 59)
 
 \section{System Overview \& Architecture}
 \label{sec:overview}
 
-The NV bolometer is a cryogenic particle detector that uses nitrogen-vacancy (NV) centers
-in diamond to read out the Meissner-field collapse of a superconducting NbN thin-film pixel.
-When a particle deposits energy exceeding the thermal threshold $E_\mathrm{th}$ in the NbN
-film, the film transitions from the superconducting (Meissner-screened) to the normal state.
-The change in local magnetic field at the NV layer is detected optically via a shift in the
-optically detected magnetic resonance (ODMR) frequency of the NV ensemble~\cite{Doherty2013}.
-% Doherty2013 p.1--4 (NV centre review: ODMR principle, ZPL at 637 nm)
+The NV bolometer is a cryogenic particle detector that uses nitrogen-vacancy (NV) centers in
+diamond to read out the Meissner-field collapse of a superconducting NbN thin-film pixel.
+When a particle deposits energy exceeding the thermal threshold in the NbN film, the film
+transitions from the superconducting (Meissner-screened) to the normal state. The resulting
+change in local magnetic field at the NV layer is detected optically via a shift in the
+optically detected magnetic resonance (ODMR) frequency of the NV
+ensemble~\cite{Doherty2013}.
+% Doherty2013 p.1--4 (NV centre review: ODMR principle)
 
-\subsection{Sensing Principle}
+\subsection{D0 Milestone Definition}
+\label{sec:d0_milestone}
 
-The NV$^-$ ground state is a spin-1 triplet with zero-field splitting $D \approx 2877.5$\,MHz
-at $T = 12$\,K (This work; CryoLab measurement).
-% internal: hardware_readiness_report.tex Sec.~2 (D = 2877.5 MHz at 12 K confirmed in lab)
-In the presence of a static bias field $B_\mathrm{bias}$, the $m_s = \pm 1$ sub-levels split
-by $2\gamma_e B_\mathrm{bias}$, where $\gamma_e / 2\pi = 28.0$\,GHz/T~\cite{Doherty2013}.
-% Doherty2013 p.~33, Eq.~(A3) (gyromagnetic ratio of NV electron spin)
-When the NbN film is superconducting, Meissner screening perturbs the local field at the NV
-layer. When the film transitions to the normal state (either thermally or via a particle
-absorption event), this perturbation collapses. The resulting change in field $\Delta B_z$
-produces an ODMR frequency shift $\Delta\nu = \gamma_e \Delta B_z / \pi$, which is the
-detection signal (OQ-1 mechanism; see Section~\ref{sec:oq1}).
+The D0 milestone is the first experimental demonstration of the NV Bolometer detection
+concept: an optically readable magnetic signature of a superconductor crossing $T_c$.
+
+\textbf{D0 success criterion (This work):}
+\begin{quote}
+Observe a shift in the NV ODMR resonance frequency, measured optically, that is correlated
+with the Meissner--Zeeman transition as an NbN thin film cools through
+$T_c \approx 15.7$\,K.
+\end{quote}
+% internal: hardware_readiness_report.tex Sec.~1 (D0 success criterion verbatim)
+
+D0 uses the same laser, cryostat, and ODMR apparatus as Jacob's existing NV characterization
+experiments. No new photon-counting electronics are required for D0 itself (CW-ODMR is
+sufficient). The critical hardware items are the NbN superconducting film and the NV diamond
+placed adjacent to it.
+
+\textbf{D0 is \emph{not} D1.} D1 requires the full SiPM/FPGA readout, single-pixel energy
+deposition, and detector performance characterization.
 
 \subsection{Milestone Architecture}
+\label{sec:milestone_arch}
+
+The project follows a milestone ladder from demonstrator to physics-scale detector:
 
 \begin{table}[ht]
 \centering
-\caption{NV bolometer milestone roadmap. Energy thresholds are from the threshold-detector
-  model (Section~\ref{sec:oq5}). \% internal: oq5\_energy\_resolution.tex Eq.~(2).
-  D0 uses the existing Montana cryostat (11\,K base, This work).}
+\caption{NV bolometer milestone roadmap. $T_\mathrm{op}$ is the target operating
+  temperature. D0 uses the existing Montana cryostat (11\,K base, This work).}
 \label{tab:milestones}
 \small
-\begin{tabular}{@{}p{1.4cm}p{2.5cm}p{1.8cm}p{2.5cm}p{4.5cm}@{}}
+\begin{tabular}{@{}p{1.5cm}p{2.8cm}p{1.8cm}p{2.8cm}p{4.2cm}@{}}
 \toprule
 Stage & SC Film & $T_\mathrm{op}$ & Readout & Primary Goal \\
 \midrule
-D0-Easy & NbN 200\,nm / sapphire & 12\,K & CW-ODMR & Meissner--Zeeman proof of concept \\
+D0-Easy & NbN 200\,nm / sapphire & 12\,K & CW-ODMR (APD) & Meissner--Zeeman proof of concept \\
 D0-Opt  & NbN, $1\,\mu\text{m}^2$ pixel & 12\,K & CW-ODMR & Energy-resolving demonstration \\
 D1      & NbN/Al $+$ Ge absorber & 4.2\,K & SiPM + FPGA & Single-pixel bolometric detection \\
 P1      & Al 20\,nm / graphite & 0.75\,K & SiPM + FPGA & Sub-eV dark matter detection \\
 \bottomrule
 \end{tabular}
 \end{table}
+% internal: hardware_readiness_report.tex (milestone progression D0--P1, NVB_TRAINING.md Table 4)
 
-\subsection{Full D1 Readout Chain}
+\subsection{Hardware in Hand}
+\label{sec:existing_hw}
 
-The selected D1 readout architecture (Option~A, \texttt{ARCHITECTURE\_SUMMARY.tex}) is:
-% internal: hardware/sipm_fpga/ARCHITECTURE_SUMMARY.tex (architecture decision 2026-03-18)
+The following hardware is in hand and has been verified against primary sources.
+% internal: hardware_readiness_report.tex Sec.~2 (Hardware Existing and Verified)
+
+\subsubsection{NV Diamond and Optical System}
+
+The core NV measurement apparatus is operational and verified through Jacob's ongoing
+experimental campaign.
+
+\begin{itemize}
+  \item \textbf{532\,nm confocal laser (NV excitation):} Actively used in all CryoLab
+    runs; $D = 2877.5$\,MHz confirmed at 12\,K (This work;
+    \cite{Doherty2013}). % Doherty2013 p.1 (D = 2.87 GHz ZFS review value; 2877.5 MHz at cryo is This work)
+  \item \textbf{Montana cryostat, 11\,K base:} Operating temperature range 11--70\,K
+    confirmed; ODMR data collected at 12\,K, 20\,K, 65\,K, up to 250\,K (This work).
+  \item \textbf{NV-diamond chip (HPHT ensemble):} ODMR contrast 6--7.5\% at 12\,K;
+    $T_1 \approx 230$\,ms at 20--65\,K; sensitivity $\sim\!14\,\mu\text{T}/\sqrt{\text{Hz}}$
+    at 12\,K (This work).
+  \item \textbf{ADF4351 MW synthesizer module:} Already used in CryoLab for ODMR sweeps;
+    frequency range 35\,MHz--4.4\,GHz; SPI-controlled from PC; $+5$\,dBm output
+    (\cite{ADF4351datasheet}). % ADF4351datasheet p.4 Table 1 (output power, frequency range)
+  \item \textbf{NdFeB stepper-motor bias magnet:} Reaches $\sim\!46$\,G; used in
+    multi-field ODMR campaigns 10.6--210\,G (This work).
+  \item \textbf{Power meter and alignment optics:} Operational in CryoLab (This work).
+\end{itemize}
+
+\subsubsection{SiPM Photon-Counting Chain (D1 Forward; Characterized for D0)}
+
+The SiPM/FPGA readout chain is designed for D1 but the SiPM characterization informs D0
+safety planning.
+% internal: hardware_readiness_report.tex Sec.~2.2 (SiPM readout chain components)
+
+\begin{itemize}
+  \item \textbf{Hamamatsu S14420-3050MG SiPM:} PDE = 40\% at 600\,nm,
+    $\sim\!25\%$ at 700\,nm (NV emission peak); % S14420datasheet p.1 Features; p.3 Fig. (PDE vs wavelength)
+    $V_{\text{BR}} = 42 \pm 5$\,V at 25$^\circ$C; % S14420datasheet p.2 Table (Electrical characteristics)
+    DCR = 1600\,kcps typical at 25$^\circ$C; % S14420datasheet p.2 Table (S14420-3050MG Dark count Typ.)
+    operating range specified to $-40^\circ$C only (\cite{S14420datasheet}). % S14420datasheet p.1 Table (Operating temperature)
+  \item \textbf{MAX40658AUT+ TIA:} Transimpedance gain 18.3\,k$\Omega$; % MAX40658datasheet p.3 Table (Z21 typ)
+    bandwidth 360--520\,MHz (\cite{MAX40658datasheet}). % MAX40658datasheet p.3 Table (BW min--max)
+  \item \textbf{ADCMP601BKSZ-R2 comparator:} Propagation delay 3.5\,ns; % ADCMP601datasheet p.4 Table 1 (tPD typ)
+    offset $\pm 2$\,mV; TTL/CMOS-compatible output (\cite{ADCMP601datasheet}).
+  \item \textbf{Digilent Nexys A7-100T FPGA:} XC7A100T; 101,440 logic cells; 4,860\,Kb BRAM; % NexysA7refmanual p.1 Table (FPGA overview)
+    USB-UART interface (\cite{NexysA7refmanual}).
+  \item \textbf{ADL5321 RF driver amplifier:} Gain 11.7\,dB at 2877\,MHz; % ADL5321datasheet Table 2 (S21 interpolated)
+    $P_{1\text{dB}} = 25.7$\,dBm; 2.3--4.0\,GHz range (\cite{ADL5321datasheet}). % ADL5321datasheet Table 1 (P1dB at 3.5 GHz, 5V typ)
+\end{itemize}
+
+\subsection{NEP Model Framework}
+\label{sec:nep_model}
+
+The bolometer noise equivalent power (NEP) model has been derived from first principles
+following Richards~\cite{Richards1994}.
+% Richards1994 PDF IN HAND: literature/Richards_1994_Bolometer_Review.pdf
+
+Key analytical results established:
+\begin{itemize}
+  \item Phonon noise NEP:
+    $\mathrm{NEP}_{\text{phonon}}^2 = 4\gamma k_B T^2 G$
+    at $\gamma = 1$ (conservative upper bound)~\cite{Richards1994}. % Richards1994 Eq. 18, p.8
+  \item Electron-phonon conductance at 12\,K:
+    $G_{ep} = 5\,\Sigma V T^4 \approx 4.7 \times 10^{-5}$\,W/K
+    (NbN 200\,nm film; $\Sigma \approx 3 \times 10^8$\,W\,m$^{-3}$\,K$^{-5}$
+    metals estimate; \needref{NbN-specific $\Sigma$ value})~\cite{Richards1994}. % Richards1994 p.1 (G_ep = 5 Sigma V T^4 framework)
+  \item NbN resistivity: $\rho_n \approx 150\,\mu\Omega\,\text{cm}$
+    for $T_c \approx 15.7$\,K NbN film~\cite{Kamlapure2010}. % Kamlapure2010 Fig. 3(d) (rho_0 vs T_c; 50 nm film T_c=15.87 K)
+  \item Nonequilibrium NEP corrections (up to 30\% phonon noise reduction,
+    60\% Johnson noise reduction) follow \cite{Mather1982}
+    (PDF in hand: \texttt{literature/Mather1982\_Bolometer\_Noise\_ApplOpt21\_1125.pdf}). % Mather1982 PDF in hand
+\end{itemize}
+
+\subsection{Critical Blockers for D0}
+\label{sec:d0_blockers}
+
+As of 2026-03-19, D0 is not ready to run. Two hard blockers remain:
+% internal: hardware_readiness_report.tex Sec.~4 (Critical Blockers) and Sec.~6 (Summary)
+
+\begin{enumerate}
+  \item \textbf{NbN film not yet obtained.}
+    D0 requires a 200\,nm NbN film on sapphire with confirmed $T_c \approx 15.7$\,K.
+    Required material parameter: $\rho_n \approx 150\,\mu\Omega\,\text{cm}$~\cite{Kamlapure2010}. % Kamlapure2010 Fig. 3(d)
+    Deposition path: UT Arlington Shimadzu NanoTech Research Center.
+    \needref{NbN film fabrication source / vendor}
+  \item \textbf{Cold-finger mounting jig not finalized.}
+    The NV diamond chip must be placed adjacent to the NbN film with a controllable gap,
+    within the cryostat cold-finger geometry. A field change $\Delta B \sim 1$\,G produces
+    a $\sim\!5.6$\,MHz ODMR shift --- detectable against the $\sim\!10$\,MHz linewidth
+    (This work;~\cite{Barry2020}). % Barry2020 Eq. 6 (Zeeman shift formula)
+    This is a mechanical engineering task.
+\end{enumerate}
+
+\textbf{Safety gate (if SiPM is used for D0):} The S14420 breakdown voltage has a
+temperature coefficient of $+47$\,mV/$^\circ$C~\cite{S14420datasheet}. % S14420datasheet p.2 Table (Temp coeff of V_op)
+Extrapolating to 12\,K ($\Delta T = 286$\,K) gives
+$\Delta V_{\text{BR}} \approx -13.4$\,V, meaning
+$V_{\text{BR}}(12\,\text{K}) \approx 28.6$\,V. % S14420datasheet p.2 Table (derived: 0.047 V/°C × 286°C)
+Applying the RT bias ($\sim\!47$\,V) at cryogenic temperature would produce
+$V_{\text{over}} \approx 18$\,V --- approximately $18\times$ the design overvoltage,
+risking permanent SiPM damage~\cite{SiPMcryoSubmeV2025}. % SiPMcryoSubmeV2025 Fig. 7 (second breakdown at V_over ~5 V at 10 mK)
+\textbf{Recommendation: Run D0 with Jacob's existing APD detector.}
+SiPM integration follows as D1 work.
+
+\subsection{D0 Experiment Sequence}
+\label{sec:d0_sequence}
+
+Once the blockers are resolved, the D0 sequence is:
+% internal: hardware_readiness_report.tex Sec.~5 (D0 Experiment Sequence, steps C1--C4)
+
+\begin{enumerate}
+  \item Cool diamond + NbN assembly to $\sim\!20$\,K (above $T_c = 15.7$\,K).
+    Record reference ODMR frequency $\nu_0$ (normal-state NbN, no Meissner screening).
+  \item Cool to 12\,K (below $T_c$). The NbN enters the Meissner state; the applied field
+    is partially excluded from the region beneath the film, reducing $B$ at the NV layer.
+    Observe the ODMR shift $\Delta\nu = 2\gamma_{\text{NV}} \Delta B$~\cite{Barry2020}. % Barry2020 Eq. 6 (Zeeman shift formula)
+  \item Warm up through $T_c$. Record ODMR frequency vs.\ temperature through the SC
+    transition. D0 success criterion: a reproducible ODMR shift correlated with the $T_c$
+    transition visible in the $R(T)$ resistance trace.
+  \item Archive all data following CryoLab standing rules: 0.1\,MHz bins, 20\,ms dwell,
+    $+5$\,dBm MW power (This work; NVB\_TRAINING.md \S2).
+\end{enumerate}
+
+\subsection{D1 Readout Architecture}
+\label{sec:d1_arch}
+
+The D1 readout architecture (Option~A) is:
+% internal: hardware_readiness_report.tex Sec.~2.2 (SiPM readout chain, architecture selection)
 \begin{equation*}
   \underbrace{\text{S14420 SiPM}}_{\text{photon detection}}
   \;\to\;
@@ -65,23 +200,6 @@ The selected D1 readout architecture (Option~A, \texttt{ARCHITECTURE\_SUMMARY.te
   \underbrace{\text{Nexys A7 FPGA}}_{\text{timing \& control}}
   \;\to\; \text{PC}.
 \end{equation*}
-The FPGA runs pulse sequencing, ADF4351 SPI frequency control,
-carry-chain TDC photon timestamping at 17.5\,ps resolution~\cite{Lim2025},
-% Lim2025 Table 4 p.13 (4-tap SCSC LSB = 17.530 ps, Artix-7 CARRY4 chain)
+The FPGA runs pulse sequencing, ADF4351 SPI frequency control, photon timestamping,
 histogram accumulation, and PC UART communication on a single board.
-
-\subsection{Current Laboratory State}
-
-\begin{itemize}
-  \item \textbf{NV diamond} (HPHT ensemble): $D = 2877.5$\,MHz at 12\,K; ODMR contrast
-    6--7.5\%; $T_1 \approx 230$\,ms at 20--65\,K;
-    sensitivity $\sim\!14\,\mu\text{T}/\sqrt{\text{Hz}}$ at 12\,K.
-    (This work; CryoLab ODMR campaign.)
-  \item \textbf{Montana cryostat}: 11\,K base; ODMR data collected at 12--250\,K.
-  \item \textbf{ADF4351 synthesizer}: 35\,MHz--4.4\,GHz, $+5$\,dBm, SPI-controlled~\cite{ADF4351datasheet}.
-    % ADF4351datasheet p.4 Table 1 (output power, frequency range)
-  \item \textbf{S14420 SiPM}: in hand; cryogenic characterization pending
-    (Section~\ref{sec:sipm-cryo}).
-  \item \textbf{NbN thin film}: deposition pending at UT Arlington Shimadzu NRC
-    (Section~\ref{sec:nbn-sourcing}).
-\end{itemize}
+See Section~\ref{sec:sipm-readout} for the full D1 readout design.

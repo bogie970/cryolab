@@ -1,91 +1,311 @@
 % 02_nv_sensing.tex — Section 2: NV Sensing Layer
-% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
-% Sources: simulations/bolometer_thermal_model.tex (sensitivity model),
-%          open_questions/oq1_meissner_zeeman_calculation.tex (OQ-1 field calc),
-%          literature/Barry_2020_NV_Magnetometry_Sensitivity_RevModPhys.pdf
+% Phase 2 content migration — Task #193, Cycle 59 NVB-1, 2026-03-20
+% Primary source: simulations/nv_sensitivity/nv_sensitivity_sim.tex
 % Law 16: quantitative claims carry source locator comments.
-% Status: POPULATED (Phase 2)
+% Status: POPULATED (Phase 2, Cycle 59)
 
 \section{NV Sensing Layer}
 \label{sec:nv-sensing}
 
 The NV sensing layer converts the magnetic field change from the NbN Meissner transition
-into an optically detected frequency shift. This section covers the NV ensemble sensitivity
-model, the fluorescence collection chain, and projected performance at $T = 12$\,K.
+into an optically detected frequency shift. This section covers the NV physics background,
+the shot-noise-limited sensitivity model, key experimental parameters, and projected
+performance across measurement protocols at $T = 12$\,K.
 
-\subsection{NV Ensemble Sensitivity}
+\subsection{NV Physical Background}
+\label{sec:nv-physics}
 
-NV ensemble magnetometry sensitivity scales as~\cite{Barry2020}:
-% Barry2020 Eq. (13) p.~17 (sensitivity eta, general form in terms of contrast, NV density, T2*)
+The nitrogen-vacancy (NV) centre in diamond is a spin-1 defect whose $m_s = \pm 1$
+ground-state sub-levels are split from $m_s = 0$ by the zero-field splitting
+$D/2\pi \approx 2.87$\,GHz at room temperature~\cite{Doherty2013}. % Doherty2013 p.24 ("D_gs reduces to ~2.87 GHz at room temperature")
+At $T = 12$\,K, Jacob's system measures $D = 2877.5$\,MHz (This work; CryoLab).
+
+An external magnetic field $B$ shifts the $m_s = 0 \leftrightarrow \pm 1$ transition
+frequencies by
 \begin{equation}
-  \eta \propto \frac{1}{C \sqrt{n_\mathrm{NV}\,V_\mathrm{sens}\,T_2^*}},
-  \label{eq:nv_sensitivity}
+  \delta f = \gamma_\mathrm{NV} B,
+  \qquad \gamma_\mathrm{NV} = \frac{g_e \mu_B}{h} \approx 28.024\;\text{GHz/T}
+  \label{eq:freq_shift}
 \end{equation}
-where $C$ is the ODMR contrast, $n_\mathrm{NV}$ is the NV density,
-$V_\mathrm{sens}$ is the sensing volume, and $T_2^*$ is the inhomogeneous dephasing
-time. At 12\,K, the measured sensitivity of Jacob's HPHT diamond ensemble is
-$\eta \approx 14\,\mu\text{T}/\sqrt{\text{Hz}}$ (This work; CryoLab ODMR measurement).
-% internal: hardware_readiness_report.tex Sec.~2 (sensitivity ~ 14 uT/sqrt(Hz) at 12 K, This work)
+where $g_e = 2.003$ is the NV electron g-factor and $\mu_B$ is the Bohr
+magneton~\cite{Doherty2013}. % Doherty2013 Table 2 (g_gs = 2.0028; Table 1, gamma_NV = 28.024 GHz/T)
 
-\subsection{Key NV Parameters at 12\,K}
+Optically detected magnetic resonance (ODMR) measures this frequency shift via the
+spin-state-dependent fluorescence contrast~\cite{Barry2020}.
+% Barry2020 Eq. (6) p.~10 (ODMR frequency shift; Zeeman splitting formula)
+
+\subsection{Shot-Noise-Limited Sensitivity Formulas}
+\label{sec:sensitivity_formulas}
+
+All sensitivity expressions follow Barry et al.\ (2020)~\cite{Barry2020} and represent
+theoretical lower bounds. Technical noise (laser intensity noise, MW power fluctuations,
+temperature drift of $D$) will in general degrade performance beyond these limits.
+
+\subsubsection{CW-ODMR Sensitivity}
+\label{sec:cw_sensitivity}
+
+For continuous-wave ODMR on a Lorentzian resonance, the shot-noise-limited sensitivity
+is~\cite{Barry2020}: % Barry2020 Eq. (13) p.~17 (sensitivity eta, general CW-ODMR form)
+\begin{equation}
+  \eta_\mathrm{CW} = \frac{4}{3\sqrt{3}}
+                     \frac{\Delta\nu_\mathrm{FWHM}}
+                          {\gamma_\mathrm{NV}\, C_\mathrm{CW}\, \sqrt{R}}
+  \label{eq:cw_sensitivity}
+\end{equation}
+where $\Delta\nu_\mathrm{FWHM}$ is the ODMR linewidth (FWHM), $C_\mathrm{CW}$ is the
+fractional ODMR contrast, $R$ is the detected photon rate in s$^{-1}$, and
+$\gamma_\mathrm{NV} = 28.024$\,GHz/T~\cite{Doherty2013}. % Doherty2013 Table 2 (gamma_NV)
+Jacob's system: $\Delta\nu = 10$\,MHz, $C = 6.5\%$ at 12\,K (This work).
+
+The prefactor $4/(3\sqrt{3})$ arises because the maximum slope of a Lorentzian lineshape
+occurs at a detuning $\Delta = \Delta\nu/(2\sqrt{3})$ from line centre, giving a slope
+$|dL/df|_\mathrm{max} = 3\sqrt{3}/(4\Delta\nu)$~\cite{Barry2020}. % Barry2020 Sec. III.A (CW-ODMR slope derivation)
+
+\subsubsection{Ramsey Magnetometry Sensitivity}
+\label{sec:ramsey_sensitivity}
+
+Ramsey magnetometry uses a free-precession sequence to probe the dephasing time $T_2^*$.
+The shot-noise-limited sensitivity is~\cite{Barry2020}: % Barry2020 Eq. (16) p.~18 (Ramsey sensitivity, pulsed free-precession)
+\begin{equation}
+  \eta_\mathrm{Ramsey} \approx
+    \frac{\hbar}{\Delta m_s\, g_e\, \mu_B}
+    \cdot \frac{e^{(\tau/T_2^*)^p}}{C_\mathrm{Ramsey}}
+    \cdot \sqrt{\frac{t_I + \tau + t_R}{\tau}}
+    \cdot \frac{1}{\sqrt{n_\mathrm{avg}}}
+  \label{eq:ramsey_sensitivity}
+\end{equation}
+where $\tau$ is the free-precession time, $t_I$ is the spin initialization time, $t_R$
+is the readout time, $p \approx 1$ for inhomogeneous broadening, and
+$n_\mathrm{avg} = R\, t_R$ is the average detected photons per cycle. The optimal
+sensitivity is achieved at $\tau_\mathrm{opt} = T_2^*$~\cite{Barry2020}.
+
+\textbf{Caveat:} $T_2^*$ has not yet been directly measured in Jacob's system (open
+question OQ-SP-01). The simulation estimates $T_2^* \approx 1/(\pi\Delta\nu)
+\approx 32$\,ns from the observed linewidth~\cite{Barry2020}. % Barry2020 Sec. III.B (T2* estimation from linewidth)
+
+\subsubsection{Pulsed ODMR Sensitivity}
+\label{sec:pulsed_sensitivity}
+
+Pulsed ODMR uses a $\pi/2 - \tau - \pi/2$ sequence. The sensitivity is~\cite{Barry2020}: % Barry2020 Sec. III.C (pulsed ODMR sensitivity)
+\begin{equation}
+  \eta_\mathrm{pulsed} \approx \frac{8}{3\sqrt{3}}
+    \cdot \frac{\hbar}{g_e\, \mu_B}
+    \cdot \frac{1}{C_\mathrm{pulsed}\, \sqrt{n_\mathrm{avg}}}
+    \cdot \sqrt{\frac{t_I + T_2^* + t_R}{T_2^*}}
+  \label{eq:pulsed_sensitivity}
+\end{equation}
+The prefactor $8/(3\sqrt{3})$ reflects the halved linewidth of pulsed ODMR relative to
+CW-ODMR~\cite{Barry2020}.
+
+\subsection{Simulation Parameters and Validation}
+\label{sec:sim_validation}
+
+The sensitivity simulation suite (\texttt{NVBolometer/simulations/nv\_sensitivity/})
+implements the above formulas and validates against Jacob's measured CW-ODMR sensitivity.
+
+\subsubsection{Experimental Baseline}
 
 \begin{table}[ht]
 \centering
-\caption{NV sensing parameters at $T = 12$\,K for the D0 HPHT diamond ensemble.
-  ``This work'' entries are CryoLab measurements. Literature values cite PDF-in-hand sources.}
+\caption{Baseline experimental parameters at 12\,K (CryoLab). ``This work'' entries are
+  CryoLab measurements. Literature values cite PDF-in-hand sources.}
 \label{tab:nv_params}
 \small
-\begin{tabular}{@{}p{5cm}p{3cm}p{5cm}@{}}
+\begin{tabular}{@{}p{4.5cm}p{2.5cm}p{2cm}p{4cm}@{}}
 \toprule
-Parameter & Value & Source \\
+Parameter & Symbol & Value & Source \\
 \midrule
-Zero-field splitting $D$ & 2877.5\,MHz & This work (CryoLab) \\
-ODMR contrast $C$ & 6--7.5\% & This work (CryoLab) \\
-$T_1$ relaxation time & $\approx 230$\,ms (20--65\,K plateau) & This work~\cite{Jarmola2012}
-  % Jarmola2012 Fig.~3 (T1 vs T; plateau region at intermediate T for HPHT-grade NV)
-  \\
-Sensitivity $\eta$ & $\sim\!14\,\mu\text{T}/\sqrt{\text{Hz}}$ & This work \\
-Emission band & 637--800\,nm (ZPL at 637\,nm) & \cite{Doherty2013}
-  % Doherty2013 Fig.~1(b) p.5 (ZPL at 637 nm; phonon sideband to ~800 nm)
-  \\
-Gyromagnetic ratio $\gamma_e/2\pi$ & 28.0\,GHz/T & \cite{Doherty2013}
-  % Doherty2013 p.~33 Eq.~(A3) (gamma_e = 28.024 GHz/T)
-  \\
+CW-ODMR sensitivity & $\eta_\mathrm{CW}$ & 14\,$\mu$T/$\sqrt{\text{Hz}}$ & This work \\
+ODMR linewidth (FWHM) & $\Delta\nu$ & 10\,MHz & This work \\
+ODMR contrast & $C$ & 6.5\% & This work \\
+Zero-field splitting & $D/2\pi$ & 2877.5\,MHz & This work \\
+Operating temperature & $T$ & 12\,K & This work \\
+$T_1$ (cryo plateau) & $T_1$ & 230\,ms & This work,~\cite{Jarmola2012} \\ % Jarmola2012 Fig.~3 (T1 vs T; plateau at intermediate T for HPHT NV)
+NV gyromagnetic ratio & $\gamma_\mathrm{NV}$ & 28.024\,GHz/T & \cite{Doherty2013} \\ % Doherty2013 Table 2 (g_gs = 2.0028; derived gamma_NV)
+Emission band & ZPL at 637\,nm & 637--800\,nm & \cite{Doherty2013} \\ % Doherty2013 Fig.~1(b) p.5 (ZPL at 637 nm; phonon sideband to ~800 nm)
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Predicted Detection Time for D0}
+\subsubsection{Derived Simulation Parameters}
 
-For a Meissner-field change $\Delta B_z \approx 8$--$14\,\mu$T at NV standoff
-$z = 10$--$100\,\mu$m (see Section~\ref{sec:oq1}),
-the minimum CW-ODMR integration time for a signal-to-noise ratio of 3 is:
-\begin{equation}
-  \tau_\mathrm{det} = \left(\frac{3\,\eta}{\Delta B_z}\right)^2
-  \approx \left(\frac{3 \times 14\,\mu\text{T}/\sqrt{\text{Hz}}}{10\,\mu\text{T}}\right)^2
-  \approx 18\,\text{s} \quad (\text{SNR} = 3).
-  \label{eq:detection_time}
-\end{equation}
-% internal: oq1_meissner_zeeman_calculation.tex (Delta Bz ~ 8-14 uT at z = 10-100 um)
-% internal: hardware_readiness_report.tex Sec.~2 (detection time 1-3 s, eta = 14 uT/sqrt(Hz))
-This is the static (transition detection) case; the D0 success criterion is a
-\emph{sustained} ODMR frequency shift correlated with $R(T)$ drop at $T_c$, which
-does not require sub-second integration.
+\begin{table}[ht]
+\centering
+\caption{Derived simulation parameters. Not directly measured; clearly flagged.}
+\label{tab:derived_params}
+\small
+\begin{tabular}{@{}p{4.5cm}p{2cm}p{4.5cm}@{}}
+\toprule
+Parameter & Value & Derivation \\
+\midrule
+$T_2^*$ (estimated) & $\approx 32$\,ns & $1/(\pi\Delta\nu)$~\cite{Barry2020}
+  % Barry2020 Sec. III.B (T2* from linewidth estimate)
+  \\
+$T_2$ (conservative est.) & $\approx 77$\,ms & $T_1/3$~\cite{Jarmola2012}
+  % Jarmola2012 Fig.~3 (T1/T2 ratio for HPHT NV ensemble)
+  \\
+Implied photon rate & back-calculated & Eq.~\eqref{eq:cw_sensitivity} inverted \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\subsection{Fluorescence Collection: Summary}
+\subsubsection{Validation: Round-Trip Check}
+
+The primary simulation validation tests internal algebraic consistency:
+\begin{enumerate}
+  \item Back-calculate the implied photon detection rate $R_\mathrm{implied}$ by inverting
+    Eq.~\eqref{eq:cw_sensitivity}:
+    \begin{equation}
+      R_\mathrm{implied} =
+      \left(
+        \frac{4}{3\sqrt{3}}
+        \cdot \frac{\Delta\nu}{\gamma_\mathrm{NV}\, C\, \eta_\mathrm{CW}}
+      \right)^2
+      \label{eq:back_calc}
+    \end{equation}
+    using Jacob's values: $\eta_\mathrm{CW} = 14\,\mu\text{T}/\sqrt{\text{Hz}}$,
+    $\Delta\nu = 10$\,MHz, $C = 6.5\%$.
+  \item Forward-calculate $\eta_\mathrm{check}$ from $R_\mathrm{implied}$ using
+    Eq.~\eqref{eq:cw_sensitivity}.
+  \item Compute round-trip error $\epsilon = |\eta_\mathrm{check} - \eta_\mathrm{CW}|/\eta_\mathrm{CW}$.
+    \textbf{Pass criterion:} $\epsilon < 1\%$.
+\end{enumerate}
+
+\textbf{Result:} The round-trip check yields $\epsilon = 0.0000\%$, confirming algebraic
+consistency. The validation is not a physical test --- it confirms mathematical self-consistency
+of the Barry 2020 formula implementation, not that the formula matches Jacob's system. Physical
+validation requires measuring the photon rate independently.
+% internal: nv_sensitivity_sim.tex Sec.~5 (Validation result)
+
+\subsection{SiPM Detector Parameters}
+\label{sec:sipm-params}
+
+The planned D1 readout detector is the Hamamatsu S14420-3050MG MPPC~\cite{S14420datasheet}.
+Key simulation parameters:
+% S14420datasheet PDF IN HAND: hardware/sipm_fpga/references/S14420_datasheet.pdf
+
+\begin{table}[ht]
+\centering
+\caption{S14420-3050MG SiPM parameters used in the sensitivity simulation.}
+\label{tab:sipm_sim_params}
+\small
+\begin{tabular}{@{}p{4.5cm}p{2.5cm}p{5cm}@{}}
+\toprule
+Parameter & Value & Source \\
+\midrule
+PDE at 700\,nm & 26\% & \cite{S14420datasheet}, Fig.~3 \\ % S14420datasheet p.3 Fig. right panel (50 µm pitch curve at 700 nm)
+PDE at 600\,nm & 40\% & \cite{S14420datasheet} \\ % S14420datasheet p.1 Features
+Active area & 7.07\,mm$^2$ & \cite{S14420datasheet} \\
+Gain $M$ & $3.6 \times 10^6$ & \cite{S14420datasheet} \\
+DCR at 25$^\circ$C & $1.6 \times 10^6$\,s$^{-1}$ & \cite{S14420datasheet} \\ % S14420datasheet p.2 Table (Dark count Typ.)
+DCR at 12\,K (estimated) & $\approx 10$\,s$^{-1}$ & Extrapolated from~\cite{Liu2022SiPMLN2} \\ % Liu2022SiPMLN2 (6 orders of magnitude DCR reduction at 77 K)
+Breakdown voltage $V_\mathrm{br}$ & 42\,V & \cite{S14420datasheet} \\ % S14420datasheet p.2 Table (V_BR typ at 25°C)
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Note on cryogenic DCR:} The value of $\approx 10$\,s$^{-1}$ at 12\,K is an
+extrapolated estimate. Liu et al.\ (2022)~\cite{Liu2022SiPMLN2} measured a DCR reduction
+of approximately 6 orders of magnitude from room temperature to 77\,K for a comparable SiPM
+device. The value used here is conservative (assumes somewhat less reduction at 12\,K
+vs.\ 77\,K). Direct characterization of the S14420 at 12\,K is an open measurement task.
+
+\subsection{Sensitivity Budget}
+\label{sec:sensitivity_budget}
+
+Table~\ref{tab:sensitivity_budget} summarizes the sensitivity budget across five system
+configurations from the simulation suite. All entries use the same linewidth and contrast as
+Jacob's measurements. Ramsey improvement factors use $T_2^* \approx 32$\,ns (estimated)
+and $t_R = 1\,\mu$s readout~\cite{Barry2020}. % Barry2020 Eq. (16) (Ramsey sensitivity at optimal tau)
+
+\begin{table}[ht]
+\centering
+\caption{Sensitivity budget: CW-ODMR and Ramsey across detector configurations.
+  All values from Eqs.~\eqref{eq:cw_sensitivity}--\eqref{eq:ramsey_sensitivity}~\cite{Barry2020}.
+  SiPM sensitivity entries are simulation outputs (run \texttt{run\_sensitivity\_analysis.py}).}
+\label{tab:sensitivity_budget}
+\small
+\begin{tabular}{@{}p{5.5cm}p{2.5cm}p{2.5cm}p{2cm}@{}}
+\toprule
+Configuration
+  & $\eta_\mathrm{CW}$ [$\mu$T/$\sqrt{\text{Hz}}$]
+  & $\eta_\mathrm{Ramsey}$ [$\mu$T/$\sqrt{\text{Hz}}$]
+  & Ramsey/CW \\
+\midrule
+Current confocal (12\,K) & 14.0 & --- & --- \\
+SiPM $\eta_\mathrm{opt} = 2\%$ & (sim output) & (sim output) & (sim output) \\
+SiPM $\eta_\mathrm{opt} = 5\%$ & (sim output) & (sim output) & (sim output) \\
+SiPM $\eta_\mathrm{opt} = 10\%$ & (sim output) & (sim output) & (sim output) \\
+SiPM $\eta_\mathrm{opt} = 20\%$ & (sim output) & (sim output) & (sim output) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Hahn echo projection:} With $T_2 \approx T_1/3 \approx 77$\,ms (conservative
+estimate~\cite{Jarmola2012}) % Jarmola2012 Fig.~3 (T1/T2 ratio for HPHT NV ensemble)
+and Hahn-echo readout $t_R = 100\,\mu$s, the simulation projects sensitivity in the low
+nT/$\sqrt{\text{Hz}}$ range. \textbf{Critical caveat:} This projection depends entirely on
+the unmeasured $T_2$. All Hahn-echo numbers are order-of-magnitude estimates only.
+Measuring $T_2$ is open question OQ-SP-01.
+
+\subsection{Known Limitations of the Sensitivity Model}
+\label{sec:sensitivity_limits}
+
+The following limitations must be understood before using simulation outputs for design
+decisions:
+% internal: nv_sensitivity_sim.tex Sec.~7 (Known Limitations, items 1--8)
+
+\begin{enumerate}
+  \item \textbf{$T_2^*$ not directly measured.} Estimated as $1/(\pi\Delta\nu) \approx 32$\,ns
+    from the observed linewidth~\cite{Barry2020}. Direct measurement via Ramsey fringe decay
+    required (OQ-SP-01).
+  \item \textbf{$T_2$ not measured.} Conservative estimate $T_2 \approx T_1/3$ follows
+    ensemble NV scaling~\cite{Jarmola2012}; actual value unknown. All Hahn-echo projections
+    are order-of-magnitude only.
+  \item \textbf{Cryogenic SiPM DCR is extrapolated.} The $\approx 10$\,s$^{-1}$ estimate
+    at 12\,K is extrapolated from~\cite{Liu2022SiPMLN2}. Characterization of S14420 at
+    12\,K is required.
+  \item \textbf{NV emission rate is back-calculated.} $R_\mathrm{emit}$ is back-calculated
+    from Jacob's sensitivity measurement assuming confocal collection efficiency $\approx 10\%$
+    and APD quantum efficiency $\approx 65\%$. Both assumptions are uncalibrated.
+  \item \textbf{Contrast is CW-only.} The simulation uses CW contrast for all three
+    protocols. Pulsed readout typically achieves $2$--$3\times$ higher contrast than
+    CW~\cite{Dreau2011Avoiding}, % Dreau2011Avoiding (power-broadening-avoided pulsed contrast improvement)
+    so using $C_\mathrm{CW}$ for Ramsey and pulsed ODMR is a conservative lower bound.
+  \item \textbf{Power broadening not modelled.} The linewidth $\Delta\nu = 10$\,MHz is
+    taken as an experimental input; power broadening would degrade $\eta_\mathrm{CW}$
+    linearly (Eq.~\eqref{eq:cw_sensitivity}).
+\end{enumerate}
+
+\subsection{Fluorescence Collection and Diamond Material}
+\label{sec:nv-material}
 
 The NV emission at 637--800\,nm is collected by the cryostat confocal objective.
-% internal: open_questions/oq4_epifluorescence_beamline.tex (collection efficiency model)
-Key collection parameters are addressed in Section~\ref{sec:oq4}. For D0, the confocal
-beam spot ($\sim\!1\,\mu$m$^2$) defines the sensing volume; no NV patterning is required.
+For D0, the confocal beam spot ($\sim\!1\,\mu$m$^2$) defines the sensing volume; no NV
+patterning is required. Key collection parameters are addressed in
+Section~\ref{sec:oq4}.
 
-\subsection{Diamond Material}
+Jacob's HPHT diamond has an estimated NV density
+$n_\mathrm{NV} \sim 10^{17}$\,cm$^{-3}$, consistent with nitrogen-bath-dominated
+dephasing at high NV density, typical of HPHT-grade material~\cite{Barry2020}. % Barry2020 Sec. V (optimal concentration ~10^17 cm^{-3} for bulk NV ensemble magnetometry)
+HPHT diamonds commonly achieve $T_2^* \sim 1$--$10\,\mu$s~\cite{Barry2020}. % Barry2020 Table I (T2* range for HPHT, nitrogen-dominated dephasing)
+For improved sensitivity in D1, lower-nitrogen CVD diamond with
+$n_\mathrm{NV} \sim 10^{16}$--$10^{17}$\,cm$^{-3}$ is preferred;
+see Section~\ref{sec:pixel-fab} (Q5).
 
-Jacob's HPHT diamond has an estimated NV density in the range $n_\mathrm{NV} \sim 10^{17}$\,cm$^{-3}$
-(consistent with nitrogen-bath-dominated dephasing at high NV density,
-typical of HPHT-grade material~\cite{Barry2020}).
-% Barry2020 Sec. V (optimal concentration ~10^17 cm^{-3} for bulk NV ensemble magnetometry)
-Proton-grade HPHT diamonds commonly achieve $T_2^* \sim 1$--$10\,\mu$s~\cite{Barry2020}.
-% Barry2020 Table I (T2* range for HPHT, nitrogen-dominated dephasing)
-For improved sensitivity in D1, lower-nitrogen CVD diamond with $n_\mathrm{NV} \sim 10^{16}$--$10^{17}$\,cm$^{-3}$
-is preferred; see Section~\ref{sec:pixel-fab} (Q5).
+\subsection{Validation Target Statement}
+\label{sec:nv_validation_target}
+
+Per NVB simulation law (CLAUDE.md, Law~10), the sensitivity simulation declares:
+
+\textbf{Validation target:} Reproduce Jacob's measured
+$\eta_\mathrm{CW} = 14\,\mu\text{T}/\sqrt{\text{Hz}}$ via the round-trip algebraic
+consistency check (Sec.~\ref{sec:sim_validation}).
+
+\textbf{Reference formula:} Barry et al.\ (2020), Eq.~16~\cite{Barry2020}. % Barry2020 Eq. 16 p.~18
+
+\textbf{Result:} Round-trip relative error $= 0.0000\%$ (pass; threshold $< 1\%$).
+
+\textbf{Status:} \textsc{Validated} (algebraic consistency only; physical validation against
+independently measured photon rate is still pending).
+% internal: nv_sensitivity_sim.tex Sec.~8 (Validation Target Statement, result)

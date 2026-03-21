@@ -1,9 +1,15 @@
 % 03_sipm_readout.tex — Section 3: SiPM Readout Design
-% Phase 2 content migration — Task #178, Cycle 54 NVB-1, 2026-03-20
-% Sources: hardware/sipm_fpga/sipm_fpga_design.tex,
+% Phase 2 content migration — Task #197, Cycle NVB, 2026-03-21
+% Sources: hardware/sipm_fpga/sipm_fpga_design.tex (primary),
 %          hardware/sipm_fpga/ARCHITECTURE_SUMMARY.tex
 % Law 16: quantitative claims carry source locator comments.
-% Status: POPULATED (Phase 2)
+% Status: POPULATED (Phase 2, Task #197 — enhanced migration)
+%
+% ABRIDGEMENT NOTE: sipm_fpga_design.tex contains a full ADF4351 register map
+% (Sec. 4), detailed Verilog SPI RTL listing, and full BOM tables. These are
+% abridged here to key specs and architecture — full detail remains in the
+% source document. The IQ modulator upgrade path and FPGA module details are
+% included in full as they were absent from the previous migration.
 
 \section{SiPM Readout Design}
 \label{sec:sipm-readout}
@@ -78,6 +84,10 @@ MW synth. & ADF4351 module & 35\,MHz--4.4\,GHz, SPI, $+5$\,dBm~\cite{ADF4351data
   \item \textbf{Cost:} Preliminary all-in estimate $\approx\!\$500$--600 for the full
     readout chain (SiPM + TIA PCB + comparator + FPGA board + cables).
     \needref{Formal vendor quote for complete BOM.}
+  \item \textbf{FPGA replaces instruments:} A single Nexys A7 board simultaneously
+    implements the pulse sequencer, MW SPI controller, photon counter/TDC, histogram
+    accumulator, and PC interface — replacing multiple standalone instruments~\cite{NexysA7refmanual}.
+    % NexysA7refmanual p.1 (board overview, PMOD connectors for instrument interfacing)
 \end{enumerate}
 
 \subsection{Rejected Options}
@@ -94,8 +104,10 @@ Option & Decision & Reason \\
 B: CITIROC 1A ASIC & Rejected & Deprecated by Weeroc \needref{Weeroc deprecation notice};
   designed for scintillator charge integration, not NV fluorescence photon-counting
   (architectural mismatch); 32-channel overkill for single-pixel D0/D1. \\
-C: Preamp-only / FPGA I/O & Deferred & Worse threshold precision; better suited
-  to D2/D3 scale ($>$8 channels)~\cite{Kim2024SeHI}.
+C: Preamp-only / FPGA I/O & Deferred & Worse threshold precision (LVCMOS33 threshold
+  uncertainty $\approx$200\,mV vs.\ ADCMP601 offset $\pm$2\,mV~\cite{ADCMP601datasheet});
+  % ADCMP601datasheet p.4 Table 1 (Vos typ/max); Artix-7 LVCMOS33 JEDEC standard 40% of VCC
+  better suited to D2/D3 scale ($>$8 channels)~\cite{Kim2024SeHI}.
   % Kim2024SeHI (SeHI method: FPGA I/O as comparator, 146 ps timing)
   \\
 D: AMD RFSoC 4x2 & Deferred & 10$\times$ cost; 10$\times$ LO phase noise headroom;
@@ -106,20 +118,150 @@ D: AMD RFSoC 4x2 & Deferred & 10$\times$ cost; 10$\times$ LO phase noise headroo
 \end{tabular}
 \end{table}
 
+\subsection{System Architecture and Signal Flow}
+
+The full D1 signal path from fluorescence detection to PC data acquisition is:
+
+\begin{center}
+\small\ttfamily
+\begin{tabular}{l}
+PC (Python DAQ)                                           \\
+  $\vert$  USB/UART                                        \\
+  $\downarrow$                                             \\
+Nexys A7-100T (Artix-7 FPGA)                              \\
+  \quad pulse\_sequencer \quad$\to$\quad AOM TTL $\to$ Laser (532\,nm) \\
+  \quad spi\_master/adf4351 $\to$ ADF4351 $\to$ MW amp $\to$ NV       \\
+  \quad tdc\_core / photon\_counter $\leftarrow$ ADCMP601 digital pulse \\
+  \quad histogram\_bram \quad$\leftarrow$ photon timestamp              \\
+  \quad uart\_interface \quad$\to$ PC                                   \\
+  \qquad\qquad\qquad\qquad\qquad MAX40658 (TIA)                        \\
+  \qquad\qquad\qquad\qquad\qquad\quad $\uparrow$                       \\
+  \qquad\qquad\qquad\qquad\qquad S14420 SiPM                           \\
+  \qquad\qquad\qquad\qquad\qquad\quad $\uparrow$                       \\
+  \qquad\qquad\qquad\qquad\quad NV fluorescence                        \\
+\end{tabular}
+\end{center}
+
 \subsection{FPGA Functions}
 
 The Nexys A7-100T FPGA (XC7A100T) implements the following subsystems in HDL:
 \begin{enumerate}
-  \item \textbf{ADF4351 SPI controller:} 32-bit serial word to program MW frequency;
-    step size 0.1\,MHz; sweep rate set by PC.
-  \item \textbf{AOM gate:} Nanosecond-precision 532\,nm laser gating for pulsed ODMR
-    (D1 forward; not needed for D0 CW-ODMR).
-  \item \textbf{Carry-chain TDC:} 17.5\,ps-resolution photon timestamping using CARRY4
-    chains~\cite{Lim2025,Wu2010WaveUnion}. % Lim2025 Table 4 (17.530 ps resolution); Wu2010WaveUnion (Wave Union method)
-  \item \textbf{Histogram accumulator:} Photon arrival-time histogram binned per ODMR
-    frequency step; accumulated over the dwell time (20\,ms per step, This work).
-  \item \textbf{UART interface:} Histogram data transmitted to PC at end of sweep.
+  \item \textbf{ADF4351 SPI controller (\texttt{spi\_master/adf4351\_ctrl}):}
+    3-wire SPI, 32-bit MSB-first, CLK $\leq$20\,MHz, LE $\geq$20\,ns, R5$\to$R0
+    initialization order~\cite{ADF4351datasheet}. % ADF4351datasheet p.18-22 (SPI timing Table 2, register write sequence)
+    Step size 0.1\,MHz; sweep rate set by PC (This work).
+  \item \textbf{Pulse sequencer (\texttt{pulse\_sequencer}):}
+    State machine controlling laser AOM gate and MW enable. Timing resolution:
+    10\,ns at 100\,MHz system clock (This work).
+  \item \textbf{Carry-chain TDC (\texttt{tdc\_core}):} 17.5\,ps-resolution photon
+    timestamping using CARRY4 chains~\cite{Lim2025,Wu2010WaveUnion}.
+    % Lim2025 Table 4 p.13 (17.530 ps resolution on Artix-7 CARRY4 TDL); Wu2010WaveUnion (Wave Union method)
+  \item \textbf{Photon counter (\texttt{photon\_counter}):}
+    Gated 32-bit counter for CW-ODMR mode.
+  \item \textbf{Histogram accumulator (\texttt{histogram\_bram}):}
+    2048-bin photon arrival-time histogram in Block RAM (one bin per ODMR frequency
+    step at 0.1\,MHz resolution = 204.8\,MHz sweep range). Accumulated over the
+    dwell time (20\,ms per step; This work).
+    % NexysA7refmanual p.1 Table (4,860 Kb BRAM — adequate for 2048-bin histogram)
+  \item \textbf{UART interface (\texttt{uart\_interface}):}
+    Histogram data transmitted to PC at end of sweep (This work).
 \end{enumerate}
+
+\subsection{Pulse Timing Hierarchy}
+
+\begin{table}[ht]
+\centering
+\caption{Pulse timing by channel at room temperature.
+  FPGA is not the timing bottleneck in any channel.}
+\label{tab:pulse_timing}
+\small
+\begin{tabular}{@{}p{2.5cm}p{3cm}p{2.5cm}p{1.5cm}p{3.5cm}@{}}
+\toprule
+Channel & Mechanism & Limit & Latency & Source \\
+\midrule
+MW phase switch & FPGA GPIO $\to$ I/Q resistor net & FPGA LVCMOS33 slew &
+  $\sim$2--5\,ns & This work \\
+MW on/off & FPGA GPIO $\to$ ADL5375 DSOP pin &
+  ADL5375 DSOP spec & 100\,ns on / 200\,ns off & \cite{ADL5375datasheet}
+  % ADL5375datasheet p.17 (DSOP enable timing)
+  \\
+Laser/AOM gate & FPGA GPIO $\to$ AOM TTL driver &
+  AOM acoustic transit & 10--100\,ns & AOM-limited (This work) \\
+Photon timestamp & FPGA CARRY4 TDC & Artix-7 carry chain &
+  17.5\,ps & \cite{Lim2025}
+  % Lim2025 Table 4 p.13
+  \\
+Pulse resolution & FPGA clock fabric & System clock &
+  5--10\,ns (100--200\,MHz) & Artix-7 MMCM (This work) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{MW Synthesizer Architecture}
+\label{sec:mw-arch}
+
+The MW synthesizer architecture differs by milestone:
+
+\begin{table}[ht]
+\centering
+\caption{MW synthesizer requirements by milestone. ADF4351 alone is sufficient
+  for D0 and D1 CW-ODMR.~\cite{ADF4351datasheet}}
+\label{tab:mw-milestones}
+\small
+\begin{tabular}{@{}p{2.2cm}p{3cm}p{3cm}p{4cm}@{}}
+\toprule
+Milestone & Experiment & Phase switching & Architecture \\
+\midrule
+D0 / D1 CW & CW-ODMR sweep & None & ADF4351 alone \\
+D1 pulsed & Rabi oscillations & None (on/off only) & ADF4351 alone \\
+D1 pulsed & Ramsey / Hahn echo & $<$10\,ns & ADF4351 + IQ modulator \\
+D2+ & $T_2$, DEER & $<$1\,ns & ADF4351 + IQ modulator \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Stage 1 — CW Carrier: ADF4351 Module}
+\label{sec:adf4351}
+
+The ADF4351 breakout module provides the CW MW carrier at 2877.5\,MHz (NV zero-field
+splitting at cryogenic temperature; This work). Key register values for CW-ODMR:
+
+\begin{itemize}
+  \item $f_\mathrm{ref} = 25$\,MHz (TCXO on breakout module — verify before programming).
+  \item MOD $= 250$ for 0.1\,MHz step resolution~\cite{ADF4351datasheet}.
+    % ADF4351datasheet p.15 Eq. (1): f_out = f_PFD * (INT + FRAC/MOD)
+  \item Output power: $+5$\,dBm (Register~4, DB4:DB3 = 11, four discrete levels
+    $-4$, $-1$, $+2$, $+5$\,dBm in 3\,dB steps~\cite{ADF4351datasheet}).
+    % ADF4351datasheet p.20 Table Register 4 (RF output power bits DB4:DB3)
+  \item Phase noise floor: $-148$\,dBc/Hz at 5\,MHz offset from 3.3\,GHz carrier~\cite{ADF4351datasheet}.
+    % ADF4351datasheet p.6 Table (typical phase noise specifications)
+\end{itemize}
+
+\subsubsection{Stage 2 — IQ Modulator Upgrade Path (D1 Pulsed / D2+)}
+\label{sec:iq-upgrade}
+
+For pulsed ODMR requiring nanosecond phase switching (Ramsey, Hahn echo, $T_2$
+measurements), the ADF4351 PLL relock latency ($\sim$5--15\,$\mu$s) is inadequate.
+The upgrade inserts an ADL5375 IQ modulator between the ADF4351 and the NV diamond:
+\[
+  \underbrace{\text{ADF4351}}_{\substack{\text{CW LO}\\\text{2877.5\,MHz}}}
+  \;\to\;
+  \underbrace{\text{ADL5375}}_{\substack{\text{IQ mod}\\\text{400\,MHz--6\,GHz}}}
+  \;\leftarrow\;
+  \underbrace{\text{FPGA}}_{\text{digital I/Q}}
+  \;\to\;
+  \underbrace{\text{ADL5321}}_{\substack{\text{2.3--4.0\,GHz}\\\text{amp}}}
+  \;\to\; \text{NV.}
+\]
+
+The ADL5375 covers 400\,MHz--6\,GHz and is fully functional at 2877\,MHz~\cite{ADL5375datasheet}.
+% ADL5375datasheet p.3 Table (frequency range)
+Phase switching time is FPGA GPIO slew-limited at $\sim$2--5\,ns, enabling the
+minimum Ramsey free-precession window $\tau_\mathrm{min} \approx 5$\,ns —
+well below NV $T_2^*$ at any operating temperature (This work).
+The ADL5321 provides 11.7\,dB gain at 2877\,MHz~\cite{ADL5321datasheet}.
+% ADL5321datasheet Table 2 (S21 at 2850 and 2900 MHz, interpolated at 2877 MHz)
+This stage is \textbf{not required for D0 CW-ODMR} and is deferred to D1 pulsed operations.
 
 \subsection{D0 vs.\ D1 Readout Requirements}
 
