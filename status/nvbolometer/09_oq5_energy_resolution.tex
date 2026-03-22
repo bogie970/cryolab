@@ -91,62 +91,117 @@ The D0 pixel consists of two thermally coupled layers:
 \noindent Both layers share the same footprint area
 $A = 7.5$\,$\mu$m$^2$.
 
-\subsubsection{NbN Electronic Heat Capacity (Sommerfeld Model)}
+\subsubsection{NbN Electronic Heat Capacity (BCS Superconducting Model)}
 \label{sec:oq5_C_NbN}
 
-For a metal in the normal state, the electronic heat capacity per unit
-volume follows the Sommerfeld (free-electron) model~\cite{Richards1994}: % Richards1994 Appendix p. 23 (C_el = gamma*T for metals)
+% SUPERSESSION NOTICE (2026-03-21, Track 3 BCS Correction):
+% The previous Sommerfeld C = gamma_V * T model (Task #216, Cycle 97)
+% has been superseded. The NbN film at T_op = 12 K is superconducting
+% (T/T_c = 0.76), and the electronic heat capacity follows BCS theory,
+% not the normal-state Sommerfeld model.
+
+The D-line detection mechanism relies on the NbN film being in the
+superconducting (Meissner) state at $T_\mathrm{op} = 12$\,K, with
+$T/T_c = 0.76$. In the superconducting state, the electronic heat
+capacity is governed by the BCS energy gap $\Delta(T)$, not the
+normal-state Sommerfeld coefficient. The correct model for computing
+$E_\mathrm{th}$ is therefore the BCS superconducting heat capacity.
+
+\paragraph{BCS gap function.}
+The temperature-dependent superconducting gap follows the
+Pad\-am\-see--Hein--Hal\-brit\-ter analytic approximation to the
+M\"uhlschlegel tabulation:
+% Padamsee1973, JLTP 12, 387, Eq. 1 (approximation to Muhlschlegel1959 Z. Physik 155, 313)
 \begin{equation}
-  c_e = \gamma_V\,T \quad [\text{J\,m}^{-3}\,\text{K}^{-1}],
-  \label{eq:oq5_sommerfeld}
+  \frac{\Delta(T)}{\Delta(0)}
+  = \tanh\!\left(1.74\,\sqrt{\frac{T_c}{T} - 1}\right),
+  \label{eq:oq5_bcs_gap}
 \end{equation}
-where $\gamma_V$ is the volumetric Sommerfeld coefficient
-[$\text{J\,m}^{-3}\,\text{K}^{-2}$]. In the Drude model,
-$\gamma_V = (\pi^2/3)\,k_B^2\,N(0)$, where $N(0)$ is the electronic
-density of states at the Fermi level (both
-spins)~\cite{Richards1994}. % Richards1994 Appendix p. 23 (gamma = pi^2 k^2 m N / hbar^2 (3pi^2 N/V)^{2/3})
+accurate to $\sim\!2\%$ of the full BCS self-consistency
+equation for all $T < T_c$.
 
-Sidorova et al.~\cite{Sidorova2020} report the single-spin density of
-states $N(0) = 3.0$--$5.0 \times 10^{28}$\,eV$^{-1}$\,m$^{-3}$ for
-disordered NbN thin films on Si/SiO$_2$, extracted from Hall and transport
-measurements. % Sidorova2020 Table III, p. 11 (N(0) column: 3.02--4.98 e28 eV^-1 m^-3)
-Using the Drude relation with total (both-spin) DOS:
+For NbN, the zero-temperature gap ratio is
+$2\Delta(0)/k_B T_c = 4.2$~\cite{Kamlapure2010},
+% Kamlapure2010 Table I p.2 (epitaxial NbN on MgO, T_c ~ 15.87 K, 2Delta/kTc = 4.2)
+significantly exceeding the weak-coupling BCS value of $3.528$.
+This gives $\Delta(0) = 2.84$\,meV ($= 33.0$\,K in temperature
+units). % Kamlapure2010 Table I p.2
+
+\paragraph{BCS electronic heat capacity.}
+The superconducting electronic heat capacity per unit volume
+involves the gap function and its temperature
+derivative~\cite{Richards1994}: % Richards1994 Appendix p. 23 (BCS heat capacity discussion)
 \begin{equation}
-  \gamma_V = \frac{\pi^2}{3}\,k_B^2 \times 2\,N(0).
-  \label{eq:oq5_gamma_drude}
+  c_e^s(T) = \gamma_V T_c \,\frac{6}{\pi^2}\,
+  \left(\frac{\Delta(0)}{k_B T_c}\right)^{\!2}
+  \left[
+    \frac{\Delta(T)^2}{k_B^2 T^2}\,f(1{-}f)
+    - \frac{1}{2}\,\frac{d[\Delta(T)/\Delta(0)]^2}{d(T/T_c)}
+      \,(1{-}2f)
+  \right],
+  \label{eq:oq5_bcs_ces}
 \end{equation}
-For $N(0) = 4.0 \times 10^{28}$\,eV$^{-1}$\,m$^{-3}$
-($= 2.50 \times 10^{47}$\,J$^{-1}$\,m$^{-3}$), this gives
-$\gamma_V \approx 313$\,J\,m$^{-3}$\,K$^{-2}$.
-% Sidorova2020 Table III p.11 (N(0) = 4.0e28 eV^-1 m^-3, mid-range of reported values)
+where $f = [\exp(\Delta(T)/k_B T) + 1]^{-1}$ is the Fermi--Dirac
+function evaluated at the gap edge, and $\gamma_V$ is the normal-state
+Sommerfeld coefficient.
+% Tinkham "Introduction to Superconductivity" Ch. 3 Eqs. 3.48--3.52
 
-\needref{NbN thin-film Sommerfeld coefficient $\gamma_V$ from direct
-calorimetric measurement. Literature suggests $\gamma_V \approx
-200$--$600$\,J\,m$^{-3}$\,K$^{-2}$ depending on film disorder and
-stoichiometry.}
+At $T_c$, BCS theory predicts a heat capacity jump
+$\Delta C / \gamma_V T_c = 1.43$ (weak coupling); for NbN
+(strong-coupling), the jump ratio is $\sim\!2.0$~\cite{Chockalingam2008}.
+% Chockalingam2008 PRB 77, 214503 (NbN thin films, T_c ~ 9.99--16.11 K)
 
-\textbf{Note on the superconducting state:} For $T < T_c$, the BCS
-electronic heat capacity is exponentially suppressed by the gap:
-$C_e^\mathrm{BCS} \sim C_e^n \exp(-\Delta/k_B T)$. At $T/T_c = 0.76$
-(i.e.\ $T_\mathrm{op} = 12$\,K), the suppression factor is
-$\exp(-1.76\,T_c/T) \approx 0.1$. However, for computing
-$E_\mathrm{th}$ we integrate through the transition: the film
-\emph{must} pass through $T_c$ to trigger detection. Near $T_c$ the
-electronic heat capacity rises sharply to its normal-state value (and
-overshoots due to the BCS jump). Using the normal-state Sommerfeld
-model throughout the integral is therefore a \emph{conservative
-(lower-bound)} approximation, since the BCS heat capacity jump at $T_c$
-adds energy that must be
-supplied~\cite{Richards1994}. % Richards1994 Appendix p. 23 (BCS heat capacity rises sharply at T_c)
+\paragraph{Normal-state Sommerfeld coefficient.}
+The Sommerfeld coefficient $\gamma_V$ sets the overall scale:
+$\gamma_V = (\pi^2/3)\,k_B^2 \times 2\,N(0)$.
+Sidorova et al.~\cite{Sidorova2020} report $N(0) = 3.0$--$5.0 \times
+10^{28}$\,eV$^{-1}$\,m$^{-3}$ for disordered NbN thin films,
+% Sidorova2020 Table III p.11 (N(0) = 3.02--4.98 e28 eV^-1 m^-3)
+giving $\gamma_V \approx 313$\,J\,m$^{-3}$\,K$^{-2}$ at mid-range.
+We use $\gamma_V = 600$\,J\,m$^{-3}$\,K$^{-2}$ as a conservative
+upper estimate (accounts for mass renormalisation in disordered NbN).
+\needref{NbN thin-film $\gamma_V$ from direct calorimetric measurement.}
 
-The total NbN film heat capacity is
-\begin{equation}
-  C_\mathrm{NbN}(T) = \gamma_V\,V_\mathrm{NbN}\,T,
-  \label{eq:oq5_C_NbN}
-\end{equation}
-with $V_\mathrm{NbN} = L \times W \times d = 5.0\,\mu\text{m} \times
+\paragraph{Supersession of Sommerfeld model.}
+The previous version of this section used the normal-state
+Sommerfeld model $C_\mathrm{NbN} = \gamma_V V T$ throughout
+the integral from $T_\mathrm{op}$ to $T_c$. This was noted
+as a ``conservative lower-bound approximation.'' In fact, at
+$T/T_c = 0.76$ the BCS electronic heat capacity with the
+NbN strong-coupling gap ratio ($2\Delta/k_B T_c = 4.2$) is
+$\sim\!3.9\times$ the Sommerfeld value
+(see Fig.~\ref{fig:bcs_heat_capacity}), making the Sommerfeld
+model a significant \emph{underestimate}, not a conservative bound.
+The BCS model is now used for all $E_\mathrm{th}$ calculations.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.95\textwidth]{simulations/bcs_nbn_heat_capacity_validation}
+% Source: bolometer_thermal_model.py (Track 3, 2026-03-21)
+% Muhlschlegel1959 Z. Physik 155, 313 (BCS tabulation)
+% Kamlapure2010 APL 96, 072509 Table I (2Delta/kTc = 4.2 for NbN)
+% Padamsee1973 JLTP 12, 387 Eq. 1 (gap approximation)
+\caption{BCS superconducting heat capacity of NbN ($T_c = 15.7$\,K).
+(a)~Solid blue: BCS model (this work, $2\Delta/k_BT_c = 4.2$
+from~\cite{Kamlapure2010}). % Kamlapure2010 Table I p.2
+Dashed red: Sommerfeld approximation $C = \gamma_V V T$ (superseded).
+Dotted green: Debye lattice contribution.
+(b)~Normalised $C_{es}/(\gamma_V V T_c)$ vs $T/T_c$ showing the BCS
+jump at $T_c$ and exponential suppression at low $T$.}
+\label{fig:bcs_heat_capacity}
+\end{figure}
+
+The total NbN film electronic heat capacity in the superconducting state
+is computed numerically from Eqs.~(\ref{eq:oq5_bcs_gap})--(\ref{eq:oq5_bcs_ces})
+using the implementation in \texttt{bolometer\_thermal\_model.py}.
+The film volume is $V_\mathrm{NbN} = 5.0\,\mu\text{m} \times
 1.5\,\mu\text{m} \times 200\,\text{nm} =
 1.50 \times 10^{-18}$\,m$^3$. % internal: NVB_TRAINING.md Sec. 4 (Demonstrator pixel geometry)
+
+At $T = 12$\,K: $C_{es}^\mathrm{BCS} = 4.20 \times 10^{-14}$\,J/K,
+compared to $C_{en}^\mathrm{Sommerfeld} = 1.08 \times 10^{-14}$\,J/K
+--- a ratio of $3.9$.
+% internal: bolometer_thermal_model.py output (Track 3, 2026-03-21)
 
 \subsubsection{Ge Absorber Heat Capacity (Debye $T^3$ Law)}
 \label{sec:oq5_C_Ge}
@@ -199,47 +254,56 @@ grows rapidly with temperature.
 \begin{table}[ht]
 \centering
 \caption{Heat capacities of the D0 pixel components at selected
-temperatures. $C_\mathrm{NbN}$ uses the Sommerfeld model with
-$\gamma_V = 600$\,J\,m$^{-3}$\,K$^{-2}$ (conservative upper estimate).
+temperatures. $C_\mathrm{NbN}$ uses the BCS superconducting electronic
+model with $2\Delta(0)/k_BT_c = 4.2$~\cite{Kamlapure2010}
+% Kamlapure2010 Table I p.2
+and $\gamma_V = 600$\,J\,m$^{-3}$\,K$^{-2}$
+(electronic plus Debye lattice contributions).
 $C_\mathrm{Ge}$ uses the Debye $T^3$ law with $\Theta_D = 374$\,K.
-Source: Eqs.~(\ref{eq:oq5_C_NbN}), (\ref{eq:oq5_C_Ge}).}
+\textbf{Updated from Sommerfeld model (Track 3, 2026-03-21).}
+Source: Eqs.~(\ref{eq:oq5_bcs_gap})--(\ref{eq:oq5_bcs_ces}), (\ref{eq:oq5_C_Ge}).}
 \label{tab:oq5_heat_cap}
 \small
 \begin{tabular}{@{}llllll@{}}
 \toprule
-$T$ [K] & $C_\mathrm{NbN}$ [J/K] & $C_\mathrm{Ge}$ [J/K] &
+$T$ [K] & $C_\mathrm{NbN}^\mathrm{BCS}$ [J/K] & $C_\mathrm{Ge}$ [J/K] &
 $C_\mathrm{total}$ [J/K] & $C_\mathrm{Ge}/C_\mathrm{NbN}$ \\
 \midrule
-12.0 & $1.08 \times 10^{-14}$ & $3.53 \times 10^{-14}$ &
-  $4.61 \times 10^{-14}$ & $3.3$ \\
-  % internal: Python calculation verified by hand
-15.0 & $1.35 \times 10^{-14}$ & $6.89 \times 10^{-14}$ &
-  $8.24 \times 10^{-14}$ & $5.1$ \\
-15.5 & $1.40 \times 10^{-14}$ & $7.61 \times 10^{-14}$ &
-  $9.00 \times 10^{-14}$ & $5.5$ \\
-15.7 & $1.41 \times 10^{-14}$ & $7.90 \times 10^{-14}$ &
-  $9.32 \times 10^{-14}$ & $5.6$ \\
+12.0 & $4.95 \times 10^{-14}$ & $3.53 \times 10^{-14}$ &
+  $8.48 \times 10^{-14}$ & $0.7$ \\
+  % internal: bolometer_thermal_model.py BCS output (Track 3, 2026-03-21)
+15.0 & $3.93 \times 10^{-14}$ & $6.89 \times 10^{-14}$ &
+  $1.08 \times 10^{-13}$ & $1.8$ \\
+15.5 & $2.91 \times 10^{-14}$ & $7.61 \times 10^{-14}$ &
+  $1.05 \times 10^{-13}$ & $2.6$ \\
+15.7 & $3.09 \times 10^{-14}$ & $7.90 \times 10^{-14}$ &
+  $1.10 \times 10^{-13}$ & $2.6$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Key observation:} The $1\,\mu$m Ge absorber contributes
-$\sim\!80\%$ of the total pixel heat capacity. If the goal is to minimise
-$E_\mathrm{th}$, reducing the Ge thickness is the single most effective
-design lever.
+\textbf{Key observation (revised):} With the BCS model, the NbN
+electronic heat capacity at $12$\,K is $\sim\!3.9\times$ larger than
+the Sommerfeld estimate, and \emph{dominates} the Ge absorber
+contribution at the operating temperature ($C_\mathrm{Ge}/C_\mathrm{NbN}
+= 0.7$ at 12\,K). The previous conclusion that Ge dominates was an
+artefact of the Sommerfeld underestimate. At temperatures closer to
+$T_c$, the BCS electronic heat capacity decreases (gap closing) and
+Ge again dominates. The most effective design lever for reducing
+$E_\mathrm{th}$ is now operating closer to $T_c$, not reducing Ge
+thickness.
 
 \subsection{Results: Threshold Energy vs.\ Operating Temperature}
 \label{sec:oq5_results}
 
-\subsubsection{Analytical Integration}
+\subsubsection{Numerical Integration with BCS Heat Capacity}
 
-The integrals in Eq.~(\ref{eq:oq5_E_th_def}) evaluate analytically for both
-components:
+The threshold energy is computed by numerical integration of the
+BCS heat capacity:
 \begin{align}
   E_\mathrm{th}^\mathrm{NbN}
-    &= \int_{T_\mathrm{op}}^{T_c} \gamma_V V_\mathrm{NbN}\,T\,dT
-     = \frac{\gamma_V V_\mathrm{NbN}}{2}
-       \left(T_c^2 - T_\mathrm{op}^2\right),
+    &= \int_{T_\mathrm{op}}^{T_c}
+       \left[C_{es}^\mathrm{BCS}(T) + C_\mathrm{lattice}(T)\right] dT,
   \label{eq:oq5_E_th_NbN} \\[4pt]
   E_\mathrm{th}^\mathrm{Ge}
     &= \int_{T_\mathrm{op}}^{T_c}
@@ -253,6 +317,17 @@ components:
     &= E_\mathrm{th}^\mathrm{NbN} + E_\mathrm{th}^\mathrm{Ge}.
   \label{eq:oq5_E_th_total}
 \end{align}
+The NbN integral uses the BCS electronic heat capacity
+(Eq.~\ref{eq:oq5_bcs_ces}) with the strong-coupling gap
+$2\Delta(0)/k_BT_c = 4.2$~\cite{Kamlapure2010} % Kamlapure2010 Table I p.2
+and the Debye lattice contribution, evaluated numerically
+via \texttt{scipy.integrate.quad}.
+
+\textbf{Supersession note:} The previous analytical formula
+$E_\mathrm{th}^\mathrm{NbN} = \gamma_V V (T_c^2 - T_\mathrm{op}^2)/2$
+(Sommerfeld model) is superseded. The Sommerfeld result of
+$E_\mathrm{th}^\mathrm{NbN} = 288$\,keV at $T_\mathrm{op} = 12$\,K
+underestimated the true value by a factor of $\sim\!3.6$.
 
 \subsubsection{Threshold Energy Table}
 
@@ -261,16 +336,20 @@ standard~\cite{Kamlapure2010}), % Kamlapure2010 (NbN T_c ~ 15.87 K for epitaxial
 $\gamma_V = 600$\,J\,m$^{-3}$\,K$^{-2}$
 (\needref{NbN $\gamma_V$ direct measurement}; estimate, see
 Sec.~\ref{sec:oq5_limitations}),
+the BCS gap from~\cite{Kamlapure2010}, % Kamlapure2010 Table I p.2
 and the Ge parameters from Eq.~(\ref{eq:oq5_Ge_params}), we compute
-$E_\mathrm{th}$ at four operating temperatures.
+$E_\mathrm{th}$ at four operating temperatures using the BCS model.
 
 \begin{table}[ht]
 \centering
 \caption{Threshold energy $E_\mathrm{th}$ for the D0 pixel
 ($T_c = 15.7$\,K) as a function of operating temperature
-$T_\mathrm{op}$. ``NbN only'' = no Ge absorber.
+$T_\mathrm{op}$. ``NbN only'' = NbN film (BCS electronic + lattice).
 ``NbN+Ge'' = full pixel with $1\,\mu$m Ge absorber.
-All energies computed from Eqs.~(\ref{eq:oq5_E_th_NbN})--(\ref{eq:oq5_E_th_total}).}
+\textbf{BCS model (Track 3, 2026-03-21) --- supersedes Sommerfeld values.}
+NbN electronic heat capacity from
+Eqs.~(\ref{eq:oq5_bcs_gap})--(\ref{eq:oq5_bcs_ces});
+Ge from Eq.~(\ref{eq:oq5_E_th_Ge}).}
 \label{tab:oq5_E_th}
 \small
 \begin{tabular}{@{}lllll@{}}
@@ -281,39 +360,41 @@ $E_\mathrm{th}^\mathrm{Ge}$ [eV] &
 $E_\mathrm{th}^\mathrm{total}$ [eV] &
 Status \\
 \midrule
-12.0  & $2.88 \times 10^5$ & $1.28 \times 10^6$ & $1.56 \times 10^6$ &
+12.0  & $1.04 \times 10^6$ & $1.28 \times 10^6$ & $2.32 \times 10^6$ &
   D0 operating point \\
-  % internal: Python calculation — E_NbN = 287893 eV, E_Ge = 1275559 eV
-15.0  & $6.04 \times 10^4$ & $3.23 \times 10^5$ & $3.83 \times 10^5$ &
+  % internal: bolometer_thermal_model.py BCS output (Track 3, 2026-03-21)
+  % E_NbN = 1040391 eV (BCS), E_Ge = 1275419 eV
+15.0  & $1.40 \times 10^5$ & $3.23 \times 10^5$ & $4.63 \times 10^5$ &
   $T_c - T_\mathrm{op} = 0.7$\,K \\
-  % internal: Python calculation — E_NbN = 60365 eV, E_Ge = 322937 eV
-15.5  & $1.75 \times 10^4$ & $9.68 \times 10^4$ & $1.14 \times 10^5$ &
+  % internal: E_NbN = 139909 eV (BCS), E_Ge = 322902 eV
+15.5  & $3.11 \times 10^4$ & $9.68 \times 10^4$ & $1.28 \times 10^5$ &
   $0.2$\,K below $T_c$ \\
-  % internal: Python calculation — E_NbN = 17528 eV, E_Ge = 96803 eV
-15.68 & $1.76 \times 10^3$ & $9.85 \times 10^3$ & $1.16 \times 10^4$ &
+  % internal: E_NbN = 31137 eV (BCS), E_Ge = 96793 eV
+15.68 & $2.41 \times 10^3$ & $9.85 \times 10^3$ & $1.23 \times 10^4$ &
   $0.02$\,K below $T_c$ \\
-  % internal: Python calculation — E_NbN = 1763 eV, E_Ge = 9848 eV
+  % internal: E_NbN = 2407 eV (BCS), E_Ge = 9847 eV
 $\geq 15.7$ & --- & --- & --- &
   Not detectable \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\noindent \textbf{Key results from Table~\ref{tab:oq5_E_th}:}
+\noindent \textbf{Key results from Table~\ref{tab:oq5_E_th} (BCS model):}
 
 \begin{itemize}
   \item At $T_\mathrm{op} = 12$\,K (the nominal D0 operating point),
-    the threshold energy is $E_\mathrm{th} \approx 1.56$\,MeV
-    (NbN+Ge) or $\approx 288$\,keV (NbN only).
+    the threshold energy is $E_\mathrm{th} \approx 2.32$\,MeV
+    (NbN+Ge) or $\approx 1.04$\,MeV (NbN only).
     This is an \emph{MeV-scale} threshold --- D0 can detect alpha
     particles ($\sim 5$\,MeV) but not keV-scale X-rays.
-    % internal: Python calculation verified
-  \item The Ge absorber contributes $\sim 80\%$ of $E_\mathrm{th}$ at all
-    operating temperatures. Eliminating or thinning the Ge absorber is the
-    most direct route to lowering the detection threshold.
+    % internal: bolometer_thermal_model.py BCS output (Track 3, 2026-03-21)
+  \item The BCS correction increases the NbN contribution by
+    $\sim\!3.6\times$ relative to the previous Sommerfeld estimate
+    ($1.04$\,MeV vs $288$\,keV). The NbN and Ge contributions are
+    now comparable at $12$\,K ($1.04$\,MeV NbN vs $1.28$\,MeV Ge).
   \item Operating at $T_\mathrm{op} = 15.5$\,K ($0.2$\,K below
-    $T_c$) reduces $E_\mathrm{th}$ by $\sim 14\times$ relative to
-    $12$\,K, reaching $\sim 114$\,keV (NbN+Ge).
+    $T_c$) reduces $E_\mathrm{th}$ by $\sim 18\times$ relative to
+    $12$\,K, reaching $\sim 128$\,keV (NbN+Ge).
   \item At $T_\mathrm{op} \geq T_c = 15.7$\,K, the film is already
     in the normal state; no threshold crossing is possible.
 \end{itemize}
@@ -435,9 +516,9 @@ timescale of the NV response to a superconducting transition.
 \begin{table}[ht]
 \centering
 \caption{D0 detection capabilities at $T_\mathrm{op} = 12$\,K
-(NbN+Ge pixel, $E_\mathrm{th} \approx 1.56$\,MeV) and at
-$T_\mathrm{op} = 15.5$\,K ($E_\mathrm{th} \approx 114$\,keV).
-NbN-only pixel values are $\sim 5\times$ lower.}
+(NbN+Ge pixel, $E_\mathrm{th} \approx 2.32$\,MeV, BCS model) and at
+$T_\mathrm{op} = 15.5$\,K ($E_\mathrm{th} \approx 128$\,keV).
+NbN-only pixel values are $\sim 2\times$ lower at 12\,K.}
 \label{tab:oq5_comparison}
 \small
 \begin{tabular}{@{}lllp{5cm}@{}}
@@ -449,7 +530,7 @@ Alpha particle (5 MeV) & $5$\,MeV & \textbf{YES} (12\,K) &
 Fission fragment & $\sim 80$\,MeV & \textbf{YES} &
   Massive surplus \\
 keV X-ray (1\,keV) & $1$\,keV & \textbf{NO} (12\,K); marginal (15.5\,K, NbN-only) &
-  NbN-only $E_\mathrm{th}(15.5) = 17.5$\,keV \\
+  NbN-only $E_\mathrm{th}(15.5) = 31.1$\,keV (BCS) \\
 IR photon ($1$\,eV) & $1.24$\,eV & \textbf{NO} &
   $10^6\times$ below threshold \\
 CEvNS recoil ($\sim$keV) & $\lesssim 1$\,keV & \textbf{NO} &
@@ -485,9 +566,9 @@ detection.
   granularity, and electron mass renormalisation all affect $\gamma_V$.
   We use $\gamma_V = 600$\,J\,m$^{-3}$\,K$^{-2}$ as a conservative
   (higher) estimate; the NbN contribution to $E_\mathrm{th}$ could be up
-  to $\sim 2\times$ lower. Since Ge dominates the total heat capacity, this
-  uncertainty affects $E_\mathrm{th}^\mathrm{total}$ by only
-  $\sim 20$--$30\%$.
+  to $\sim 2\times$ lower. With the BCS model, NbN and Ge contribute
+  comparably to $E_\mathrm{th}$ at $12$\,K, so this uncertainty
+  affects $E_\mathrm{th}^\mathrm{total}$ by $\sim 40$--$50\%$.
   \needref{NbN thin-film $\gamma_V$ from calorimetric measurement on
   200\,nm film.}
 
@@ -498,14 +579,15 @@ detection.
   \emph{increase} $E_\mathrm{th}$.
   % Richards1994 Appendix p. 22 (Ge Debye temp listed as 363 K; standard value 374 K from Flubacher1959)
 
-\item \textbf{BCS heat capacity jump neglected.}
-  At $T_c$, the BCS theory predicts a heat capacity discontinuity
-  $\Delta C / C_n = 1.43$ (weak-coupling BCS). For NbN (strong-coupling),
-  the jump ratio can be larger ($\sim 2$). This means the actual energy
-  required to push the film \emph{through} $T_c$ is somewhat larger than
-  our integral with the normal-state Sommerfeld model predicts.
-  Our $E_\mathrm{th}$ values are therefore \emph{lower bounds}.
-  % Richards1994 Appendix p. 23 (BCS heat capacity jump discussion)
+\item \textbf{BCS heat capacity jump now included (Track 3 correction).}
+  The BCS model includes the heat capacity discontinuity at $T_c$
+  ($\Delta C / \gamma T_c = 1.43$ weak-coupling; $\sim\!2$ for
+  NbN strong-coupling~\cite{Chockalingam2008}).
+  % Chockalingam2008 PRB 77, 214503 (NbN SC properties)
+  This was previously listed as a neglected correction; it is now
+  fully incorporated. The BCS gap approximation (Padamsee) introduces
+  $\sim\!2\%$ error relative to the exact M\"uhlschlegel tabulation.
+  % Padamsee1973, JLTP 12, 387, Eq. 1
 
 \item \textbf{Thermal coupling between NbN and Ge layers.}
   We assume perfect thermal coupling: a phonon deposited in the Ge
@@ -514,8 +596,8 @@ detection.
   layers, especially on sub-nanosecond timescales. If the layers are
   thermally decoupled, $E_\mathrm{th}$ for triggering the NbN transition
   is determined by $C_\mathrm{NbN}$ alone (the ``NbN-only'' column in
-  Table~\ref{tab:oq5_E_th}), which is $\sim 5\times$
-  lower~\cite{Richards1994}. % Richards1994 Appendix p. 23 (boundary resistance B/T^3)
+  Table~\ref{tab:oq5_E_th}), which is $\sim 2\times$ lower at
+  $12$\,K~\cite{Richards1994}. % Richards1994 Appendix p. 23 (boundary resistance B/T^3)
 
 \item \textbf{Nonequilibrium phonon spectrum.}
   A particle impact produces a nonequilibrium phonon distribution, not a
@@ -546,7 +628,8 @@ detection.
 
 \begin{table}[ht]
 \centering
-\caption{Summary: OQ-5 Threshold Energy Analysis for D0 (corrected model).}
+\caption{Summary: OQ-5 Threshold Energy Analysis for D0
+(BCS model, Track 3 correction 2026-03-21).}
 \label{tab:oq5_summary}
 \small
 \begin{tabular}{@{}lll@{}}
@@ -554,31 +637,37 @@ detection.
 Item & Result & Confidence \\
 \midrule
 Detector paradigm & \textbf{Threshold} (not calorimeter) & Firm \\
-$E_\mathrm{th}$ at 12\,K (NbN+Ge) & $\sim 1.56$\,MeV &
+$E_\mathrm{th}$ at 12\,K (NbN+Ge) & $\sim 2.32$\,MeV &
   $\pm 2\times$ ($\gamma_V$ uncertainty) \\
-$E_\mathrm{th}$ at 12\,K (NbN only) & $\sim 288$\,keV &
+$E_\mathrm{th}$ at 12\,K (NbN only) & $\sim 1.04$\,MeV &
   $\pm 2\times$ \\
-$E_\mathrm{th}$ at 15.5\,K (NbN+Ge) & $\sim 114$\,keV &
+$E_\mathrm{th}$ at 15.5\,K (NbN+Ge) & $\sim 128$\,keV &
   $\pm 2\times$ \\
-$E_\mathrm{th}$ at 15.68\,K (NbN+Ge) & $\sim 11.6$\,keV &
+$E_\mathrm{th}$ at 15.68\,K (NbN+Ge) & $\sim 12.3$\,keV &
   $\pm 2\times$ \\
-Ge dominance of heat capacity & $\sim 80\%$ of total & Firm \\
+NbN/Ge contribution at 12\,K & $\sim 45\%$ NbN / $55\%$ Ge & BCS model \\
+BCS/Sommerfeld ratio (NbN C at 12\,K) & $3.9\times$ & Strong-coupling gap \\
 Readout mismatch & \textcolor{red}{\textbf{OPEN}} &
   Sub-ns recovery vs.\ s-scale ODMR \\
+Old Sommerfeld $E_\mathrm{th}$ & \textbf{SUPERSEDED} & BCS model required \\
 Old ``48\,eV'' result & \textbf{RETIRED} & Wrong detector paradigm \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\noindent \textbf{Answer to OQ-5 (corrected):} The NbN Demonstrator pixel
-D0 is a threshold detector, not a linear calorimeter. The minimum energy
-required to trigger a superconducting-to-normal transition is
-$E_\mathrm{th} = \int_{T_\mathrm{op}}^{T_c} C(T)\,dT$, which evaluates to
-$\sim 1.56$\,MeV at $T_\mathrm{op} = 12$\,K for the full
-NbN+Ge pixel. The previously reported ``$48$\,eV phonon-noise-limited
-energy resolution'' applied the wrong detector paradigm and is retired. D0
-at 12\,K is sensitive to alpha particles and fission fragments but not to
-keV-scale X-rays, eV-scale photons, or sub-eV particle physics signals.
+\noindent \textbf{Answer to OQ-5 (BCS-corrected, Track 3):} The NbN
+Demonstrator pixel D0 is a threshold detector, not a linear calorimeter.
+The minimum energy required to trigger a superconducting-to-normal
+transition is $E_\mathrm{th} = \int_{T_\mathrm{op}}^{T_c} C(T)\,dT$,
+which evaluates to $\sim 2.32$\,MeV at $T_\mathrm{op} = 12$\,K for the
+full NbN+Ge pixel using the BCS superconducting heat capacity with the
+NbN strong-coupling gap ($2\Delta(0)/k_BT_c = 4.2$,
+Kamlapure~\cite{Kamlapure2010}).
+% Kamlapure2010 Table I p.2
+The BCS correction increases the NbN contribution by $3.6\times$ relative
+to the superseded Sommerfeld model. D0 at 12\,K is sensitive to alpha
+particles and fission fragments but not to keV-scale X-rays, eV-scale
+photons, or sub-eV particle physics signals.
 
 The critical open question is whether the threshold crossing produces a
 persistent (or at least readout-resolvable) state change, given the
