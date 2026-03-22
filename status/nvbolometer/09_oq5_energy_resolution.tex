@@ -466,6 +466,236 @@ parameters); both follow the same formula.  Flag: $\Sigma_\mathrm{NbN} = 3\times
 is an estimate [\textcolor{red}{NEEDREF: NbN electron-phonon coupling constant}];
 Table~I comparison is qualitative until $\Sigma_\mathrm{NbN}$ is measured.
 
+% ── TAT Simulation: Time-Above-Threshold Thermal Dynamics ───────────────────
+% Task #323, Law 19 continuation, 2026-03-22
+\subsection{Time-Above-Threshold (TAT) Simulation: Thermal Dynamics and Energy Readout}
+\label{sec:oq5_tat_simulation}
+
+The threshold detector paradigm (Sec.~\ref{sec:oq5_paradigm}) establishes that D0 responds
+to energy depositions above $E_\mathrm{th}$ by transiently exceeding $T_c$.  The
+\emph{time-above-threshold} (TAT) detection scheme converts this thermal transient into a
+digital timing measurement: a TDC records the interval $\tau_\mathrm{TAT}$ during which the
+film resistance exceeds a comparator threshold, and $\tau_\mathrm{TAT}$ is then mapped to
+$E_\mathrm{dep}$ via a calibration transfer function.  The full ODE simulation of this
+mechanism is implemented in \texttt{simulations/sim\_TAT.py}
+(blueprint: \texttt{simulations/tat\_sim\_design.tex}, Task~\#312).
+
+\subsubsection{Two-Temperature ODE Model}
+\label{sec:oq5_tat_ode}
+
+The simulation solves the two-temperature ODE system for electron temperature
+$T_e(t)$ and phonon temperature $T_\mathrm{ph}(t)$
+(tat\_sim\_design.tex Eq.~8):
+\begin{align}
+  C_e(T_e)\,\frac{dT_e}{dt}
+    &= P_\mathrm{dep}(t) - \Sigma_\mathrm{ep} V (T_e^5 - T_\mathrm{ph}^5),
+    \label{eq:tat_Te} \\
+  C_\mathrm{ph}(T_\mathrm{ph})\,\frac{dT_\mathrm{ph}}{dt}
+    &= \Sigma_\mathrm{ep} V (T_e^5 - T_\mathrm{ph}^5)
+       - G_K (T_\mathrm{ph} - T_\mathrm{sub}).
+    \label{eq:tat_Tph}
+\end{align}
+The electron-phonon power flow uses the
+Richards~(1994) hot-electron expression
+$P_\mathrm{ep} = \Sigma V (T_e^5 - T_\mathrm{ph}^5)$. % Richards1994 Sec. II.J p. 19
+The Kapitza boundary conductance $G_K$ (Swartz~1989) sets the film-to-substrate
+heat leak. % Swartz1989 Eq. 3.1 p. 611; Table II p. 627 (metal-dielectric at ~10K, AMM range)
+Energy deposition is modelled as a Gaussian pulse with $\sigma = 0.1$\,ns
+(tat\_sim\_design.tex Eq.~9).
+
+The ODE solver uses \texttt{scipy.integrate.solve\_ivp} with the Radau implicit
+method (stiff-capable), as specified in tat\_sim\_design.tex Sec.~4.6.
+
+\subsubsection{Key Simulation Parameters}
+\label{sec:oq5_tat_params}
+
+\begin{table}[ht]
+\centering
+\caption{Key parameters for the TAT simulation (sim\_TAT.py).
+All values carry Law~16 source locators.}
+\label{tab:tat_params}
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+Parameter & Value & Units & Source \\
+\midrule
+Film volume $V$ & $1.5 \times 10^{-18}$ & m$^3$ & NVB\_TRAINING.md \S4 ($5\times1.5\times0.2\,\mu$m) \\
+% NVB_TRAINING.md §4 (design target)
+$T_c$ (NbN) & 15.7 & K & NVB\_TRAINING.md \S8 \\
+% NVB_TRAINING.md §8
+$T_\mathrm{bath}$ & 12.0 & K & nvratemodel\_crosscheck\_report.md \S1 \\
+% nvratemodel_crosscheck_report.md §1 (Jacob's cryostat operating point)
+$\Sigma_\mathrm{ep}$ & $3.0 \times 10^8$ & W\,m$^{-3}$\,K$^{-5}$ & Sidorova2020 Table~III p.11 ($\tau_\mathrm{ep} = 11.9$--$17.5$\,ps at 10\,K) \\
+% Sidorova2020 Table III p.11 (tau_ep range for NbN thin films at 10K)
+$\gamma_V$ (Sommerfeld) & 600 & J\,m$^{-3}$\,K$^{-2}$ & Sidorova2020 Table~III p.11 ($N(0) = 4.0 \times 10^{28}$\,eV$^{-1}$\,m$^{-3}$) \\
+% Sidorova2020 Table III p.11
+$\lambda_\mathrm{ep}$ & 1.46 & dimensionless & Babu2018 arXiv:1808.05073 (tunneling data, $T_c = 14$\,K NbN films) \\
+% Babu2018 arXiv:1808.05073 (DFT alpha^2*F(omega), tunneling data; lambda_ep value)
+$G_K/A$ & 500 & W\,m$^{-2}$\,K$^{-1}$ & Swartz1989 Table~II p.627 (metal-dielectric at $\sim$10\,K, AMM) \\
+% Swartz1989 Table II p.627 (acoustic mismatch model range for metal-dielectric at ~10K)
+$G_K$ (total) & $3.75 \times 10^{-9}$ & W\,K$^{-1}$ & derived: $G_K/A \times A_\mathrm{film}$ \\
+% derived from G_K/A * A_film = 500 * 7.5e-12 = 3.75e-9 W/K
+$G_\mathrm{ep}(T_c)$ & $1.37 \times 10^{-4}$ & W\,K$^{-1}$ & Richards1994 \S II.J p.19 ($G_\mathrm{ep} = 5\Sigma V T^4$) \\
+% Richards1994 Sec. II.J p. 19 (G_ep = 5*Sigma*V*T^4, evaluated at T_c=15.7K)
+TDC resolution & 17.5 & ps & Lim2025 Sec.~4 (Artix-7 CARRY4 TDL) \\
+% Lim2025 Sec. 4 (Artix-7 FPGA TDL characterization)
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Thermal Hierarchy: Kapitza Bottleneck}
+\label{sec:oq5_tat_hierarchy}
+
+The simulation reveals a strong thermal hierarchy:
+\[
+  G_\mathrm{ep}(T_c) = 1.37 \times 10^{-4}\,\mathrm{W/K}
+  \gg G_K = 3.75 \times 10^{-9}\,\mathrm{W/K}
+  \quad \Rightarrow \quad
+  G_\mathrm{ep}/G_K = 36{,}500.
+\]
+% Sidorova2020 Table III p.11 (tau_ep = 11.9-17.5 ps at 10K); Swartz1989 Table II p.627
+The electron-phonon subsystem equilibrates nearly instantaneously
+($\tau_\mathrm{ep} \approx 15$\,ps~\cite{Sidorova2020}), % Sidorova2020 Table III p.11
+while the dominant cooling pathway is the phonon-to-substrate Kapitza
+conductance~\cite{Swartz1989}. % Swartz1989 Table II p.627
+The characteristic thermal time constant of the film is:
+\begin{equation}
+  \tau_\mathrm{thermal} = \frac{C(T_c)}{G_K} = 29.3\,\mu\mathrm{s}.
+  \label{eq:tau_thermal}
+\end{equation}
+% Richards1994 Sec. I.A p. 2 (tau = C/G definition for bolometer thermal time constant)
+
+\subsubsection{Two-Regime TAT Response}
+\label{sec:oq5_tat_regimes}
+
+The sim identifies two distinct operating regimes depending on $E_\mathrm{dep}$:
+
+\paragraph{Regime~1 --- Electron-Flash ($E_\mathrm{dep} \approx 2.35$--$5.0$\,MeV).}
+Just above the effective threshold (accounting for phonon collection efficiency
+$\eta_\mathrm{ph} = 0.45$, giving $E_\mathrm{th,eff} = 5.23$\,MeV):
+electrons briefly spike above $T_c$ during the deposition pulse, but
+rapid electron-phonon equilibration pulls $T_e$ back below $T_c$ within
+$\lesssim 1\,\mu$s.  $\tau_\mathrm{TAT}$ is sub-microsecond.
+Energy resolution $\Delta E/E > 100\%$ --- this regime is not useful for
+spectroscopy.
+
+\paragraph{Regime~2 --- Bulk Heating ($E_\mathrm{dep} > 5.5$\,MeV).}
+The entire pixel (electrons + phonons + Ge absorber) heats above $T_c$.
+Cooling is Kapitza-limited ($\tau \sim C/G_K$) and $\tau_\mathrm{TAT}$
+scales quasi-linearly with $E_\mathrm{dep}$ % tat_sim_design.tex Eq. 10
+(tat\_sim\_design.tex Eq.~10).
+Energy resolution $\Delta E / E < 0.01\%$ in this regime --- excellent
+spectroscopic performance for dark-matter detection.
+
+\subsubsection{Transfer Function: $E_\mathrm{dep} \to \tau_\mathrm{TAT}$}
+\label{sec:oq5_tat_transfer}
+
+Table~\ref{tab:tat_transfer} shows the computed transfer function.
+Timing jitter is dominated by thermal fluctuations:
+$\delta\tau_\mathrm{thermal} = 1.39$\,ns
+($\delta T_\mathrm{rms} = \sqrt{k_B T^2 / C}$,
+Mather~(1982) Eq.~5 p.~1126~\cite{Mather1982}). % Mather1982 Eq. 5 p. 1126 (thermal fluctuation noise)
+TDC jitter (17.5\,ps,~\cite{Lim2025}) % Lim2025 Sec. 4
+is negligible compared to thermal fluctuations.
+
+\begin{table}[ht]
+\centering
+\caption{TAT transfer function: deposited energy vs.\ time-above-threshold and energy resolution.
+Bulk-heating regime ($E_\mathrm{dep} > 5.5$\,MeV) achieves $\Delta E/E < 0.01\%$.
+Source: sim\_TAT.py (Task~\#320, 2026-03-22).}
+\label{tab:tat_transfer}
+\small
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+$E_\mathrm{dep}$ [MeV] & $\tau_\mathrm{TAT}$ [$\mu$s] & $T_\mathrm{max}$ [K] & $\Delta E/E$ [\%] \\
+\midrule
+2.6  & 0.0001 & 15.8 & $\sim$169   \\
+3.2  & 0.0002 & 17.1 & $\sim$284   \\
+5.0  & 0.0005 & 19.4 & $\sim$0.02  \\
+5.6  & 1.7    & 20.0 & $\sim$0.01  \\
+7.7  & 10.8   & 21.7 & $<$0.01     \\
+10.7 & 20.5   & 23.4 & $<$0.01     \\
+22.7 & 48.1   & 27.6 & $<$0.01     \\
+67.0 & 109.1  & 34.8 & $<$0.01     \\
+197.6 & 222.0 & 44.0 & $<$0.01     \\
+522.9 & 415.4 & 54.4 & $<$0.01     \\
+\bottomrule
+\end{tabular}
+\end{table}
+% Source locator: sim_TAT.py output (Task #320); tat_sim_design.tex Eq. 10 (tau_TAT scaling)
+% Mather1982 Eq. 5 p. 1126 (delta_T_rms = sqrt(k_B T^2 / C) for thermal fluctuation noise)
+
+\subsubsection{Law~19 Overlay Figures: sim\_TAT Validation}
+\label{sec:oq5_tat_law19}
+
+Figure~\ref{fig:tat_law19_validation} shows the Law~19 validation overlay for
+sim\_TAT: computed $T_e(t)$ transients plotted against the analytical
+$\tau = C/G_K$ decay envelope, confirming that the bulk-heating regime
+thermalises on the expected timescale.
+Figure~\ref{fig:tat_transfer_function} shows the transfer function
+$\tau_\mathrm{TAT}(E_\mathrm{dep})$ and $\Delta E/E$ vs.\ $E_\mathrm{dep}$,
+with the two-regime boundary at $\sim$5.5\,MeV clearly resolved.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.90\textwidth]{simulations/sim_TAT_law19_validation}
+% Source: simulations/sim_TAT.py (Task #320, 2026-03-22)
+% Validation target: T_e(t) transient decay verified against analytical tau = C(T_c)/G_K = 29.3 us
+% Sidorova2020 Table III p.11 (tau_ep = 11.9-17.5 ps at 10K); Swartz1989 Table II p.627 (G_K AMM)
+\caption{Law~19 validation overlay for sim\_TAT.
+Upper panel: electron temperature $T_e(t)$ transients for four representative
+deposited energies.  The dashed black line marks $T_c = 15.7$\,K; the shaded
+region above $T_c$ is the TAT interval.
+Analytical decay envelope $T_c + \Delta T\,\exp(-t/\tau_\mathrm{thermal})$
+overlaid in grey, with $\tau_\mathrm{thermal} = C(T_c)/G_K = 29.3\,\mu$s
+(Richards~\cite{Richards1994} Sec.~I.A p.~2). % Richards1994 Sec. I.A p. 2
+Lower panel: $\tau_\mathrm{TAT}$ values extracted from the transients.
+\textbf{Experimental comparison:}
+Cherednichenko~(1997)~\cite{Cherednichenko1997} NbN/sapphire bolometer (3.5\,nm film) % Cherednichenko1997 (NbN/sapphire, hot-electron bolometer baseline)
+shows $\tau \sim 70$\,ps in the hot-electron regime where $G_\mathrm{ep}$ is the bottleneck.
+Our 200\,nm film has $G_\mathrm{ep} \gg G_K$ (ratio $= 36{,}500$), so the Kapitza
+boundary is the bottleneck, giving the much longer $\tau_\mathrm{thermal} = 29.3\,\mu$s
+consistent with the expected $d$-scaling.~\cite{Sidorova2020} % Sidorova2020 Table III p.11 (d-scaling of tau_ep)
+\textbf{Law~19 status:} WARN --- simulation verified; independent experimental transient data
+for 200\,nm NbN at this geometry is pending.}
+\label{fig:tat_law19_validation}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.90\textwidth]{simulations/sim_TAT_transfer_function}
+% Source: simulations/sim_TAT.py (Task #320, 2026-03-22)
+% Kapitza bottleneck: Swartz1989 Table II p.627 (G_K/A = 500 W/m^2/K, metal-dielectric at ~10K)
+% Babu2018 arXiv:1808.05073 (lambda_ep = 1.46, phonon DOS for NbN)
+\caption{Transfer function $\tau_\mathrm{TAT}(E_\mathrm{dep})$ and energy resolution
+$\Delta E/E$ vs.\ $E_\mathrm{dep}$ for the NbN D0 pixel.
+Left axis: $\tau_\mathrm{TAT}$ [$\mu$s] (log scale).
+Right axis: $\Delta E/E$ [\%].
+Two-regime boundary at $\sim$5.5\,MeV separates the electron-flash regime
+(poor resolution, $\Delta E/E > 100\%$) from the bulk-heating regime
+($\Delta E/E < 0.01\%$, excellent spectroscopic performance).
+The quasi-linear $\tau_\mathrm{TAT}(E_\mathrm{dep})$ scaling in the bulk-heating
+regime follows tat\_sim\_design.tex Eq.~(10).
+Kapitza conductance $G_K/A = 500$\,W\,m$^{-2}$\,K$^{-1}$
+(Swartz~\cite{Swartz1989} Table~II p.~627, acoustic mismatch model). % Swartz1989 Table II p.627
+Phonon coupling $\lambda_\mathrm{ep} = 1.46$ from Babu~\cite{Babu2018}. % Babu2018 arXiv:1808.05073 (tunneling data)
+Energy range: 100\,eV--100\,keV from the transfer function sweep; MeV regime from
+the threshold scan (Table~\ref{tab:tat_transfer}).}
+\label{fig:tat_transfer_function}
+\end{figure}
+
+\noindent\textbf{Law~19 status:} \textbf{WARN} --- Simulation figures produced and embedded.
+$T_e(t)$ transient reproduces the expected analytical decay $\tau = C/G_K$ to
+within the ODE solver tolerance.  Comparison to Cherednichenko~(1997) is qualitative
+(different film thickness and regime); quantitative experimental comparison for our
+200\,nm geometry is pending.
+Open flags: (a)~$\Sigma_\mathrm{ep} = 3\times 10^8$\,W\,m$^{-3}$\,K$^{-5}$ is an
+estimate [\textcolor{red}{NEEDREF: NbN-specific Sigma measurement}];
+(b)~$G_K/A = 500$\,W\,m$^{-2}$\,K$^{-1}$ is an AMM estimate
+[\textcolor{red}{NEEDREF: NbN/sapphire Kapitza measurement at 10--15\,K}];
+(c)~$\lambda_\mathrm{ep} = 1.46$ from Babu~\cite{Babu2018} % Babu2018 arXiv:1808.05073 (tunneling data, DFT alpha^2*F(omega))
+is for $T_c = 14$\,K NbN films; temperature dependence not modelled.
+
 \subsection{Readout Speed Mismatch: Thermal Recovery vs.\ CW-ODMR Integration}
 \label{sec:oq5_readout_mismatch}
 
