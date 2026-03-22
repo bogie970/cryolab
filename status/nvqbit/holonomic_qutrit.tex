@@ -113,7 +113,7 @@ compatible} with the NVQbit hyperfine tripod design without significant redesign
 \subsection{Route B: Sequential Holonomic Operations Spanning $\SU(3)$}
 \label{sec:sequential}
 
-The key insight from Vitanov (2012)~\cite{Vitanov2012} is that any $\SU(3)$ transformation % Vitanov2012 Sec. III.A Eq. 12: Givens decomposition theorem
+The key insight from Vitanov (2012)~\cite{Vitanov2012} is that any $\SU(3)$ transformation % Vitanov2012 Sec. III.A Eq. (12) p.4: U = R23·R12·R31, Givens decomposition of SU(3) qutrit
 of a tripod qutrit can be decomposed into a sequence of $\SU(2)$ rotations acting on
 2D subspaces:
 
@@ -124,8 +124,8 @@ of a tripod qutrit can be decomposed into a sequence of $\SU(2)$ rotations actin
 
 where $R_{ij}$ denotes a Givens rotation acting on the $(i,j)$ subspace. Each Givens
 rotation is itself an $\SU(2)$ element requiring 3 Euler angles, so an arbitrary $\SU(3)$
-transformation requires at most 9 parameters % Vitanov2012 Sec. III.A, after Eq. 13: "9 consecutive interaction steps are required"
-(matching $\dim[\SU(3)] = 8$ % Vitanov2012 Sec. II.B.2, after Eq. 8: "the total number of real independent parameters in Eq. (8) is eight, exactly as needed"
+transformation requires at most 9 parameters % Vitanov2012 Sec. III.A.1 p.4: "9 consecutive steps are required to construct an arbitrary SU(3) transformation of the qutrit by Givens rotations"
+(matching $\dim[\SU(3)] = 8$ % Vitanov2012 Sec. II.B.2 Eq. (8) p.3: "the total number of real independent parameters in Eq. (8) is eight, exactly as needed"
 plus a global phase)~\cite{Vitanov2012}.
 
 For the NVQbit tripod, each $R_{ij}$ is a $\UU(2)$ holonomy on the dark subspace formed by
@@ -134,10 +134,10 @@ $\Omega_3$) and runs a holonomic gate on the $\{\ket{g_1}, \ket{g_2}\}$ dark pai
 $R_{13}$ (decouple $\ket{g_2}$), then $R_{23}$ (decouple $\ket{g_1}$).
 
 \textbf{Practical count:} Vitanov shows that via Givens decomposition, at most
-\textbf{9 consecutive interaction steps} are needed. % Vitanov2012 Sec. II, Theorem 1
+\textbf{9 consecutive interaction steps} are needed. % Vitanov2012 Sec. III.A.1 p.4: "9 consecutive steps are required to construct an arbitrary SU(3) transformation of the qutrit by Givens rotations"
 Alternatively, using quantum
 Householder reflections, any $\SU(3)$ can be realized in \textbf{3 reflections, each
-requiring a single interaction step}, reducing the total to 3 steps~\cite{Vitanov2012}. % Vitanov2012 Sec. III, Theorem 2
+requiring a single interaction step}, reducing the total to 3 steps~\cite{Vitanov2012}. % Vitanov2012 Sec. III.B.2 p.5: "allow one to produce an arbitrary preselected SU(3) transform of a tripod qutrit in only 3 physical steps"
 The discrete Fourier transform on a qutrit requires 7 Givens steps or just \textbf{2 physical steps (Householder reflection + phase gate)}. % Vitanov2012 Sec. III.B.3 Eq. 25: F = i\Phi_1(-2\pi/3)M(\chi;2\pi/3); interaction sets Eqs. 26a--26b confirm two steps
 
 \textbf{NV feasibility:} This is the most natural route for NVQbit. The tripod

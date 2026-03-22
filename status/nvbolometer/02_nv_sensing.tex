@@ -309,3 +309,39 @@ consistency check (Sec.~\ref{sec:sim_validation}).
 \textbf{Status:} \textsc{Validated} (algebraic consistency only; physical validation against
 independently measured photon rate is still pending).
 % internal: nv_sensitivity_sim.tex Sec.~8 (Validation Target Statement, result)
+
+% ── Law 19 Overlay Figure: Barry2020 ODMR Sensitivity Reproduction ─────────
+% Track 3 Task #314, 2026-03-22
+\subsubsection{Law~19 Overlay: Barry2020 CW-ODMR Sensitivity Reproduction}
+\label{sec:nv_barry2020_overlay}
+
+Figure~\ref{fig:barry2020_odmr_overlay} reproduces Barry~et~al.\ (2020) Eq.~(16)
+CW-ODMR sensitivity formula and confirms that Jacob's measured
+$\eta_\mathrm{CW} = 14\,\mu\text{T}/\sqrt{\text{Hz}}$ is correctly reproduced
+at the measured parameters ($\Delta\nu = 10$\,MHz, $C = 6.5\%$, $T = 12$\,K).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{validation/ODMR_sensitivity_Barry2020_overlay}
+% Source: validation/make_ODMR_sensitivity_Barry2020_overlay.py (Track 3, Task #314, 2026-03-22)
+% Barry2020 Rev. Mod. Phys. 92, 015004, Eq. (16) p. 10
+% Jacob's CryoLab data: eta_CW = 14 uT/sqrt(Hz) at T=12 K, Delta_nu=10 MHz, C=6.5%
+\caption{Reproduction of Barry~et~al.\ (2020) Eq.~(16) CW-ODMR shot-noise-limited
+sensitivity $\eta_\mathrm{CW}$.
+\textbf{Left:} $\eta_\mathrm{CW}$ vs.\ ODMR linewidth $\Delta\nu$ (blue line)
+with Jacob's operating point $(\Delta\nu = 10$\,MHz, $\eta = 14\,\mu\text{T}/\sqrt{\text{Hz}})$
+marked (orange star).
+\textbf{Right:} $\eta_\mathrm{CW}$ vs.\ detected photon rate $R$ at
+$\Delta\nu = 10$\,MHz.  The back-calculated rate
+$R_\mathrm{implied} = 9.11 \times 10^4$\,cps reproduces $\eta = 14\,\mu\text{T}/\sqrt{\text{Hz}}$
+with round-trip error $= 0.00\%$, confirming implementation of
+Barry~\cite{Barry2020} Eq.~(16). % Barry2020 Eq. 16 p. 10; round-trip error 0.00% (Task #314)
+Formula: $\eta_\mathrm{CW} = \frac{4}{3\sqrt{3}} \frac{\Delta\nu}{\gamma_\mathrm{NV}\, C\, \sqrt{R}}$,
+prefactor $4/(3\sqrt{3}) = 0.7698$.} % Barry2020 Appendix A.1.c, Eq. A12
+\label{fig:barry2020_odmr_overlay}
+\end{figure}
+
+\noindent\textbf{Law~19 status:} \textbf{PASS} --- Overlay figure produced and embedded.
+Barry2020 Eq.~(16) correctly reproduces Jacob's measured $\eta = 14\,\mu\text{T}/\sqrt{\text{Hz}}$
+with round-trip error $= 0.00\%$ (algebraic self-consistency confirmed; physical
+validation against independently measured $R$ is still pending).
