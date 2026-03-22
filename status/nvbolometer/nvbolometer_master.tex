@@ -44,7 +44,8 @@
 
 % \needref: marks a claim whose supporting PDF is not yet in references/
 % Use this wherever a spec or fact needs a citation that isn't in hand.
-\newcommand{\needref}[1]{\textcolor{red}{\textbf{[PENDING: #1]}}}
+% \detokenize handles underscores in argument keys without triggering math mode.
+\newcommand{\needref}[1]{\textcolor{red}{\textbf{[PENDING: \texttt{\detokenize{#1}}]}}}
 
 \hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
 
@@ -84,6 +85,7 @@
 \input{sections/15_dm_parameter_space}
 \input{sections/16_d0_experimental_roadmap}
 \input{sections/17_pline_architecture}
+\input{sections/18_epifluorescence_design}
 
 \nocite{placeholder_skeleton}
 \bibliographystyle{unsrt}
