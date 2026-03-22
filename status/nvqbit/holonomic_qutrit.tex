@@ -105,7 +105,7 @@ quantum holonomy.
 \textbf{NV feasibility of a tetrapod:} The NV center in the $m_s = 0$ manifold has only 3
 hyperfine sublevels ($m_I = -1, 0, +1$). To form a tetrapod, one would need a 4th ground
 state --- for example by including a sublevel from $m_s = -1$. However, the $m_s = 0$ and
-$m_s = -1$ manifolds are separated by $D \approx 2.87$~GHz~\cite{Doherty2013}, and mixing
+$m_s = -1$ manifolds are separated by $D \approx 2.87$~GHz~\cite{Doherty2013}, % Smeltzer2009 p.1 (D = 2.87 GHz zero-field splitting) and mixing
 them into a single computational register sacrifices the protection afforded by the
 $m_s = 0$ encoding (nuclear spin coherence). This route is \textbf{not naturally
 compatible} with the NVQbit hyperfine tripod design without significant redesign.
@@ -146,7 +146,7 @@ one can select any 2-of-3 ground state pair as the active dark subspace. Each pa
 holonomic gate uses the existing adiabatic protocol. The cost is that a full $\SU(3)$
 gate requires $\sim$3 sequential holonomic loops, each with its own adiabatic
 evolution time $T_{\text{loop}} \sim 10$--$100~\mu$s. Total gate time: $\sim
-30$--$300~\mu$s, well within the nuclear $T_2 \approx 10$~ms
+30$--$300~\mu$s, well within the nuclear $T_2 \approx 10$~ms % Pfender2017 Fig. 3 (T_2 coherence time measurements: 25 ± 10 ms)
 budget~\cite{Pfender2017}.
 
 \textbf{This route is recommended as the primary qutrit gate strategy for NVQbit.}
@@ -174,7 +174,7 @@ on the \emph{electron} spin-1 manifold, not the nuclear hyperfine manifold used 
 Adapting NHQC to the $^{14}$N hyperfine qutrit ($m_I = -1, 0, +1$ within $m_s = 0$)
 would require RF-driven transitions between nuclear sublevels --- feasible in principle
 (Smeltzer et al.\ demonstrated coherent RF Rabi on $^{14}$N~\cite{Smeltzer2009}), but
-the slower nuclear Rabi frequencies ($\sim 30$~kHz) mean that ``fast'' non-adiabatic gates
+the slower nuclear Rabi frequencies ($\sim 30$~kHz) % Smeltzer2009 p.2 Eq. Fig. 4a (measured Rabi frequencies for ^14N nuclear spin ~30 kHz) mean that ``fast'' non-adiabatic gates
 may not offer a speed advantage over adiabatic holonomic gates on this platform.
 
 \subsection{Summary of Routes}
