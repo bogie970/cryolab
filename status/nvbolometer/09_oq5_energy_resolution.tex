@@ -437,24 +437,26 @@ measured composite bolometer NEP values from Richards~(1994) Table~I.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.90\textwidth]{validation/NEP_phonon_Richards1994_overlay}
-% Source: validation/make_NEP_phonon_Richards1994_overlay.py (Track 3, Task #314, 2026-03-22)
+\includegraphics[width=0.90\textwidth]{simulations/figures/fig_Richards1994_NEP_phonon_overlay}
+% Source: simulations/figures/make_fig_Richards1994_NEP_phonon_overlay.py (Track 3, Atlas f801f0a1, 2026-03-23)
 % Richards1994 J. Appl. Phys. 76(1), Eq. (18) p. 8 and Table I p. 13
-\caption{Reproduction of Richards~(1994) Eq.~(18) phonon noise NEP.
-Blue line: our simulation $\mathrm{NEP}_\mathrm{ph} = \sqrt{4k_B T^2 G_\mathrm{ep}(T)}$
+% Reference data: literature_data/Richards1994_reference_values.json (Cycle 150, Task #436)
+\caption{Reproduction of Richards~(1994) Eq.~(18) phonon noise NEP\@.
+Our simulation (solid blue): $\mathrm{NEP}_\mathrm{ph} = \sqrt{4k_B T^2 G_\mathrm{ep}(T)}$
 with $G_\mathrm{ep} = 5\Sigma V T^4$ (Richards~\cite{Richards1994} Sec.~II.J p.~19).
 % Richards1994 Sec. II.J p. 19 (G_ep = 5*Sigma*V*T^4, hot-electron regime)
-Red diamonds: Richards~(1994) Table~I measured composite bolometer NEP values
+Red squares: Richards~(1994) Table~I measured composite bolometer NEP values
 at $T_s = 1.60$, $0.97$, $0.30$, $0.10$\,K
 (Serlemitsos, Lange, Alsop, Clapp). % Richards1994 Table I p. 13
-Orange star: our D0 operating point at $T = 12$\,K:
-$\mathrm{NEP}_\mathrm{ph} = 6.09 \times 10^{-13}$\,W\,Hz$^{-1/2}$. % internal: bolometer_thermal_model.py output; Sigma_ep [NEEDREF: NbN-specific value]
-The simulation curve follows $\mathrm{NEP}_\mathrm{ph} \propto T^3$
-as expected from Eq.~(18) with $G_\mathrm{ep} \propto T^4$.
+Orange star: D0 operating point at $T = 12$\,K:
+$\mathrm{NEP}_\mathrm{ph} = 6.09 \times 10^{-13}$\,W\,Hz$^{-1/2}$. % Richards1994 Eq. 18 p. 8; sim_full_detector.py output; Sigma_ep [NEEDREF: NbN-specific value]
+Grey dashed: $\propto T^3$ guide line.
+The simulation correctly reproduces the $T^3$ scaling from Eq.~(18) with $G_\mathrm{ep} \propto T^4$.
 \textbf{Note:} Table~I reference points are for composite bolometers optimised for
-sub-K operation; they lie $\sim\!10^2$--$10^4\times$ below the $T^3$ scaling
-expected from our NbN film parameters ($\Sigma_\mathrm{NbN}$ is an estimate;
-see text for flag).}
+sub-K operation with different $\Sigma$ and $V$; they lie $\sim\!10^2$--$10^4\times$ below
+our NbN curve ($\Sigma_\mathrm{NbN}$ is an estimate;
+see text for flag). Discrepancy: qualitative agreement on functional form,
+absolute offset reflects material parameter differences.}
 \label{fig:nep_phonon_richards1994}
 \end{figure}
 

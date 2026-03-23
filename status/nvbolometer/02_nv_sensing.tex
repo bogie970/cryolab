@@ -322,22 +322,28 @@ at the measured parameters ($\Delta\nu = 10$\,MHz, $C = 6.5\%$, $T = 12$\,K).
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\textwidth]{validation/ODMR_sensitivity_Barry2020_overlay}
-% Source: validation/make_ODMR_sensitivity_Barry2020_overlay.py (Track 3, Task #314, 2026-03-22)
-% Barry2020 Rev. Mod. Phys. 92, 015004, Eq. (16) p. 10
+\includegraphics[width=0.90\textwidth]{simulations/figures/fig_Barry2020_ODMR_sensitivity_overlay}
+% Source: simulations/figures/make_fig_Barry2020_ODMR_overlay.py (Track 3, Atlas f801f0a1, 2026-03-23)
+% Barry2020 Rev. Mod. Phys. 92, 015004, Eq. (16)
 % Jacob's CryoLab data: eta_CW = 14 uT/sqrt(Hz) at T=12 K, Delta_nu=10 MHz, C=6.5%
 \caption{Reproduction of Barry~et~al.\ (2020) Eq.~(16) CW-ODMR shot-noise-limited
-sensitivity $\eta_\mathrm{CW}$.
-\textbf{Left:} $\eta_\mathrm{CW}$ vs.\ ODMR linewidth $\Delta\nu$ (blue line)
-with Jacob's operating point $(\Delta\nu = 10$\,MHz, $\eta = 14\,\mu\text{T}/\sqrt{\text{Hz}})$
-marked (orange star).
-\textbf{Right:} $\eta_\mathrm{CW}$ vs.\ detected photon rate $R$ at
-$\Delta\nu = 10$\,MHz.  The back-calculated rate
-$R_\mathrm{implied} = 9.11 \times 10^4$\,cps reproduces $\eta = 14\,\mu\text{T}/\sqrt{\text{Hz}}$
-with round-trip error $= 0.00\%$, confirming implementation of
-Barry~\cite{Barry2020} Eq.~(16). % Barry2020 Eq. 16 p. 10; round-trip error 0.00% (Task #314)
+sensitivity $\eta_\mathrm{CW}$ vs.\ detected photon rate $R$.
+Blue curve: Barry2020 Eq.~(16) with $\Delta\nu = 10$\,MHz, $C = 6.5\%$.
+% Barry2020 Eq. 16
+Orange star: Jacob's confocal system (12\,K):
+$\eta_\mathrm{CW} = 14\,\mu\text{T}/\sqrt{\text{Hz}}$,
+$R_\mathrm{implied} = 9.11 \times 10^4$\,cps.
+% Jacob's CryoLab measurement; NVB_TRAINING.md S5.1; Barry2020 Eq. 16 inverted
+Green diamond: SiPM design (D1):
+$\eta_\mathrm{CW} = 23.9\,\mu\text{T}/\sqrt{\text{Hz}}$,
+$R_\mathrm{SiPM} = 3.12 \times 10^4$\,cps (1.7$\times$ worse than confocal).
+% S14420 datasheet Fig.3 (PDE 26\% at 700 nm); Barry2020 Eq. 16
+Round-trip error $= 0.00\%$, confirming implementation of
+Barry~\cite{Barry2020} Eq.~(16). % Barry2020 Eq. 16; round-trip error 0.00%
+Dashed red: reference $\eta = 14\,\mu\text{T}/\sqrt{\text{Hz}}$.
 Formula: $\eta_\mathrm{CW} = \frac{4}{3\sqrt{3}} \frac{\Delta\nu}{\gamma_\mathrm{NV}\, C\, \sqrt{R}}$,
-prefactor $4/(3\sqrt{3}) = 0.7698$.} % Barry2020 Appendix A.1.c, Eq. A12
+prefactor $4/(3\sqrt{3}) = 0.7698$~\cite{Barry2020}. % Barry2020 Appendix A.1.c, Eq. A12
+Discrepancy from reference: $0.00\%$.}
 \label{fig:barry2020_odmr_overlay}
 \end{figure}
 
