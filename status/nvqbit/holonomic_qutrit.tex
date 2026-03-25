@@ -105,7 +105,7 @@ quantum holonomy.
 \textbf{NV feasibility of a tetrapod:} The NV center in the $m_s = 0$ manifold has only 3
 hyperfine sublevels ($m_I = -1, 0, +1$). To form a tetrapod, one would need a 4th ground
 state --- for example by including a sublevel from $m_s = -1$. However, the $m_s = 0$ and
-$m_s = -1$ manifolds are separated by $D \approx 2.87$~GHz~\cite{Doherty2013}, % Smeltzer2009 p.1 (D = 2.87 GHz zero-field splitting) and mixing
+$m_s = -1$ manifolds are separated by $D \approx 2.87$~GHz~\cite{Doherty2013}, % Doherty2013 (NV ground-state ZFS D = 2.87 GHz) and mixing
 them into a single computational register sacrifices the protection afforded by the
 $m_s = 0$ encoding (nuclear spin coherence). This route is \textbf{not naturally
 compatible} with the NVQbit hyperfine tripod design without significant redesign.
@@ -174,7 +174,7 @@ on the \emph{electron} spin-1 manifold, not the nuclear hyperfine manifold used 
 Adapting NHQC to the $^{14}$N hyperfine qutrit ($m_I = -1, 0, +1$ within $m_s = 0$)
 would require RF-driven transitions between nuclear sublevels --- feasible in principle
 (Smeltzer et al.\ demonstrated coherent RF Rabi on $^{14}$N~\cite{Smeltzer2009}), but
-the slower nuclear Rabi frequencies ($\sim 30$~kHz) % Smeltzer2009 p.2 Eq. Fig. 4a (measured Rabi frequencies for ^14N nuclear spin ~30 kHz) mean that ``fast'' non-adiabatic gates
+the slower nuclear Rabi frequencies ($\sim 30$~kHz) % Smeltzer2009 Fig.2j (^14N Rabi nutation, Omega=32.9 kHz; ms=-1 manifold, B=509G) mean that ``fast'' non-adiabatic gates
 may not offer a speed advantage over adiabatic holonomic gates on this platform.
 
 \subsection{Summary of Routes}
@@ -670,9 +670,11 @@ M.~Pfender \textit{et al.},
 Nat.\ Commun.\ \textbf{8}, 834 (2017).
 
 \bibitem{Smeltzer2009}
-B.~Smeltzer, L.~Childress, and A.~Gali,
-``$^{13}$C hyperfine interactions in the nitrogen-vacancy centre in diamond,''
-New J.\ Phys.\ \textbf{13}, 025021 (2011).
+B.~Smeltzer, J.~McIntyre, and L.~Childress,
+``Robust control of individual nuclear spins in diamond,''
+Phys.\ Rev.\ A \textbf{80}, 032322 (2009).
+% PDF: NVQbit/literature/Smeltzer_2009_Nuclear_Spin_Control.pdf; arXiv:0909.3896v1
+% Fig.~2j: $^{14}$N Rabi nutation ($m_s=-1$, $B=509$\,G), $\Omega=32.9$\,kHz
 
 \bibitem{Vitanov2017}
 L.~S.~Simeonov and N.~V.~Vitanov,
