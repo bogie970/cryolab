@@ -146,7 +146,7 @@ one can select any 2-of-3 ground state pair as the active dark subspace. Each pa
 holonomic gate uses the existing adiabatic protocol. The cost is that a full $\SU(3)$
 gate requires $\sim$3 sequential holonomic loops, each with its own adiabatic
 evolution time $T_{\text{loop}} \sim 10$--$100~\mu$s. Total gate time: $\sim
-30$--$300~\mu$s, well within the nuclear $T_2 \approx 10$~ms % Pfender2017 Fig. 3 (T_2 coherence time measurements: 25 ± 10 ms)
+30$--$300~\mu$s, well within the nuclear $T_2 \approx 10$~ms % Pfender2017 p.3 text: "T2 ≈ 10 ms" for NV- charge state (limited by electron spin longitudinal relaxation via hyperfine). Note: Pfender2017 Fig.3 shows T2 = 25±10 ms for NV+ charge state (electron spin-less) — a different experimental condition; NVQbit operates in NV-.
 budget~\cite{Pfender2017}.
 
 \textbf{This route is recommended as the primary qutrit gate strategy for NVQbit.}
@@ -375,8 +375,8 @@ For the $^{14}$N nuclear spin in $m_s = 0$~\cite{Pfender2017}:
   \item \textbf{$T_1$ (nuclear):} Minutes at high field ($\sim 1$~T). At lower fields
     ($\sim 50$~G, NVQbit operating regime), $T_1$ is limited by electron $T_1$
     fluctuations via hyperfine coupling. Expected: $T_1^{(\text{nuc})} \gg T_2^{(\text{nuc})}$.
-  \item \textbf{$T_2$ (nuclear):} $\approx 10$~ms in NV$^-$~\cite{Pfender2017}. This
-    applies to \emph{all} nuclear coherences ($m_I = 0 \leftrightarrow \pm 1$ and
+  \item \textbf{$T_2$ (nuclear):} $\approx 10$~ms in NV$^-$~\cite{Pfender2017}. % Pfender2017 p.3 text: "T2 ≈ 10 ms" for NV- (limited by electron spin longitudinal relaxation via hyperfine coupling). Distinct from Fig.3 which shows T2 = 25±10 ms for NV+ (electron spin-less charge state; not the NVQbit operating regime).
+    This applies to \emph{all} nuclear coherences ($m_I = 0 \leftrightarrow \pm 1$ and
     $m_I = +1 \leftrightarrow -1$) approximately equally, since all three levels reside
     in the same $m_s = 0$ manifold and experience similar magnetic noise environments.
 \end{itemize}
@@ -396,7 +396,7 @@ The critical comparison is gate time vs.\ coherence time:
 Gate: single-register operation & 1 holonomic loop & 3 holonomic loops \\
 Loop time & $10$--$100~\mu$s & $10$--$100~\mu$s (each) \\
 Total gate time & $10$--$100~\mu$s & $30$--$300~\mu$s \\
-Coherence time ($T_2^{(\text{nuc})}$) & $\approx 10$~ms & $\approx 10$~ms \\
+Coherence time ($T_2^{(\text{nuc})}$) & $\approx 10$~ms & $\approx 10$~ms \\ % Pfender2017 p.3: NV- charge state; Fig.3 (25±10 ms) is NV+ — different condition
 Margin ($T_2$/gate) & $\sim 100\text{--}1000\times$ & $\sim 33\text{--}333\times$ \\
 \bottomrule
 \end{tabular}
@@ -404,8 +404,8 @@ Margin ($T_2$/gate) & $\sim 100\text{--}1000\times$ & $\sim 33\text{--}333\times
 
 \textbf{Assessment:} The qutrit encoding reduces the coherence margin by a factor of
 $\sim 3\times$ compared to the qubit encoding, but the margin remains $\gg 1$. The
-nuclear $T_2 \approx 10$~ms gives $\sim 33$--$333\times$ headroom even for a full
-$\SU(3)$ gate. Decoherence is \textbf{not a showstopper} for the qutrit encoding.
+nuclear $T_2 \approx 10$~ms (NV$^-$ regime, \cite{Pfender2017}) % Pfender2017 p.3: NV- T2≈10ms; not to be confused with NV+ Fig.3 value of 25±10ms
+gives $\sim 33$--$333\times$ headroom even for a full $\SU(3)$ gate. Decoherence is \textbf{not a showstopper} for the qutrit encoding.
 
 The dominant concern is not $T_2$ per se but \textbf{accumulated gate error}: each
 holonomic loop has finite fidelity ($\sim 96\%$ per gate in Nagata et al.'s electron-spin
@@ -420,7 +420,8 @@ nuclear-hyperfine qutrit operates in an entirely different physical regime: RF-d
 ($\Omega_{RF}/2\pi \approx 32.9$~kHz Rabi, $\sim 3$~orders of magnitude slower),
 requires a finite bias field ($B \sim 30$~G), and encodes the qubit in the $^{14}$N
 nuclear spin rather than the electron spin. Decoherence mechanisms (nuclear $T_2 \approx
-10$~ms vs.\ electron $T_2 \sim \mu$s) and coupling strengths differ substantially.
+10$~ms in NV$^-$ \cite{Pfender2017}% Pfender2017 p.3: T2≈10ms for NV- operating regime; NV+ gives 25±10ms (Fig.3) but NVQbit uses NV-
+\ vs.\ electron $T_2 \sim \mu$s) and coupling strengths differ substantially.
 The estimate $0.96^3 \approx 88.5\%$ should therefore be treated as an \emph{optimistic
 floor} derived from a different physical system, not a prediction for the NVQbit qutrit
 implementation. A dedicated fidelity analysis for the nuclear-hyperfine RF-driven regime
