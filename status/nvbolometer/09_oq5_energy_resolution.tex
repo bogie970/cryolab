@@ -533,8 +533,8 @@ $\gamma_V$ (Sommerfeld) & 600 & J\,m$^{-3}$\,K$^{-2}$ & Sidorova2020 Table~III p
 % Sidorova2020 Table III p.11
 $\lambda_\mathrm{ep}$ & 1.46 & dimensionless & Babu2018 arXiv:1808.05073 (tunneling data, $T_c = 14$\,K NbN films) \\
 % Babu2018 arXiv:1808.05073 (DFT alpha^2*F(omega), tunneling data; lambda_ep value)
-$G_K/A$ & 500 & W\,m$^{-2}$\,K$^{-1}$ & Swartz1989 Table~II p.627 (metal-dielectric at $\sim$10\,K, AMM) \\
-% Swartz1989 Table II p.627 (acoustic mismatch model range for metal-dielectric at ~10K)
+$G_K/A$ & 500 & W\,m$^{-2}$\,K$^{-1}$ & Swartz1989 Table~II p.624 (metal-dielectric at $\sim$10\,K, AMM) \\
+% Swartz1989 Table II p.624 (acoustic mismatch model range for metal-dielectric at ~10K)
 $G_K$ (total) & $3.75 \times 10^{-9}$ & W\,K$^{-1}$ & derived: $G_K/A \times A_\mathrm{film}$ \\
 % derived from G_K/A * A_film = 500 * 7.5e-12 = 3.75e-9 W/K
 $G_\mathrm{ep}(T_c)$ & $1.37 \times 10^{-4}$ & W\,K$^{-1}$ & Richards1994 \S II.J p.19 ($G_\mathrm{ep} = 5\Sigma V T^4$) \\
@@ -555,11 +555,11 @@ The simulation reveals a strong thermal hierarchy:
   \quad \Rightarrow \quad
   G_\mathrm{ep}/G_K = 36{,}500.
 \]
-% Sidorova2020 Table III p.11 (tau_ep = 11.9-17.5 ps at 10K); Swartz1989 Table II p.627
+% Sidorova2020 Table III p.11 (tau_ep = 11.9-17.5 ps at 10K); Swartz1989 Table II p.624
 The electron-phonon subsystem equilibrates nearly instantaneously
 ($\tau_\mathrm{ep} \approx 15$\,ps~\cite{Sidorova2020}), % Sidorova2020 Table III p.11
 while the dominant cooling pathway is the phonon-to-substrate Kapitza
-conductance~\cite{Swartz1989}. % Swartz1989 Table II p.627
+conductance~\cite{Swartz1989}. % Swartz1989 Table II p.624
 The characteristic thermal time constant of the film is:
 \begin{equation}
   \tau_\mathrm{thermal} = \frac{C(T_c)}{G_K} = 29.3\,\mu\mathrm{s}.
@@ -643,7 +643,7 @@ with the two-regime boundary at $\sim$5.5\,MeV clearly resolved.
 \includegraphics[width=0.90\textwidth]{simulations/sim_TAT_law19_validation}
 % Source: simulations/sim_TAT.py (Task #320, 2026-03-22)
 % Validation target: T_e(t) transient decay verified against analytical tau = C(T_c)/G_K = 29.3 us
-% Sidorova2020 Table III p.11 (tau_ep = 11.9-17.5 ps at 10K); Swartz1989 Table II p.627 (G_K AMM)
+% Sidorova2020 Table III p.11 (tau_ep = 11.9-17.5 ps at 10K); Swartz1989 Table II p.624 (G_K AMM)
 \caption{Law~19 validation overlay for sim\_TAT.
 Upper panel: electron temperature $T_e(t)$ transients for four representative
 deposited energies.  The dashed black line marks $T_c = 15.7$\,K; the shaded
@@ -667,7 +667,7 @@ for 200\,nm NbN at this geometry is pending.}
 \centering
 \includegraphics[width=0.90\textwidth]{simulations/sim_TAT_transfer_function}
 % Source: simulations/sim_TAT.py (Task #320, 2026-03-22)
-% Kapitza bottleneck: Swartz1989 Table II p.627 (G_K/A = 500 W/m^2/K, metal-dielectric at ~10K)
+% Kapitza bottleneck: Swartz1989 Table II p.624 (G_K/A = 500 W/m^2/K, metal-dielectric at ~10K)
 % Babu2018 arXiv:1808.05073 (lambda_ep = 1.46, phonon DOS for NbN)
 \caption{Transfer function $\tau_\mathrm{TAT}(E_\mathrm{dep})$ and energy resolution
 $\Delta E/E$ vs.\ $E_\mathrm{dep}$ for the NbN D0 pixel.
@@ -679,7 +679,7 @@ Two-regime boundary at $\sim$5.5\,MeV separates the electron-flash regime
 The quasi-linear $\tau_\mathrm{TAT}(E_\mathrm{dep})$ scaling in the bulk-heating
 regime follows tat\_sim\_design.tex Eq.~(10).
 Kapitza conductance $G_K/A = 500$\,W\,m$^{-2}$\,K$^{-1}$
-(Swartz~\cite{Swartz1989} Table~II p.~627, acoustic mismatch model). % Swartz1989 Table II p.627
+(Swartz~\cite{Swartz1989} Table~II p.~627, acoustic mismatch model). % Swartz1989 Table II p.624
 Phonon coupling $\lambda_\mathrm{ep} = 1.46$ from Babu~\cite{Babu2018}. % Babu2018 arXiv:1808.05073 (tunneling data)
 Energy range: 100\,eV--100\,keV from the transfer function sweep; MeV regime from
 the threshold scan (Table~\ref{tab:tat_transfer}).}
